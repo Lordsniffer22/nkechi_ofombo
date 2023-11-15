@@ -110,7 +110,7 @@ while IFS= read -r line; do
     print_center -ama "(Press enter to Skip if you dont have one)"
     msg -bar3
     echo ""
-    read "DOMAIN: " domain
+    read -p "DOMAIN: " domain
     sleep 2
     if [ -z "$domain" ]; then
       echo "You did not enter a domain"
