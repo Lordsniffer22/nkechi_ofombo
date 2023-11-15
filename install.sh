@@ -98,30 +98,30 @@ echo ""
 read -p "ENTER KEY : " kufulu
 msg -bar3
 sleep 3
+clear
+echo ""
+print_center -ama  "YOU NEED TO SPECIFY A DOMAIN/Subdomain"
+print_center -ama "(Press enter to Skip if you dont have one)"
+msg -bar3
+echo ""
+read -p "DOMAIN: " domain
+sleep 2
+if [ -z "$domain" ]; then
+  echo "You did not enter a domain"
+  sleep 1
+  echo "Your Default Server IP will be exposed"
+  sleep 2
+else
+  echo "You entered $domain"
+  echo "$domain" > domain.txt
+  sleep 2
+fi
 time_count 3
 # Check if the answer is valid
 while IFS= read -r line; do
   if [ "$kufulu" == "$line" ]; then
     echo "Confirmed ✅"
     sleep 2
-    clear
-    echo ""
-    print_center -ama  "YOU NEED TO SPECIFY A DOMAIN/Subdomain"
-    print_center -ama "(Press enter to Skip if you dont have one)"
-    msg -bar3
-    echo ""
-    read -p "DOMAIN: " domain
-    sleep 2
-    if [ -z "$domain" ]; then
-      echo "You did not enter a domain"
-      sleep 1
-      echo "Your Default Server IP will be exposed"
-      sleep 2
-    else
-      echo "You entered $domain"
-      echo "$domain" > domain.txt
-      sleep 2
-    fi
     print_center -verd "╭════════════════════════════╮"
     print_center -verd "├⇝Verification Successful⇴ "
     print_center -verd "├⇝Tesla Says⇴ Thank you! "
