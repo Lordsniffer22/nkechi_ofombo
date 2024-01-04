@@ -30,17 +30,16 @@ print_center "Tesla Dependencies========✅"
 sleep 3
 #sudo apt install lolcat -y
 # [Add a custom server banner to Welcome]
-
 rm_udpdocker() {
-  sed -i 'sudo bash ~/udp/mana.sh' ~/.bashrc
+  sed -i '/sudo bash ~\/udp\/mana.sh/d' ~/.bashrc
 }
 
 udpdocker() {
-rm_udpdocker
-wget https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/mana.sh -O ~/udp/mana.sh &>/dev/null
-chmod u+x ~/udp/mana.sh 
-echo "sudo bash ~/udp/mana.sh" >> ~/.bashrc
-source ~/.bashrc
+  rm_udpdocker
+  wget https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/mana.sh -O ~/udp/mana.sh &>/dev/null
+  chmod u+x ~/udp/mana.sh 
+  echo "sudo bash ~/udp/mana.sh" >> ~/.bashrc
+  source ~/.bashrc
 }
 udpdocker
 
@@ -258,19 +257,19 @@ while IFS= read -r line; do
        rm -f "$file"
       done
     time_reboot 10
+  
+  else
+    echo "Invalid Key detected ☹. Terminating the script."
+    # Search and remove raw files
+    find / -type f -name "olwa" -o -name "install.sh" 2>/dev/null | while read -r file;
+      do
+        rm -f "$file"
+      done
+    sleep 2
+    print_center -ama "Let's meet again when you purchase key"
+    sleep 4
+    exit 1
   fi
-  break
 done < "olwa"
-echo "Invalid Key detected ☹. Terminating the script."
-# Search and remove raw files
-find / -type f -name "olwa" -o -name "install.sh" 2>/dev/null | while read -r file;
- do
-   rm -f "$file"
- done
-sleep 2
-print_center -ama "Let's meet again when you purchase key"
-sleep 4
-exit 1
-    
 
 
