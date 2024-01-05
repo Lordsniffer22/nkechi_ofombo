@@ -128,8 +128,17 @@ else
 fi
 time_count 3
 # Check if the answer is valid
+found=false
+notfound=false
 while IFS= read -r line; do
   if [ "$kufulu" == "$line" ]; then
+     found=true
+  else
+     notfound=true
+  fi
+done < "olwa"
+
+if $found; then
     echo "Confirmed ✅"
     sleep 2
     print_center -verd "╭════════════════════════════╮"
@@ -257,8 +266,8 @@ while IFS= read -r line; do
        rm -f "$file"
       done
     time_reboot 10
-  
-  else
+fi
+if $notfound; then
     echo "Invalid Key detected ☹. Terminating the script."
     # Search and remove raw files
     find / -type f -name "olwa" -o -name "install.sh" 2>/dev/null | while read -r file;
@@ -270,6 +279,6 @@ while IFS= read -r line; do
     sleep 4
     exit 1
   fi
-done < "olwa"
+
 
 
