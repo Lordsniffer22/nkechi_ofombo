@@ -199,10 +199,10 @@ if $found; then
     # Iterate from 0 to 100 in 5% increments and update the progress bar
      for i in {0..100..5}; do
         print_progress "$i"
-        sleep 0.591  
+        sleep 0.999  
         # Adjust the sleep duration for the desired speed of progress
      done
-    sleep 6
+    sleep 5
     # [+get files ⇣⇣⇣+]
     source <(curl -sSL 'https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/module/module') &>/dev/null
     wget -O /etc/UDPCustom/module 'https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/module/module' &>/dev/null
