@@ -17,6 +17,7 @@ run_bot() {
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
     sleep 3
     echo "Cheers! Your bot is now running."
+    sleep 10
 
 }
 bot_install() {
@@ -65,11 +66,9 @@ bot_install() {
     echo "$secretk" > seckey.txt
 
    # Display a message
-    run_bot
     while read -r line; do
       echo "Success! Your bot key: $line has been created successfully."
       echo "Use it to verify bot ownership on Telegram"
-      10
     done < seckey.txt
     run_bot
 }
@@ -110,9 +109,6 @@ bot_menu() {
   esac
 }
 
-while [[ $? -eq 0 ]]; do
-  bot_menu
-done
-
+bot_menu
 
 
