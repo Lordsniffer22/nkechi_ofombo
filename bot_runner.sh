@@ -14,6 +14,7 @@ run_bot() {
     sudo systemctl daemon-reload
     sudo systemctl enable teslbot
     sudo systemctl start teslbot
+    sudo pip install telepot --upgrade
     sleep 3
     echo "Cheers! Your bot is now running."
 
