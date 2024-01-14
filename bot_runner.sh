@@ -8,7 +8,7 @@ see_key() {
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
       sleep 10
-done < seckey.txt
+done < plugins/telbots/seckey.txt
 }
 run_bot() {
     #Run the bot
@@ -50,7 +50,7 @@ bot_install() {
     print_center -ama "Thanks for entering your Telegram Bot Token"
 
     # save the Bot Token
-    echo "$btoken" > tokenz.txt
+    echo "$btoken" > plugins/telbots/tokenz.txt
 
 
     # Function to generate a random 12-character key
@@ -62,8 +62,8 @@ bot_install() {
     secretk=$(generate_key)
 
    # Store the new key in seckey.txt
-    sed -i '' '1,$d' seckey.txt
-    echo "$secretk" > seckey.txt
+    sed -i '' '1,$d' plugins/telbots/seckey.txt
+    echo "$secretk" > plugins/telbots/seckey.txt
 
    # Display a message
     while read -r line; do
