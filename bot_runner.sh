@@ -7,6 +7,7 @@ see_key() {
       echo "Your Bot secret (Verification) key is: $line "
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
+done
 }
 run_bot() {
     #Run the bot
