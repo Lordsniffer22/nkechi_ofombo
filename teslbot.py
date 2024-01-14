@@ -76,7 +76,7 @@ def handle(msg):
         command = msg['text']
 
         if command.lower() == 'start' or command == '/start':
-            bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot! To continue, please verify your server ownership using /verify command.")
+            bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot!\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
             user_verification_status[chat_id] = False
 
         elif command.lower() == 'restart':
@@ -125,19 +125,19 @@ def handle(msg):
                 response = verify_user(chat_id, secret_key)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "‼️ Oh Oooh...! You entered it wrongly. \n 🚦 To verify, Use this format: \n \n /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY \n that you got from your VPS server 💻", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "‼😳 Oh Oooh...! You entered it wrongly. \n\n 🚦 To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
 
         elif command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first by providing the secret key using /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
                 bot.sendMessage(chat_id, "To add a user, use the format: /add [username] [password] [days]", reply_markup=keyboard)
 
         elif command.startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first by providing the secret key using /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
                 try:
                     _, username, password, days = command.split()
@@ -146,7 +146,7 @@ def handle(msg):
                     response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
                 except ValueError:
-                    bot.sendMessage(chat_id, "‼️ Oh Oooh...! You entered it wrongly😳. \n Use /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
+                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
 # Set the command handler
 bot.message_loop(handle)
