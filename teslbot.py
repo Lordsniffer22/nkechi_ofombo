@@ -132,7 +132,7 @@ def handle(msg):
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
-                bot.sendMessage(chat_id, "To add a user, send:  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
         elif command.startswith('/add'):
             # Check if the user is verified before allowing to use /add command
