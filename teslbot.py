@@ -58,6 +58,17 @@ def remove_user(username, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 
+def user_details(chat_id):
+    # Check if the user is verified
+    if not user_verified(chat_id):
+        return "🔐 You need to verify yourself first by providing the secret key using /verify command."
+
+    try:
+        cat_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        return cat_users
+    except subprocess.CalledProcessError as e:
+        return f"Failed to fetch user details. Error: {e}"
+
 def user_verified(chat_id):
     # Check if the user is verified
     return user_verification_status.get(chat_id, False)
@@ -69,7 +80,7 @@ def verify_user(chat_id, secret_key):
 
     if secret_key == stored_secret_key:
         user_verification_status[chat_id] = True
-        return "Verification successful! You can now use /add and /remove commands."
+        return "Verification successful! You can now use /add, /remove, and /details commands."
     else:
         return "Verification failed. Please provide the correct secret key."
 
@@ -81,6 +92,7 @@ def handle(msg):
         [KeyboardButton(text='Restart', resize_keyboard=True),
          KeyboardButton(text='Add User', resize_keyboard=True),
          KeyboardButton(text='Remove User', resize_keyboard=True),
+         KeyboardButton(text='User Details', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True)],
     ], resize_keyboard=True)
 
@@ -101,6 +113,7 @@ def handle(msg):
                              "To see the usage guide, Press /help\n"
                              "To add user, Press /add \n"
                              "To remove user, Press /remove \n"
+                             "To get user details, Press /details \n"
                              "\n"
                              "🔰 Made with spirit. \n"
                              "========================= \n"
@@ -121,8 +134,12 @@ def handle(msg):
                             "- To Remove a user, \n"
                             "Send /remove [username]\n"
                             "\n"
+                            "- To get user details, \n"
+                            "Send /details\n"
+                            "\n"
                             "Example:\n" "/add Nicolas passwad 30\n"
                             "/remove Nicolas\n"
+                            "/details\n"
                             "\n"
                             "if you are facing issues with the bot,\n"
                             "press /start\n"
@@ -151,6 +168,13 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
+        elif command.lower() == 'remove user':
+            # Check if the user is verified before allowing to use /remove command
+            if not user_verified(chat_id):
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
+            else:
+                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+
         elif command.lower().startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
@@ -165,13 +189,6 @@ def handle(msg):
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
-        elif command.lower() == 'remove user':
-            # Check if the user is verified before allowing to use /remove command
-            if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
-            else:
-                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
-
         elif command.lower().startswith('/remove'):
             # Check if the user is verified before allowing to use /remove command
             if not user_verified(chat_id):
@@ -183,6 +200,14 @@ def handle(msg):
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+
+        elif command.lower() == 'user details':
+            # Check if the user is verified before allowing to use /details command
+            if not user_verified(chat_id):
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
+            else:
+                response = user_details(chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
 # Set the command handler
 bot.message_loop(handle)
