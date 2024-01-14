@@ -37,7 +37,7 @@ bot_install() {
    # Move the teslbot.py to the directory
     sudo mv teslbot.py plugins/telbots/
     sudo cp tokenz.txt plugins/telbots/
-    sudo mv seckey.txt plugins/telbots/
+    
     #get teslbot service from git
     wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service
     sudo mv teslbot.service /etc/systemd/system/
@@ -62,9 +62,8 @@ bot_install() {
     secretk=$(generate_key)
 
    # Store the new key in seckey.txt
-    sed -i '' '1,$d' plugins/telbots/seckey.txt
-    echo "$secretk" > plugins/telbots/seckey.txt
-
+    echo "$secretk" > seckey.txt
+    sudo cp -f seckey.txt plugins/telbots/
    # Display a message
     while read -r line; do
       echo "Success! Your bot key: $line has been created successfully."
