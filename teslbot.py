@@ -76,7 +76,7 @@ def handle(msg):
         command = msg['text']
 
         if command.lower() == 'start' or command == '/start':
-            bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot!\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
+            bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot👽\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
             user_verification_status[chat_id] = False
 
         elif command.lower() == 'restart':
@@ -125,7 +125,7 @@ def handle(msg):
                 response = verify_user(chat_id, secret_key)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "‼😳 Oh Oooh...! You entered it wrongly. \n\n 🚦 To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "‼😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
 
         elif command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
