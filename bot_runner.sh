@@ -35,7 +35,7 @@ bot_install() {
    # Move the teslbot.py to the directory
     sudo mv teslbot.py plugins/telbots/
     sudo cp tokenz.txt plugins/telbots/
-
+    sudo mv seckey.txt plugins/telbots/
     #get teslbot service from git
     wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service
     sudo mv teslbot.service /etc/systemd/system/
