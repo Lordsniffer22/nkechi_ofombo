@@ -11,16 +11,16 @@ done < seckey.txt
 }
 run_bot() {
     #Run the bot
-    sudo systemctl daemon-reload
-    sudo systemctl enable teslbot
-    sudo systemctl start teslbot
     sudo pip install telepot --upgrade
+    cd plugins/telbots/
+    screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
     sleep 3
     echo "Cheers! Your bot is now running."
 
 }
 bot_install() {
     sudo apt update && apt upgrade -y
+    sudo apt-get install screen
     clear
     sudo apt install python3-pip
     sudo pip install telepot
