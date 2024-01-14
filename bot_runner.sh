@@ -7,6 +7,7 @@ see_key() {
       echo "Your Bot secret (Verification) key is: $line "
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
+      sleep 10
 done < seckey.txt
 }
 run_bot() {
@@ -68,6 +69,7 @@ bot_install() {
     while read -r line; do
       echo "Success! Your bot key: $line has been created successfully."
       echo "Use it to verify bot ownership on Telegram"
+      10
     done < seckey.txt
     run_bot
 }
