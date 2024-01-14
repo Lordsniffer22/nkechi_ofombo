@@ -17,7 +17,7 @@ user_verification_status = {}
 def add_user(username, password, days, user_info, chat_id):
     # Check if the user is verified
     if not user_verified(chat_id):
-        return "You need to verify yourself first by providing the secret key using /verify command."
+        return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
     current_date = datetime.now()
     expiration_date = current_date + timedelta(days=int(days))
@@ -116,7 +116,7 @@ def handle(msg):
 
         elif command.lower() == 'verify':
             # Prompt user to enter the secret key for verification
-            bot.sendMessage(chat_id, "Please enter the secret key for verification:")
+            bot.sendMessage(chat_id, "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
             user_verification_status[chat_id] = False
 
         elif command.lower().startswith('/verify'):
@@ -125,19 +125,19 @@ def handle(msg):
                 response = verify_user(chat_id, secret_key)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "Invalid command format. Use /verify [secret_key]", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "‼️ Oh Oooh...! You entered it wrongly. \n 🚦 To verify, Use this format: \n \n /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY \n that you got from your VPS server 💻", reply_markup=keyboard)
 
         elif command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "You need to verify yourself first by providing the secret key using /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first by providing the secret key using /verify command.")
             else:
                 bot.sendMessage(chat_id, "To add a user, use the format: /add [username] [password] [days]", reply_markup=keyboard)
 
         elif command.startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "You need to verify yourself first by providing the secret key using /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first by providing the secret key using /verify command.")
             else:
                 try:
                     _, username, password, days = command.split()
@@ -146,7 +146,7 @@ def handle(msg):
                     response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
                 except ValueError:
-                    bot.sendMessage(chat_id, "Invalid command format. Use /add [username] [password] [days]", reply_markup=keyboard)
+                    bot.sendMessage(chat_id, "‼️ Oh Oooh...! You entered it wrongly😳. \n Use /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
 # Set the command handler
 bot.message_loop(handle)
