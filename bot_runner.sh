@@ -25,14 +25,18 @@ bot_install() {
     sudo pip install telepot
     touch tokenz.txt
     touch seckey.txt
-    #download teslbot from git
-    wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py
-    mkdir -p plugins/telbots/
+   # Download teslbot from git
+    wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
+
+   # Create the directory with sudo
+    sudo mkdir -p plugins/telbots/ &&
+
+   # Move the teslbot.py to the directory
     sudo mv teslbot.py plugins/telbots/
 
     #get teslbot service from git
     wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service
-    sudo mv teslbot.service etc/systemd/system/
+    sudo mv teslbot.service /etc/systemd/system/
     print_centre -ama "BOT TOKEN REQUIRED"
     sleep 3
     msg -bar3
