@@ -49,7 +49,7 @@ bot_install() {
     sudo mv teslbot.service /etc/systemd/system/
     clear
     print_center -ama "BOT TOKEN REQUIRED"
-    sleep 3
+    sleep 2
     msg -bar3
     echo ""
     read -p "Enter Token: " btoken
