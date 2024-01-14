@@ -36,7 +36,9 @@ bot_install() {
       sudo mkdir -p plugins/telbots/ &&
 
    # Move the teslbot.py to the directory
+      sudo rm -f plugins/telbots/teslbot.py
       sudo mv teslbot.py plugins/telbots/
+
     }
     teslbot_fetch &>/dev/null
     sudo cp tokenz.txt plugins/telbots/
