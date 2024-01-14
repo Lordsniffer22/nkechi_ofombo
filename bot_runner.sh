@@ -15,6 +15,7 @@ print_viola() {
 see_key() {
     while read -r line; do
       echo -e "Your Bot secret (Verification) key is: \e[95m$line\e[0m"
+      echo ""
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
       sleep 10
