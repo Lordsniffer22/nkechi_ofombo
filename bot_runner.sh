@@ -12,7 +12,7 @@ done < plugins/telbots/seckey.txt
 }
 run_bot() {
     #Run the bot
-    sudo pip install telepot --upgrade
+    sudo pip install telepot --upgrade &>/dev/null
     cd plugins/telbots/
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
     sleep 3
@@ -29,17 +29,23 @@ bot_install() {
     touch tokenz.txt
     touch seckey.txt
    # Download teslbot from git
-    wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
+   teslbot_fetch() {
+      wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
 
    # Create the directory with sudo
-    sudo mkdir -p plugins/telbots/ &&
+      sudo mkdir -p plugins/telbots/ &&
 
    # Move the teslbot.py to the directory
-    sudo mv teslbot.py plugins/telbots/
+      sudo mv teslbot.py plugins/telbots/
+    }
+    teslbot_fetch &>/dev/null
     sudo cp tokenz.txt plugins/telbots/
+    #creste file command
+    wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
+    chmod +x /usr/bin/bot
     
     #get teslbot service from git
-    wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service
+    wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service &>/dev/null
     sudo mv teslbot.service /etc/systemd/system/
     print_centre -ama "BOT TOKEN REQUIRED"
     sleep 3
@@ -77,7 +83,7 @@ bot_menu() {
   clear
   echo ""
   msg -bar
-  print_centre -ama "BOT MANAGER By TeslaSSH"
+  print_center -ama "BOT MANAGER By TeslaSSH"
   msg -bar0
   echo ""
   # print options menu
