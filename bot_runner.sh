@@ -7,7 +7,7 @@ see_key() {
       echo "Your Bot secret (Verification) key is: $line "
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
-done
+done < seckey.txt
 }
 run_bot() {
     #Run the bot
@@ -33,6 +33,7 @@ bot_install() {
 
    # Move the teslbot.py to the directory
     sudo mv teslbot.py plugins/telbots/
+    sudo cp tokenz.txt plugins/telbots/
 
     #get teslbot service from git
     wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service
