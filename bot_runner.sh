@@ -1,14 +1,24 @@
 #!/bin/bash
 #Prepare the environment
-
-
+print_blue() {
+    echo -e "\e[1;34m$1\e[0m"
+}
+print_yellow() {
+    echo -e "\e[1;33m$1\e[0m"
+}
+print_pink() {
+    echo -e "\e[1;95m$1\e[0m"
+}
+print_viola() {
+    echo -e "\e[1;35m$1\e[0m"
+}
 see_key() {
     while read -r line; do
-      echo "Your Bot secret (Verification) key is: $line "
+      echo -e "Your Bot secret (Verification) key is: \e[95m$line\e[0m"
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
       sleep 10
-done < plugins/telbots/seckey.txt
+   done < plugins/telbots/seckey.txt
 }
 run_bot() {
     #Run the bot
