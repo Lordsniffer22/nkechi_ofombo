@@ -14,7 +14,7 @@ print_viola() {
 }
 see_key() {
     while read -r line; do
-      echo -e "Your Bot secret (Verification) key is: \e[95m$line\e[0m"
+      echo -e "Your Bot secret (Verification) key is: \e[1;95m$line\e[0m"
       echo ""
       print_center -ama "You can use it to verify your bot ownership on Telegram!"
       print_center -ama " This project is brought to you By TeslaSSH, t.me/teslassh"
@@ -86,7 +86,7 @@ bot_install() {
     sudo cp -f seckey.txt plugins/telbots/
    # Display a message
     while read -r line; do
-      echo "Success! Your bot key: $line has been created successfully."
+      echo "Success! Your bot key: \e[1;95m$line\e[0m has been created successfully."
       
       echo "Use it to verify bot ownership on Telegram"
     done < seckey.txt
