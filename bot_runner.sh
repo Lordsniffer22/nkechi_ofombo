@@ -25,7 +25,7 @@ bot_install() {
     sudo apt-get install screen
     clear
     sudo apt install python3-pip
-    sudo pip install telepot
+    sudo pip install telepot &>/dev/null
     touch tokenz.txt
     touch seckey.txt
    # Download teslbot from git
@@ -47,7 +47,8 @@ bot_install() {
     #get teslbot service from git
     wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service &>/dev/null
     sudo mv teslbot.service /etc/systemd/system/
-    print_centre -ama "BOT TOKEN REQUIRED"
+    clear
+    print_center -ama "BOT TOKEN REQUIRED"
     sleep 3
     msg -bar3
     echo ""
@@ -73,6 +74,7 @@ bot_install() {
    # Display a message
     while read -r line; do
       echo "Success! Your bot key: $line has been created successfully."
+      
       echo "Use it to verify bot ownership on Telegram"
     done < seckey.txt
     run_bot
