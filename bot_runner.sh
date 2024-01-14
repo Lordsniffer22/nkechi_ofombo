@@ -8,7 +8,6 @@ see_key() {
       echo "You can use it to verify your bot ownership on Telegram!"
       echo " This project is brought to you By TeslaSSH, t.me/teslassh"
 }
-
 run_bot() {
     #Run the bot
     sudo systemctl daemon-reload
@@ -74,7 +73,7 @@ bot_menu() {
   print_centre -ama "BOT MANAGER By TeslaSSH"
   msg -bar0
   echo ""
-# print options menu
+  # print options menu
   print_center -ama "${a12:-CHOOSE AN OPTION}"
   msg -bar3
   echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -teal "${a6:-RESTART BOT♞}")"
