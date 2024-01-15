@@ -195,21 +195,27 @@ def handle(msg):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
-
         elif command.lower().startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
             else:
                 try:
-                    _, username, password, days = command.split()
+                    _, *args = command.split()
+                    if len(args) == 3:
+                        # User provided [username] [password] [days] in a single message
+                        username, password, days = args
+                    else:
+                        # User sent /add and should provide [username] [password] [days] in the next message
+                        bot.sendMessage(chat_id, "Please send [username] [password] [days] in the next message without the /add command.")
+                        return
+
                     # Introduce a sleep of 3 seconds
                     time.sleep(3)
                     response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
                 except ValueError:
-                    # Ask the user to send the arguments in the next message
-                    bot.sendMessage(chat_id, "Please send the arguments [username] [password] [days] in the next message.")
+                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
