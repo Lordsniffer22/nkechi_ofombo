@@ -58,25 +58,17 @@ def remove_user(username, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 
-def list_users(chat_id):
-    # Check if the user is verified
-    if not user_verified(chat_id):
-        return "🔐 You need to verify yourself first by providing the secret key using /verify command."
-
-    # Retrieve the list of usernames and remaining days of expiry
+def show_users():
     cat_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
-    users_info = []
-    for line in cat_users.split('\n'):
-        if line and 'home' in line and 'false' in line and '::/' not in line and 'syslog' not in line and 'hwid' not in line and 'token' not in line:
-            user_info = line.split(':')[0]
-            expiration_date = subprocess.check_output(['chage', '-l', user_info]).decode('utf-8').split('\n')[4].split(': ')[1]
-            expiration_days = (datetime.strptime(expiration_date, '%Y-%m-%d') - datetime.now()).days
-            users_info.append(f"{user_info} :: {expiration_days} days")
+    user_list = [line.split(':')[0] for line in cat_users.split('\n') if line.startswith('/home/') and ',false,' in line]
+    return user_list
 
-    if users_info:
-        return "\n".join(users_info)
-    else:
-        return "No registered users."
+def get_user_details(username):
+    try:
+        user_details = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8')
+        return user_details
+    except subprocess.CalledProcessError as e:
+        return f"Failed to get details for user {username}. Error: {e}"
 
 def user_verified(chat_id):
     # Check if the user is verified
@@ -101,7 +93,7 @@ def handle(msg):
         [KeyboardButton(text='Restart', resize_keyboard=True),
          KeyboardButton(text='Add User', resize_keyboard=True),
          KeyboardButton(text='Remove User', resize_keyboard=True),
-         KeyboardButton(text='Users', resize_keyboard=True),
+         KeyboardButton(text='Show Users', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True)],
     ], resize_keyboard=True)
 
@@ -122,7 +114,7 @@ def handle(msg):
                              "To see the usage guide, Press /help\n"
                              "To add user, Press /add \n"
                              "To remove user, Press /remove \n"
-                             "To list users, Press /users \n"
+                             "To show users, Press /users \n"
                              "\n"
                              "🔰 Made with spirit. \n"
                              "========================= \n"
@@ -143,7 +135,7 @@ def handle(msg):
                             "- To Remove a user, \n"
                             "Send /remove [username]\n"
                             "\n"
-                            "- To List users, \n"
+                            "- To Show all users, \n"
                             "Send /users\n"
                             "\n"
                             "Example:\n" "/add Nicolas passwad 30\n"
@@ -177,7 +169,7 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
-        elif command.startswith('/add'):
+        elif command.lower().startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
@@ -198,7 +190,7 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
-        elif command.startswith('/remove'):
+        elif command.lower().startswith('/remove'):
             # Check if the user is verified before allowing to use /remove command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
@@ -210,10 +202,26 @@ def handle(msg):
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
-        elif command.lower() == 'users':
-            # List all users and their remaining days of expiry
-            response = list_users(chat_id)
-            bot.sendMessage(chat_id, response, reply_markup=keyboard)
+        elif command.lower() == 'show users' or command.lower() == '/users':
+            # Check if the user is verified before allowing to use /users command
+            if not user_verified(chat_id):
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
+            else:
+                user_list = show_users()
+                if user_list:
+                    users_message = "👥 Users on the server:\n" + "\n".join(user_list)
+                    bot.sendMessage(chat_id, users_message, reply_markup=keyboard)
+        elif command.lower() == 'show users' or command.lower() == '/users':
+            # Check if the user is verified before allowing to use /users command
+            if not user_verified(chat_id):
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
+            else:
+                user_list = show_users()
+                if user_list:
+                    users_message = "👥 Users on the server:\n" + "\n".join(user_list)
+                    bot.sendMessage(chat_id, users_message, reply_markup=keyboard)
+                else:
+                    bot.sendMessage(chat_id, "No users found on the server.", reply_markup=keyboard)
 
 # Set the command handler
 bot.message_loop(handle)
