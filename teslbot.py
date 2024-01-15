@@ -99,12 +99,12 @@ def handle(msg):
 
     # Define custom keyboard buttons with smaller size in a single row
     keyboard = ReplyKeyboardMarkup(keyboard=[
+        [KeyboardButton(text='Add User', resize_keyboard=True),
+         KeyboardButton(text='Remove User', resize_keyboard=True),
+         KeyboardButton(text='List Users', resize_keyboard=True)],
         [KeyboardButton(text='Restart', resize_keyboard=True),
-         KeyboardButton(text='Add User', resize_keyboard=True),
-         KeyboardButton(text='Remove User', resize_keyboard=True)],
-        [KeyboardButton(text='List Users', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
-         KeyboardButton(text='New Button', resize_keyboard=True)],
+         KeyboardButton(text='Dev Team', resize_keyboard=True)],
     ], resize_keyboard=True)
 
     if content_type == 'text':
@@ -135,7 +135,7 @@ def handle(msg):
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
             
-        elif command.lower() == 'dev🐧':
+        elif command.lower() == 'dev team':
             start_message = ("♻️ ZERO ONE LLC 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
                              "\n"
