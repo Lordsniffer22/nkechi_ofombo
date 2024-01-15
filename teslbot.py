@@ -210,7 +210,7 @@ def handle(msg):
             else:
                 # Set the pending /add command
                 pending_add_user_command = command
-                bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "Lets Add a New User. \n Please provide [username] [password] [days] in the next message. \n\n Example: Nicholas Passwad 30. \n\n You can use the shortcut example below to add new user next time: \n /add Nicholas Passwad 30 ", reply_markup=keyboard)
 
         elif pending_add_user_command:
             # Process the pending /add command
@@ -219,7 +219,7 @@ def handle(msg):
                 response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the pending /add command.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! You are not usual.  I couldn't see the user details\n\n Try running the /add command again. Or check the guide.", reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
