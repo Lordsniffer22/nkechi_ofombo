@@ -70,7 +70,10 @@ def list_users(chat_id):
 
         for user in users_list:
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', user]).decode('utf-8').split('\n')[1].split(':')[1].strip()
-            users_days_remaining.append(f"{user} :: {remaining_days} days")
+
+            # Exclude users with expiry set to "never"
+            if remaining_days.lower() != 'never':
+                users_days_remaining.append(f"{user} :: {remaining_days} days")
 
         users_message = "\n".join(users_days_remaining)
         return f"List of Users and Remaining Days:\n{users_message}"
@@ -146,8 +149,6 @@ def handle(msg):
                             "Send /users\n"
                             "\n"
                             "Example:\n" "/add Nicolas passwad 30\n"
-                            "/remove Nicolas\n"
-                            "/users\n"
                             "\n"
                             "if you are facing issues with the bot,\n"
                             "press /start\n"
@@ -175,20 +176,6 @@ def handle(msg):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
-
-        elif command.lower().startswith('/add'):
-            # Check if the user is verified before allowing to use /add command
-            if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
-            else:
-                try:
-                    _, username, password, days = command.split()
-                    # Introduce a sleep of 3 seconds
-                    time.sleep(3)
-                    response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
-                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
-                except ValueError:
-                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
