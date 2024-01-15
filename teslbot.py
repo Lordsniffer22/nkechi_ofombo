@@ -98,13 +98,15 @@ def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
 
     # Define custom keyboard buttons with smaller size in a single row
-    keyboard = ReplyKeyboardMarkup(keyboard=[
-        [KeyboardButton(text='Restart', resize_keyboard=True),
-         KeyboardButton(text='Add User', resize_keyboard=True),
-         KeyboardButton(text='Remove User', resize_keyboard=True),
-         KeyboardButton(text='List Users', resize_keyboard=True),
-         KeyboardButton(text='Help', resize_keyboard=True)],
-    ], resize_keyboard=True)
+keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Restart', resize_keyboard=True),
+     KeyboardButton(text='Add User', resize_keyboard=True),
+     KeyboardButton(text='Remove User', resize_keyboard=True)],
+    [KeyboardButton(text='List Users', resize_keyboard=True),
+     KeyboardButton(text='Help', resize_keyboard=True),
+     KeyboardButton(text='Dev🐧', resize_keyboard=True)],
+], resize_keyboard=True)
+
 
     if content_type == 'text':
         command = msg['text']
@@ -114,7 +116,7 @@ def handle(msg):
             user_verification_status[chat_id] = False
 
         elif command.lower() == 'restart':
-            start_message = ("🔰 WELCOME TO TESLA SSH BOT 🔰. \n"
+            start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
                              "\n"
                              "You can use me to manage users on your server!\n"
@@ -129,6 +131,25 @@ def handle(msg):
                              "========================= \n"
                              "By: @TESLASSH \n"
                              "Mastered by: @hackwell101 \n"
+                             "Join @udpcustom")
+
+            # Send the start message with the custom keyboard
+            bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
+            
+        elif command.lower() == 'dev🐧':
+            start_message = ("♻️ ZERO ONE LLC 💻. \n"
+                             "━━━━━━━━━━━━━━━━ \n"
+                             "\n"
+                             "Hello, thanks for choosing our cloud projects!\n"
+                             "\n"
+                             "This Tool was an imagination from @hackwell101, our Team member and founder of @udpcustom\n\n"
+                             "Super thanks to the developers:\n"
+                             "=============================== \n"
+                             "Bot Logic: Ted ( @hackwell101 ) \n"
+                             "Program Lang: Tesla SSH ( @teslassh ) \n"
+                             "To list users, Press /users \n"
+                             "\n"
+                             "💖Made with spirit. \n"
                              "Join @udpcustom")
 
             # Send the start message with the custom keyboard
