@@ -4,15 +4,15 @@ from datetime import datetime, timedelta
 import time
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
+with open('tokenz.txt', 'r') as file:
+    bot_token = file.read().strip()
+bot = telepot.Bot(bot_token)
+
 # File path to store the secret key
 seckey_file_path = 'seckey.txt'
 
 # Dictionary to store user verification status
 user_verification_status = {}
-
-with open('tokenz.txt', 'r') as file:
-    bot_token = file.read().strip()
-bot = telepot.Bot(bot_token)
 
 def add_user(username, password, days, user_info, chat_id):
     # Check if the user is verified
@@ -47,6 +47,46 @@ def add_user(username, password, days, user_info, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
 
+def remove_user(username, chat_id):
+    # Check if the user is verified
+    if not user_verified(chat_id):
+        return "🔐 You need to verify yourself first by providing the secret key using /verify command."
+
+    try:
+        subprocess.run(['sudo', 'userdel', '--force', username], check=True)
+        return f"User {username} removed successfully!"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to remove user {username}. Error: {e}"
+
+def show_users():
+    try:
+        cat_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        return cat_users
+    except subprocess.CalledProcessError as e:
+        return f"Failed to retrieve user details. Error: {e}"
+
+def user_details():
+    users_data = show_users()
+    if not users_data:
+        return "😳 Oh Oooh...! No registered users found."
+
+    lines = users_data.split('\n')
+    header = lines[0]
+    user_lines = lines[1:]
+
+    details = []
+
+    for line in user_lines:
+        if line:
+            user_info = line.split(':')
+            username = user_info[0]
+            expiration_date_str = subprocess.check_output(['chage', '-l', username]).decode('utf-8').split('\n')[3].split(': ')[1]
+            expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
+            remaining_days = (expiration_date - datetime.now()).days
+            details.append(f"{username} :: {remaining_days} days")
+
+    return "\n".join(details)
+
 def user_verified(chat_id):
     # Check if the user is verified
     return user_verification_status.get(chat_id, False)
@@ -58,36 +98,9 @@ def verify_user(chat_id, secret_key):
 
     if secret_key == stored_secret_key:
         user_verification_status[chat_id] = True
-        return "Verification successful! You can now use /add command."
+        return "Verification successful! You can now use /add, /remove, and /users commands."
     else:
         return "Verification failed. Please provide the correct secret key."
-
-def detail_user(chat_id):
-    active_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8').split('\n')
-    user_details = []
-
-    for user_info in active_users:
-        if 'home' in user_info and 'false' in user_info and '::/' not in user_info and 'hwid' not in user_info and 'token' not in user_info:
-            user = user_info.split(':')[0]
-            expiration_info = subprocess.check_output(['chage', '-l', user]).decode('utf-8').split('\n')[3]
-            password_info = user_info.split(':')[5]
-            status_info = subprocess.check_output(['passwd', '--status', user]).decode('utf-8').split()[1]
-
-            user_details.append({
-                'user': user,
-                'expiration_info': expiration_info,
-                'password_info': password_info,
-                'status_info': status_info
-            })
-
-    if not user_details:
-        return "No registered users."
-
-    message = "Details of registered users:\n"
-    for user_info in user_details:
-        message += f"{user_info['user']} :: {user_info['expiration_info']} days\n"
-
-    return message
 
 def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -96,6 +109,8 @@ def handle(msg):
     keyboard = ReplyKeyboardMarkup(keyboard=[
         [KeyboardButton(text='Restart', resize_keyboard=True),
          KeyboardButton(text='Add User', resize_keyboard=True),
+         KeyboardButton(text='Remove User', resize_keyboard=True),
+         KeyboardButton(text='Users', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True)],
     ], resize_keyboard=True)
 
@@ -110,11 +125,13 @@ def handle(msg):
             start_message = ("🔰 WELCOME TO TESLA SSH BOT 🔰. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
                              "\n"
-                             "You can use me to add users to your server!\n"
+                             "You can use me to manage users on your server!\n"
                              "\n"
                              "To reload the bot, Press /start\n"
                              "To see the usage guide, Press /help\n"
                              "To add user, Press /add \n"
+                             "To remove user, Press /remove \n"
+                             "To show users, Press /users \n"
                              "\n"
                              "🔰 Made with spirit. \n"
                              "========================= \n"
@@ -132,7 +149,15 @@ def handle(msg):
                             "- To Add a new user, \n"
                             "Send /add [username] [password] [days]\n"
                             "\n"
+                            "- To Remove a user, \n"
+                            "Send /remove [username]\n"
+                            "\n"
+                            "- To Show all users, \n"
+                            "Send /users\n"
+                            "\n"
                             "Example:\n" "/add Nicolas passwad 30\n"
+                            "/remove Nicolas\n"
+                            "/users\n"
                             "\n"
                             "if you are facing issues with the bot,\n"
                             "press /start\n"
@@ -161,7 +186,7 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
-        elif command.startswith('/add'):
+        elif command.lower().startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
@@ -175,12 +200,29 @@ def handle(msg):
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
+        elif command.lower() == 'remove user':
+            # Check if the user is verified before allowing to use /remove command
+            if not user_verified(chat_id):
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
+            else:
+                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+
+        elif command.lower().startswith('/remove'):
+            # Check if the user is verified before allowing to use /remove command
+            if not user_verified(chat_id):
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
+            else:
+                try:
+                    _, username = command.split()
+                    response = remove_user(username, chat_id)
+                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
+
         elif command.lower() == 'users':
             # Check if the user is verified before allowing to use /users command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to use /users command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
             else:
-                response = detail_user(chat_id)
+                response = user_details()
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
 # Set the command handler
