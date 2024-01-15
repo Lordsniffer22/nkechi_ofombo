@@ -63,22 +63,20 @@ def list_users(chat_id):
     if not user_verified(chat_id):
         return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
+    # Get the list of users and their expiration dates
     try:
-        users_output = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
-        users_list = [line.split(':')[0] for line in users_output.splitlines()]
-        users_info = '\n'.join([f'{user} :: {get_remaining_days(user)} days' for user in users_list])
-        return users_info
+        user_list_output = subprocess.check_output(['sudo', 'grep', '/bin/false', '/etc/passwd']).decode('utf-8')
+        user_list = user_list_output.strip().split('\n')
+        user_details = []
+
+        for user_info in user_list:
+            username, _, expiration_date = user_info.split(':')
+            remaining_days = (datetime.strptime(expiration_date, '%Y-%m-%d') - datetime.now()).days
+            user_details.append(f"{username} :: {remaining_days} days")
+
+        return "\n".join(user_details)
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
-
-def get_remaining_days(username):
-    try:
-        expiration_date_str = subprocess.check_output(['sudo', 'chage', '-l', username, '|', 'grep', 'Account', 'expires', '|', 'awk', '-F:', '{{print $2}}']).decode('utf-8').strip()
-        expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
-        remaining_days = (expiration_date - datetime.now()).days
-        return remaining_days
-    except subprocess.CalledProcessError:
-        return "N/A"
 
 def user_verified(chat_id):
     # Check if the user is verified
@@ -179,7 +177,7 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
-        elif command.startswith('/add'):
+        elif command.lower().startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
@@ -212,13 +210,10 @@ def handle(msg):
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
-        elif command.lower() == 'users':
-            # Check if the user is verified before allowing to use /users command
-            if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
-            else:
-                response = list_users(chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+        elif command.lower() == 'list users' or command == '/users':
+            # List all users with remaining days
+            response = list_users(chat_id)
+            bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
 # Set the command handler
 bot.message_loop(handle)
