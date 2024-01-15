@@ -98,15 +98,14 @@ def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
 
     # Define custom keyboard buttons with smaller size in a single row
-keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Restart', resize_keyboard=True),
-     KeyboardButton(text='Add User', resize_keyboard=True),
-     KeyboardButton(text='Remove User', resize_keyboard=True)],
-    [KeyboardButton(text='List Users', resize_keyboard=True),
-     KeyboardButton(text='Help', resize_keyboard=True),
-     KeyboardButton(text='Dev🐧', resize_keyboard=True)],
-], resize_keyboard=True)
-
+    keyboard = ReplyKeyboardMarkup(keyboard=[
+        [KeyboardButton(text='Restart', resize_keyboard=True),
+         KeyboardButton(text='Add User', resize_keyboard=True),
+         KeyboardButton(text='Remove User', resize_keyboard=True)],
+        [KeyboardButton(text='List Users', resize_keyboard=True),
+         KeyboardButton(text='Help', resize_keyboard=True),
+         KeyboardButton(text='New Button', resize_keyboard=True)],
+    ], resize_keyboard=True)
 
     if content_type == 'text':
         command = msg['text']
