@@ -76,7 +76,7 @@ def list_users(chat_id):
                 users_days_remaining.append(f"│ {user}   ⇿ {remaining_days}")
 
         users_message = "\n".join(users_days_remaining)
-        return f"╭─USERS──────EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS──────EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
