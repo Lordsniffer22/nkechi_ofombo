@@ -63,18 +63,17 @@ def list_users(chat_id):
     if not user_verified(chat_id):
         return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
-    # Get the list of users and their expiration dates
     try:
-        user_list_output = subprocess.check_output(['sudo', 'grep', '/bin/false', '/etc/passwd']).decode('utf-8')
-        user_list = user_list_output.strip().split('\n')
-        user_details = []
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':')[0] for line in users_info.split('\n') if line]
+        users_days_remaining = []
 
-        for user_info in user_list:
-            username, _, expiration_date = user_info.split(':')
-            remaining_days = (datetime.strptime(expiration_date, '%Y-%m-%d') - datetime.now()).days
-            user_details.append(f"{username} :: {remaining_days} days")
+        for user in users_list:
+            remaining_days = subprocess.check_output(['sudo', 'chage', '-l', user]).decode('utf-8').split('\n')[1].split(':')[1].strip()
+            users_days_remaining.append(f"{user} :: {remaining_days} days")
 
-        return "\n".join(user_details)
+        users_message = "\n".join(users_days_remaining)
+        return f"List of Users and Remaining Days:\n{users_message}"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
@@ -211,7 +210,6 @@ def handle(msg):
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
         elif command.lower() == 'list users' or command == '/users':
-            # List all users with remaining days
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
