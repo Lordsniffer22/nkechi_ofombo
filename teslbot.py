@@ -58,34 +58,27 @@ def remove_user(username, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 
-def show_users():
+def list_users(chat_id):
+    # Check if the user is verified
+    if not user_verified(chat_id):
+        return "🔐 You need to verify yourself first by providing the secret key using /verify command."
+
     try:
-        cat_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
-        return cat_users
+        users_output = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':')[0] for line in users_output.splitlines()]
+        users_info = '\n'.join([f'{user} :: {get_remaining_days(user)} days' for user in users_list])
+        return users_info
     except subprocess.CalledProcessError as e:
-        return f"Failed to retrieve user details. Error: {e}"
+        return f"Failed to list users. Error: {e}"
 
-def user_details():
-    users_data = show_users()
-    if not users_data:
-        return "😳 Oh Oooh...! No registered users found."
-
-    lines = users_data.split('\n')
-    header = lines[0]
-    user_lines = lines[1:]
-
-    details = []
-
-    for line in user_lines:
-        if line:
-            user_info = line.split(':')
-            username = user_info[0]
-            expiration_date_str = subprocess.check_output(['chage', '-l', username]).decode('utf-8').split('\n')[3].split(': ')[1]
-            expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
-            remaining_days = (expiration_date - datetime.now()).days
-            details.append(f"{username} :: {remaining_days} days")
-
-    return "\n".join(details)
+def get_remaining_days(username):
+    try:
+        expiration_date_str = subprocess.check_output(['sudo', 'chage', '-l', username, '|', 'grep', 'Account', 'expires', '|', 'awk', '-F:', '{{print $2}}']).decode('utf-8').strip()
+        expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
+        remaining_days = (expiration_date - datetime.now()).days
+        return remaining_days
+    except subprocess.CalledProcessError:
+        return "N/A"
 
 def user_verified(chat_id):
     # Check if the user is verified
@@ -110,7 +103,7 @@ def handle(msg):
         [KeyboardButton(text='Restart', resize_keyboard=True),
          KeyboardButton(text='Add User', resize_keyboard=True),
          KeyboardButton(text='Remove User', resize_keyboard=True),
-         KeyboardButton(text='Users', resize_keyboard=True),
+         KeyboardButton(text='List Users', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True)],
     ], resize_keyboard=True)
 
@@ -131,7 +124,7 @@ def handle(msg):
                              "To see the usage guide, Press /help\n"
                              "To add user, Press /add \n"
                              "To remove user, Press /remove \n"
-                             "To show users, Press /users \n"
+                             "To list users, Press /users \n"
                              "\n"
                              "🔰 Made with spirit. \n"
                              "========================= \n"
@@ -152,7 +145,7 @@ def handle(msg):
                             "- To Remove a user, \n"
                             "Send /remove [username]\n"
                             "\n"
-                            "- To Show all users, \n"
+                            "- To List all users, \n"
                             "Send /users\n"
                             "\n"
                             "Example:\n" "/add Nicolas passwad 30\n"
@@ -186,7 +179,7 @@ def handle(msg):
             else:
                 bot.sendMessage(chat_id, "To add a user, send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n", reply_markup=keyboard)
 
-        elif command.lower().startswith('/add'):
+        elif command.startswith('/add'):
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
@@ -216,13 +209,15 @@ def handle(msg):
                     _, username = command.split()
                     response = remove_user(username, chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                except ValueError:
+                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
         elif command.lower() == 'users':
             # Check if the user is verified before allowing to use /users command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
-                response = user_details()
+                response = list_users(chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
 # Set the command handler
