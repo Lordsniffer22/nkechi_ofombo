@@ -26,7 +26,7 @@ def add_user(username, password, days, user_info, chat_id):
     # Check if the user already exists
     existing_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
     if f'{username}:' in existing_users and user_info.lower() not in existing_users.lower():
-        return f"User {username} already exists with different info."
+        return f"User {username} already exists with a different info."
 
     # Generate hashed password
     osl_version = subprocess.check_output(['openssl', 'version']).decode('utf-8')
@@ -36,7 +36,8 @@ def add_user(username, password, days, user_info, chat_id):
 
     # Create user
     try:
-        subprocess.run(['sudo', 'useradd', '-m', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
+        command = ['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username]
+        subprocess.run(command, check=True)
 
         # Get server IP address
         server_ip = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
@@ -46,6 +47,7 @@ def add_user(username, password, days, user_info, chat_id):
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
+
 
 def remove_user(username, chat_id):
     # Check if the user is verified
