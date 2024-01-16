@@ -30,21 +30,41 @@ see_key() {
     while read -r line; do
       echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
       echo ""
-      echo ""
       print_blu "You can use it to verify your bot ownership on Telegram."
       print_center -ama " Made By TeslaSSH, t.me/teslassh"
-      sleep 10
+      sleep 4
+      press_back
+
    done < plugins/telbots/seckey.txt
 }
+press_back() {
+ echo ""
+ read -p "Press Enter to go back" confm
+ sleep 1
+ case $confm in
+   [Yy]* ) bot_menu ;;
+   [Nn]* ) bot_menu ;;
+   * ) bot_menu ;;
+ esac
+}
+
 run_bot() {
     #Run the bot
-    screen -ls | grep Tesla | cut -d. -f1 | awk '{print $1}' | xargs kill
+    ban_me
+    print_center -ama "RESTARTING THE BOT".....
+    sleep 4
+    if screen -ls | grep -q "udpbot"; then
+      screen -ls | grep udpbot | cut -d. -f1 | awk '{print $1}' | xargs kill
+    else
+      echo ""
+    fi
     sudo pip install telepot --upgrade &>/dev/null
     cd plugins/telbots/
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
-    sleep 3
     echo "Cheers! Your bot is now running."
-    sleep 10
+    echo ""
+    sleep 4
+    bot_menu
 
 }
 bot_install() {
