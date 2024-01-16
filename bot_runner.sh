@@ -68,11 +68,11 @@ run_bot() {
 
 }
 bot_install() {
-    sudo apt update && apt upgrade -y
-    sudo apt-get install screen
     clear
+    sudo apt update && apt upgrade
+    sudo apt-get install screen
     sudo apt install python3-pip
-    sudo pip install telepot -y &>/dev/null
+    sudo pip install telepot &>/dev/null
     touch tokenz.txt
     touch seckey.txt
    # Download teslbot from git
