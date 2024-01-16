@@ -71,8 +71,8 @@ run_bot() {
     ban_me
     print_center -ama "BOT INITIALISING....."
     sleep 3
-    if screen -ls | grep -q "udpbot"; then
-      screen -ls | grep udpbot | cut -d. -f1 | awk '{print $1}' | xargs kill
+    if screen -ls | grep -q "Tesla"; then
+      screen -ls | grep Tesla | cut -d. -f1 | awk '{print $1}' | xargs kill
     else
       echo ""
     fi
@@ -180,7 +180,7 @@ bot_menu() {
   # handle option selection
   case $option in
   1)
-    run_bot
+    restart_bot
     ;;
   2)
     bot_install
