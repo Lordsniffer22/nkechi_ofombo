@@ -48,11 +48,29 @@ press_back() {
  esac
 }
 
-run_bot() {
+restart_bot() {
     #Run the bot
     ban_me
     print_center -ama "RESTARTING THE BOT".....
-    sleep 4
+    sleep 2
+    if screen -ls | grep -q "Tesla"; then
+      screen -ls | grep Tesla | cut -d. -f1 | awk '{print $1}' | xargs kill
+    else
+      echo ""
+    fi
+    sudo pip install telepot --upgrade &>/dev/null
+    screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
+    echo "Cheers! Your bot is now running."
+    echo ""
+    sleep 2
+    bot_menu
+
+}
+run_bot() {
+    #Run the bot
+    ban_me
+    print_center -ama "BOT INITIALISING....."
+    sleep 3
     if screen -ls | grep -q "udpbot"; then
       screen -ls | grep udpbot | cut -d. -f1 | awk '{print $1}' | xargs kill
     else
@@ -61,9 +79,9 @@ run_bot() {
     sudo pip install telepot --upgrade &>/dev/null
     cd plugins/telbots/
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
-    echo "Cheers! Your bot is now running."
+    print_pink "Cheers! Your bot is now running."
     echo ""
-    sleep 4
+    sleep 2
     bot_menu
 
 }
