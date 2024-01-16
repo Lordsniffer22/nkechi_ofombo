@@ -16,7 +16,7 @@ see_key() {
     while read -r line; do
       echo -e "Your Bot secret (Verification) key is: \e[1;95m$line\e[0m"
       echo ""
-      print_center -ama "You can use it to verify your bot ownership on Telegram!"
+      print_blue "You can use it to verify your bot ownership on Telegram!"
       print_center -ama " This project is brought to you By TeslaSSH, t.me/teslassh"
       sleep 10
    done < plugins/telbots/seckey.txt
