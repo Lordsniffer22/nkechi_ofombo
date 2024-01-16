@@ -33,9 +33,9 @@ see_key() {
       print_blu "You can use it to verify your bot ownership on Telegram."
       print_center -ama " Made By TeslaSSH, t.me/teslassh"
       sleep 4
-      press_back
 
    done < plugins/telbots/seckey.txt
+   press_back
 }
 press_back() {
  echo ""
