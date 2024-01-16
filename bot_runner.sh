@@ -3,6 +3,9 @@
 print_blue() {
     echo -e "\e[1;34m$1\e[0m"
 }
+print_blu() {
+    echo -e "\e[34m$1\e[0m"
+}
 print_yellow() {
     echo -e "\e[1;33m$1\e[0m"
 }
@@ -13,16 +16,29 @@ print_viola() {
     echo -e "\e[1;35m$1\e[0m"
 }
 see_key() {
+    ban_me
+    msg -bar
+    print_center -ama "SERVER KEY Manager"
+    msg -bar0
+    echo ""
+    
+  # print options menu
+    print_center -ama "${a12:-BOT SECRET KEY}"
+    msg -bar3
+    gamba="Bot secret:"
+    echo ""
     while read -r line; do
-      echo -e "Your Bot secret (Verification) key is: \e[1;95m$line\e[0m"
+      echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
       echo ""
-      print_blue "You can use it to verify your bot ownership on Telegram!"
-      print_center -ama " This project is brought to you By TeslaSSH, t.me/teslassh"
+      echo ""
+      print_blu "You can use it to verify your bot ownership on Telegram."
+      print_center -ama " Made By TeslaSSH, t.me/teslassh"
       sleep 10
    done < plugins/telbots/seckey.txt
 }
 run_bot() {
     #Run the bot
+    screen -ls | grep Tesla | cut -d. -f1 | awk '{print $1}' | xargs kill
     sudo pip install telepot --upgrade &>/dev/null
     cd plugins/telbots/
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
@@ -95,10 +111,19 @@ bot_install() {
     run_bot
 }
 
+ban_me() {
+  clear
+  print_pink " _____ _____ ____  _        _      ____ ____  _   _ "
+  print_pink "|_   _| ____/ ___|| |      / \    / ___/ ___|| | | |"
+  print_blue "  | | |  _| \___ \| |     / _ \   \___ \___ \| |_| |"
+  print_yellow "  | | | |___ ___) | |___ / ___ \   ___) |__) |  _  |"
+  print_yellow "  |_| |_____|____/|_____/_/   \_\ |____/____/|_| |_|" 
+  echo ""
+}
+
 bot_menu() {
   source <(curl -sSL 'https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/module/module')
-  clear
-  echo ""
+  ban_me
   msg -bar
   print_center -ama "BOT MANAGER By TeslaSSH"
   msg -bar0
@@ -106,9 +131,9 @@ bot_menu() {
   # print options menu
   print_center -ama "${a12:-CHOOSE AN OPTION}"
   msg -bar3
-  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -teal "${a6:-RESTART BOT♞}")"
-  echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-INSTALL BOT}")"
-  echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY⚡}")"
+  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ♞}")"
+  echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-INSTALL BOT ✳️}")"
+  echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY 🔑}")"
   exit2home
 
   # prompt user for option selection
