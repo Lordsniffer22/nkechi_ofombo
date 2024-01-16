@@ -72,7 +72,7 @@ bot_install() {
     sudo apt-get install screen
     clear
     sudo apt install python3-pip
-    sudo pip install telepot &>/dev/null
+    sudo pip install telepot -y &>/dev/null
     touch tokenz.txt
     touch seckey.txt
    # Download teslbot from git
