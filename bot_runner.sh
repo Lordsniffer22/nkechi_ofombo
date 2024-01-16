@@ -58,9 +58,7 @@ restart_bot() {
     else
       echo ""
     fi
-    sudo pip install telepot --upgrade &>/dev/null
-    screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
-    echo "Cheers! Your bot is now running."
+    run_bot
     echo ""
     sleep 2
     bot_menu
