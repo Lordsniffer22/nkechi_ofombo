@@ -126,7 +126,7 @@ ch_token() {
 bot_install() {
     cd
     clear
-    sudo apt update && apt upgrade -y
+    #sudo apt update && apt upgrade -y
     sudo apt-get install screen
     sudo apt install python3-pip
     sudo pip install telepot &>/dev/null
