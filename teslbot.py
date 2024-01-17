@@ -212,27 +212,26 @@ def handle(msg):
                 # Reset the pending command after processing
                 pending_add_user_command = None
 
-        if command.lower() == 'remove user':
+        elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
                 # Set the pending "Remove User" command
-                pending_remove_user_command = command
-                bot.sendMessage(chat_id, "Please provide [username] in the next message to remove the user.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "Please send the [username] to be removed.", reply_markup=keyboard)
+                pending_remove_user_command[chat_id] = command
 
-        elif pending_remove_user_command:
+        elif pending_remove_user_command.get(chat_id):
             # Process the pending "Remove User" command
             try:
-                _, username = (pending_remove_user_command + ' ' + command).split()
+                _, username = command.split()
                 response = remove_user(username, chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the 'Remove User' command.", reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
-                pending_remove_user_command = None
-
+                pending_remove_user_command.pop(chat_id, None)
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
