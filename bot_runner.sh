@@ -34,7 +34,7 @@ see_key() {
       print_center -ama " Made By TeslaSSH, t.me/teslassh"
       sleep 4
 
-   done < plugins/telbots/seckey.txt
+   done < /octopo/tgb/seckey.txt
    press_back
 }
 press_back() {
@@ -75,15 +75,16 @@ run_bot() {
       echo ""
     fi
     sudo pip install telepot --upgrade &>/dev/null
-    cd plugins/telbots/
+    cd /octopo/tgb/
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
     print_pink "Cheers! Your bot is now running."
     echo ""
     sleep 2
-    bot_menu
+    sudo bot
 
 }
 bot_install() {
+    cd
     clear
     sudo apt update && apt upgrade
     sudo apt-get install screen
@@ -95,23 +96,23 @@ bot_install() {
    teslbot_fetch() {
       wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
 
-   # Create the directory with sudo
-      sudo mkdir -p plugins/telbots/ &&
+   # Create the directory with to store the python_bot
+      sudo mkdir -p /octopo/tgb/ &&
 
    # Move the teslbot.py to the directory
-      sudo rm -f plugins/telbots/teslbot.py
-      sudo mv teslbot.py plugins/telbots/
-
+      sudo rm -f /octopo/tgb/teslbot.py
+      sudo mv teslbot.py /octopo/tgb/
+      
     }
     teslbot_fetch &>/dev/null
-    sudo cp tokenz.txt plugins/telbots/
+    sudo cp tokenz.txt /octopo/tgb/
     #creste file command
     wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
     chmod +x /usr/bin/bot
     
     #get teslbot service from git
-    wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service &>/dev/null
-    sudo mv teslbot.service /etc/systemd/system/
+    #wget -O teslbot.service https://raw.githubusercontent.com/TeslaSSH/Redq/main/config/teslbot.service &>/dev/null
+    #sudo mv teslbot.service /etc/systemd/system/
     clear
     print_center -ama "BOT TOKEN REQUIRED"
     sleep 2
@@ -120,9 +121,11 @@ bot_install() {
     read -p "Enter Token: " btoken
     sleep 2
     print_center -ama "Thanks for entering your Telegram Bot Token"
+    sleep 2
+    clear
 
     # save the Bot Token
-    echo "$btoken" > plugins/telbots/tokenz.txt
+    echo "$btoken" > /octopo/tgb/tokenz.txt
 
 
     # Function to generate a random 12-character key
@@ -135,15 +138,10 @@ bot_install() {
 
    # Store the new key in seckey.txt
     echo "$secretk" > seckey.txt
-    sudo cp -f seckey.txt plugins/telbots/
+    sudo cp -f seckey.txt /octopo/tgb/
    # Display a message
-    while read -r line; do
-      echo -e "Your Bot secret (Verification) key is: \e[1;95m$line\e[0m"
-      echo ""
-      print_center -ama "You can use it to verify your bot ownership on Telegram!"
-      print_center -ama " This project is brought to you By TeslaSSH, t.me/teslassh"
-      sleep 10
-    done < seckey.txt
+    see_key
+    rm -f bot_runner.sh
     run_bot
 }
 
