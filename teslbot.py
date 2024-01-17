@@ -191,16 +191,15 @@ def handle(msg):
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
 # Define a variable to store the pending add user command
-        if command.lower() == 'add user':
+
+        if command == 'add user' or command == '/add':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
-                bot.sendMessage(chat_id, "To add a user, you can either send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n\n"
-                                          "OR\n\n"
-                                          "Send /add, and in the next message provide [username] [password] [days].", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "To add a user, please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
 
-        elif command.lower().startswith('/add') and len(command.split()) == 1:
+        elif command.startswith('/add') and len(command.split()) == 1:
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
@@ -209,14 +208,10 @@ def handle(msg):
                 pending_add_user_command = command
                 bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
 
-        elif pending_add_user_command or command.lower().startswith('/add'):
-            # Process the /add command
+        elif pending_add_user_command:
+            # Process the pending /add command
             try:
-                if pending_add_user_command:
-                    _, username, password, days = (pending_add_user_command + ' ' + command).split()
-                else:
-                    _, username, password, days = command.split()
-
+                _, username, password, days = (pending_add_user_command + ' ' + command).split()
                 response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
@@ -224,6 +219,15 @@ def handle(msg):
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
+
+        elif command.startswith('/add') and len(command.split()) == 4:
+            # Process the /add command
+            try:
+                _, username, password, days = command.split()
+                response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the /add command.", reply_markup=keyboard)
 
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
