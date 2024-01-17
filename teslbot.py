@@ -156,24 +156,25 @@ def handle(msg):
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
 
-        elif command.lower() == 'help':
+        elif command.lower() == 'help' or command == '/help':
             help_message = ("HOW TO USE BOT:\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━"
                             "\n"
                             "- To Add a new user, \n"
-                            "Send /add [username] [password] [days]\n"
+                            'Cick on "Add User" Button, and then send me the user details to be added. in the format below: \n [username] [password] [days]\n'
                             "\n"
+                            "Example: \n Nicholas passwad 30\n"
+                            "..........................."
+
                             "- To Remove a user, \n"
                             "Send /remove [username]\n"
                             "\n"
+                            "Example: \n /remove Nicholas\n"
+                            "............................\n"
                             "- To List all users, \n"
-                            "Send /users\n"
-                            "\n"
-                            "Example:\n" "/add Nicolas passwad 30\n"
+                            'Click on "List Users" button\n'
                             "\n"
                             "if you are facing issues with the bot,\n"
-                            "press /start\n"
-                            "\n"
                             "Contact: @teslassh"
                             )
             bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
@@ -198,7 +199,7 @@ def handle(msg):
             else:
                 # Set the pending "Add User" command
                 pending_add_user_command = command
-                bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30", reply_markup=keyboard)
 
         elif pending_add_user_command:
             # Process the pending "Add User" command
@@ -207,7 +208,7 @@ def handle(msg):
                 response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the 'Add User' command.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.", reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
