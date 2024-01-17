@@ -4,9 +4,6 @@ from datetime import datetime, timedelta
 import time
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
-# Define a variable to store the pending add user command
-pending_add_user_command = None
-
 with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
 bot = telepot.Bot(bot_token)
@@ -96,7 +93,8 @@ def verify_user(chat_id, secret_key):
         return "Verification successful! You can now use /add, /remove, and /users commands."
     else:
         return "Verification failed. Please provide the correct secret key."
-
+    
+pending_add_user_command = None
 def handle(msg):
     global pending_add_user_command
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -192,16 +190,15 @@ def handle(msg):
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
-
-
+# Define a variable to store the pending add user command
         if command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
-                bot.sendMessage(chat_id, "TO ADD USER: \n You can either click on /add, And follow the prompt.\n\n"
-                                          "OR TRY THE SHORTCUT\n\n"
-                                          "Send: /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "To add a user, you can either send:\n  /add [username] [password] [days] \n\n Example:\n /add Nicolas passwad 30\n\n"
+                                          "OR\n\n"
+                                          "Send /add, and in the next message provide [username] [password] [days].", reply_markup=keyboard)
 
         elif command.lower().startswith('/add') and len(command.split()) == 1:
             # Check if the user is verified before allowing to use /add command
@@ -210,16 +207,20 @@ def handle(msg):
             else:
                 # Set the pending /add command
                 pending_add_user_command = command
-                bot.sendMessage(chat_id, "Lets Add a New User. \n Please provide [username] [password] [days] in the next message. \n\n Example: Nicholas Passwad 30. \n\n You can use the shortcut example below to add new user next time: \n /add Nicholas Passwad 30 ", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
 
-        elif pending_add_user_command:
-            # Process the pending /add command
+        elif pending_add_user_command or command.lower().startswith('/add'):
+            # Process the /add command
             try:
-                _, username, password, days = (pending_add_user_command + ' ' + command).split()
+                if pending_add_user_command:
+                    _, username, password, days = (pending_add_user_command + ' ' + command).split()
+                else:
+                    _, username, password, days = command.split()
+
                 response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! You are not usual.  I couldn't see the user details\n\n Try running the /add command again. Or check the guide.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the /add command.", reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
