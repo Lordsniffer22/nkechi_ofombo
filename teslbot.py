@@ -164,7 +164,7 @@ def handle(msg):
                             'Cick on "Add User" Button, and then send me the user details to be added. in the format below: \n [username] [password] [days]\n'
                             "\n"
                             "Example: \n Nicholas passwad 30\n"
-                            "..........................."
+                            "...........................\n"
 
                             "- To Remove a user, \n"
                             "Send /remove [username]\n"
