@@ -191,15 +191,17 @@ def handle(msg):
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
 # Define a variable to store the pending add user command
-# Define a variable to store the pending add user comman
+# Define a variable to store the pending add user command
 
-        if command == 'add user' or command == '/add':
+        if command.lower() == 'add user' or command.lower() == '/add':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
-                if command == '/add':
+                if command.lower() == '/add':
                     bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
+                elif command.lower() == 'add user':
+                    bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.")
                 else:
                     try:
                         _, username, password, days = command.split()[1:]
@@ -208,7 +210,7 @@ def handle(msg):
                     except ValueError:
                         bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the /add command.", reply_markup=keyboard)
 
-        elif command.startswith('/add') and len(command.split()) == 1:
+        elif command.lower().startswith('/add') and len(command.split()) == 1:
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
@@ -217,7 +219,7 @@ def handle(msg):
                 pending_add_user_command = command
                 bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
 
-        elif pending_add_user_command or command.startswith('/add'):
+        elif pending_add_user_command or command.lower().startswith('/add'):
             # Process the /add command
             try:
                 if pending_add_user_command:
