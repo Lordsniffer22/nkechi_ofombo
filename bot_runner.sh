@@ -214,7 +214,7 @@ ban_me() {
   print_pink "|_   _| ____/ ___|| |      / \    / ___/ ___|| | | |"
   print_blue "  | | |  _| \___ \| |     / _ \   \___ \___ \| |_| |"
   print_yellow "  | | | |___ ___) | |___ / ___ \   ___) |__) |  _  |"
-  print_yellow "  |_| |_____|____/|_____/_/   \_\ |____/____/|_| |_|" 
+  print_pink "  |_| |_____|____/|_____/_/   \_\ |____/____/|_| |_|" 
   echo ""
 }
 
@@ -231,8 +231,8 @@ bot_menu() {
   echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ♞}")"
   echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-INSTALL BOT ✳️}")"
   echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY 🔑}")"
-  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ♞}")"
-  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN♞}")"
+  echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ♞}")"
+  echo " $(msg -verd "[5]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN♞}")"
   exit2home
 
   # prompt user for option selection
