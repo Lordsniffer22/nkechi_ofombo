@@ -211,25 +211,26 @@ def handle(msg):
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
+      elif command.lower() == 'remove user':
+              # Check if the user is verified before allowing to use /remove command
+           if not user_verified(chat_id):
+              bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the /verify command.")
+           else:
+              # Set the pending "Remove User" command
+              bot.sendMessage(chat_id, "Please send the [username] you want to remove.")
+              pending_remove_user_command = command.lower()
 
-        elif command.lower() == 'remove user':
-            # Check if the user is verified before allowing to use /remove command
-            if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
-            else:
-                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
-
-        elif command.lower().startswith('/remove'):
-            # Check if the user is verified before allowing to use /remove command
-            if not user_verified(chat_id):
-                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
-            else:
-                try:
-                    _, username = command.split()
-                    response = remove_user(username, chat_id)
-                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
-                except ValueError:
-                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+     elif pending_remove_user_command:
+              # Process the pending "Remove User" command
+          try:
+             _, username = (pending_remove_user_command + ' ' + command).split()
+             response = remove_user(username, chat_id)
+             bot.sendMessage(chat_id, response, reply_markup=keyboard)
+          except ValueError:
+             bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the 'Remove User' command.", reply_markup=keyboard)
+          finally:
+              # Reset the pending command after processing
+             pending_remove_user_command = None
 
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
