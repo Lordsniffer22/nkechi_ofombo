@@ -74,7 +74,6 @@ run_bot() {
     else
       echo ""
     fi
-    sudo pip install telepot --upgrade &>/dev/null
     cd /octopo/tgb/
     screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
     print_pink "Cheers! Your bot is now running."
@@ -83,15 +82,57 @@ run_bot() {
     sudo bot
 
 }
+
+stop_bot() {
+    #Run the bot
+    ban_me
+    print_center -ama "STOPPING THE BOT".....
+    sleep 2
+    if screen -ls | grep -q "Tesla"; then
+      screen -ls | grep Tesla | cut -d. -f1 | awk '{print $1}' | xargs kill
+    else
+      echo ""
+    fi
+    print_pink "Your Bot has been stopped"
+    sleep 2
+    bot_menu
+
+}
+ch_token() {
+    # Run the bot
+    ban_me
+    print_center -ama "CHANGE YOUR BOT TOKEN"
+    msg -bar3
+    sleep 1
+    echo ""
+    print_blue "Enter new token"
+    echo ""
+    read -p "NEW TOKEN: " new_token
+    sleep 3
+
+    while IFS= read -r line; do
+        if [ "$line" == "$new_token" ]; then
+            print_yellow "The Bot Token entered already exists"
+            bot_menu
+        fi
+    done < /octopo/tgb/tokenz.txt
+
+    echo "$new_token" > /octopo/tgb/tokenz.txt
+    print_pink "A new Bot token has been Saved!"
+    bot_menu
+}
+
+
 bot_install() {
     cd
     clear
-    sudo apt update && apt upgrade
+    sudo apt update && apt upgrade -y
     sudo apt-get install screen
     sudo apt install python3-pip
     sudo pip install telepot &>/dev/null
-    touch tokenz.txt
-    touch seckey.txt
+    sudo pip install telepot --upgrade &>/dev/null
+    sudo touch tokenz.txt
+    sudo seckey.txt
    # Download teslbot from git
    teslbot_fetch() {
       wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
@@ -105,7 +146,7 @@ bot_install() {
       
     }
     teslbot_fetch &>/dev/null
-    sudo cp tokenz.txt /octopo/tgb/
+    sudo mv tokenz.txt /octopo/tgb/
     #creste file command
     wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
     chmod +x /usr/bin/bot
@@ -138,10 +179,32 @@ bot_install() {
 
    # Store the new key in seckey.txt
     echo "$secretk" > seckey.txt
-    sudo cp -f seckey.txt /octopo/tgb/
+    sudo mv -f seckey.txt /octopo/tgb/
+
    # Display a message
-    see_key
-    rm -f bot_runner.sh
+    ban_me
+    msg -bar
+    print_center -ama "SERVER KEY Manager"
+    msg -bar0
+    echo ""
+    
+  # print options menu
+    print_center -ama "${a12:-BOT SECRET KEY}"
+    msg -bar3
+    gamba="Bot secret:"
+    echo ""
+    while read -r line; do
+      echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
+      echo ""
+      print_blu "You can use it to verify your bot ownership on Telegram."
+      print_center -ama " Made By TeslaSSH, t.me/teslassh"
+      sleep 5
+    done < /octopo/tgb/seckey.txt
+    # Search and remove raw files
+    find / -type f -name "bot_runner.sh" 2>/dev/null | while read -r file;
+      do
+        rm -f "$file"
+      done
     run_bot
 }
 
@@ -168,6 +231,8 @@ bot_menu() {
   echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ♞}")"
   echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-INSTALL BOT ✳️}")"
   echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY 🔑}")"
+  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ♞}")"
+  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN♞}")"
   exit2home
 
   # prompt user for option selection
@@ -184,6 +249,12 @@ bot_menu() {
   3)
     see_key
     ;;
+  4)
+    stop_bot
+    ;;
+  5)
+    ch_token
+    ;;
   0)
     exit
     ;;
@@ -191,5 +262,6 @@ bot_menu() {
 }
 
 bot_menu
+
 
 
