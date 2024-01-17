@@ -197,15 +197,12 @@ def handle(msg):
             if not user_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
-                if command.lower() == '/add':
-                    bot.sendMessage(chat_id, "Please provide [username] [password] [days] in the next message.", reply_markup=keyboard)
-                else:
-                    try:
-                        _, username, password, days = command.split()[1:]
-                        response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
-                        bot.sendMessage(chat_id, response, reply_markup=keyboard)
-                    except ValueError:
-                        bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the /add command.", reply_markup=keyboard)
+                try:
+                    _, username, password, days = command.split()[1:]
+                    response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
+                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                except ValueError:
+                    bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong with processing the /add command.", reply_markup=keyboard)
 
         elif command.lower().startswith('/add') and len(command.split()) == 1:
             # Check if the user is verified before allowing to use /add command
@@ -231,7 +228,6 @@ def handle(msg):
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
-
 
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
