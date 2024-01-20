@@ -1,7 +1,8 @@
 import telepot
 from pytube import YouTube
 from telepot.loop import MessageLoop
-from io import BytesIO
+import tempfile
+import os
 
 # Replace 'YOUR_BOT_TOKEN' with your actual bot token
 TOKEN = '6724007051:AAG_ZXO7N__TwMQlVFvJuuJmJ1ViBIRWchY'
@@ -25,13 +26,13 @@ def handle(msg):
                 # Get the highest resolution stream
                 stream = yt.streams.get_highest_resolution()
 
-                # Get the video as bytes
-                video_bytes = BytesIO()
-                stream.download(output_path=video_bytes)
+                # Create a temporary file to save the video
+                with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_file:
+                    # Download the video to the temporary file
+                    stream.download(output_path=temp_file.name)
 
-                # Send the video back to the user
-                video_bytes.seek(0)
-                bot.sendVideo(chat_id, video_bytes)
+                    # Send the video back to the user
+                    bot.sendVideo(chat_id, open(temp_file.name, 'rb'))
 
                 # Send a confirmation message
                 bot.sendMessage(chat_id, f'Send complete for video with ID {video_id}')
