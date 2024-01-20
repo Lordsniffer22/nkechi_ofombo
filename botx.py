@@ -4,7 +4,7 @@ from telepot.loop import MessageLoop
 from io import BytesIO
 
 # Replace 'YOUR_BOT_TOKEN' with your actual bot token
-TOKEN = 'YOUR_BOT_TOKEN'
+TOKEN = '6724007051:AAG_ZXO7N__TwMQlVFvJuuJmJ1ViBIRWchY'
 bot = telepot.Bot(TOKEN)
 
 def handle(msg):
