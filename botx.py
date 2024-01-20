@@ -41,12 +41,21 @@ def on_callback_query(msg):
             url = info['formats'][0]['url']  # Get the URL of the best audio format
             bot.sendAudio(from_id, url, title=info['title'])
 
+# Function to handle regular messages
+def on_chat_message(msg):
+    content_type, chat_type, chat_id = telepot.glance(msg)
+
+    # Respond only to text messages
+    if content_type == 'text':
+        bot.sendMessage(chat_id, "To search for YouTube videos, please use inline mode. Start your message with @YourBotName.")
+
 # Create the bot and set the event handlers
 bot = telepot.Bot(TOKEN)
-bot.message_loop({'inline_query': on_inline_query, 'callback_query': on_callback_query})
+bot.message_loop({'inline_query': on_inline_query, 'callback_query': on_callback_query, 'chat': on_chat_message})
 
 print('Bot is listening...')
 
 # Keep the program running
+import time
 while True:
-    pass
+    time.sleep(10)
