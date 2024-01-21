@@ -7,12 +7,24 @@ from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
 bot = telepot.Bot(bot_token)
-
 # File path to store the secret key
 seckey_file_path = 'seckey.txt'
+domain_file_path = 'pydomain.txt'
 
 # Dictionary to store user verification status
 user_verification_status = {}
+
+def save_domain(domain):
+    with open(domain_file_path, 'w') as domain_file:
+        domain_file.write(domain)
+
+def get_domain():
+    try:
+        with open(domain_file_path, 'r') as domain_file:
+            return domain_file.read().strip()
+    except FileNotFoundError:
+        return None
+
 def add_user(username, password, days, user_info, chat_id):
     # Check if the user is verified
     if not user_verified(chat_id):
@@ -37,11 +49,11 @@ def add_user(username, password, days, user_info, chat_id):
     try:
         subprocess.run(['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
-        # Get server IP address
-        server_ip = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
+        # Get server IP address or saved domain
+        server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
 
         # Send success message with details
-        success_message = f"User {username} added successfully!\n\nServer Details:\n{server_ip}:1-65535@{username}:{password}"
+        success_message = f"User {username} added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
@@ -192,6 +204,18 @@ def handle(msg):
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
 ###########
+
+        elif command.lower() == 'add domain':
+            # Prompt user to enter the domain for saving
+            bot.sendMessage(chat_id, "Please enter the domain to be saved.")
+        elif command.lower().startswith('/add domain'):
+            try:
+                _, domain = command.split()
+                save_domain(domain)
+                bot.sendMessage(chat_id, f"Domain '{domain}' saved successfully!")
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add domain [your_domain]")
+
         if command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
