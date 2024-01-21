@@ -205,16 +205,19 @@ def handle(msg):
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
 ###########
 
-        elif command.lower() == 'add domain':
-            # Prompt user to enter the domain for saving
-            bot.sendMessage(chat_id, "Please enter the domain to be saved.")
-        elif command.lower().startswith('/domain'):
+        if command.lower().startswith('/domain'):
+
             try:
-                _, domain = command.split()
+
+                _, domain = command.split(maxsplit=1)
+
                 save_domain(domain)
+
                 bot.sendMessage(chat_id, f"Domain '{domain}' saved successfully!")
+
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /add domain [your_domain]")
+
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /domain [your_domain]")
 
         if command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
