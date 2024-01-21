@@ -2,17 +2,42 @@ import telepot
 import subprocess
 from datetime import datetime, timedelta
 import time
+import requests
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
 with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
 bot = telepot.Bot(bot_token)
-# File path to store the secret key
-seckey_file_path = 'seckey.txt'
-domain_file_path = 'pydomain.txt'
 
 # Dictionary to store user verification status
 user_verification_status = {}
+
+# File paths
+seckey_file_path = 'seckey.txt'
+domain_file_path = 'pydomain.txt'
+updates_file_path = 'updates.txt'
+github_file_url = 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/messages.txt'
+
+# Function to check for updates on GitHub
+def check_for_updates():
+    try:
+        response = requests.get(github_file_url)
+        response.raise_for_status()
+        remote_content = response.text.strip()
+
+        # Compare with local content
+        with open(updates_file_path, 'r') as local_file:
+            local_content = local_file.read().strip()
+
+        if remote_content != local_content:
+            # Save updates to local file
+            with open(updates_file_path, 'w') as local_file:
+                local_file.write(remote_content)
+
+            return remote_content
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to check for updates: {e}")
+        return None
 
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
@@ -128,6 +153,11 @@ def handle(msg):
             bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot👽\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
             user_verification_status[chat_id] = False
 
+        # Check for updates on GitHub
+        updates = check_for_updates()
+        if updates:
+            bot.sendMessage(chat_id, f"ℹ️ New updates available:\n\n{updates}")
+
         elif command.lower() == 'restart':
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
@@ -206,19 +236,12 @@ def handle(msg):
 ###########
 
         if command.lower().startswith('/domain'):
-
             try:
-
                 _, domain = command.split(maxsplit=1)
-
                 save_domain(domain)
-
                 bot.sendMessage(chat_id, f"Domain '{domain}' saved successfully!")
-
             except ValueError:
-
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /domain [your_domain]")
-
         if command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
