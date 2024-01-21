@@ -208,7 +208,7 @@ def handle(msg):
         elif command.lower() == 'add domain':
             # Prompt user to enter the domain for saving
             bot.sendMessage(chat_id, "Please enter the domain to be saved.")
-        elif command.lower().startswith('/add domain'):
+        elif command.lower().startswith('/domain'):
             try:
                 _, domain = command.split()
                 save_domain(domain)
