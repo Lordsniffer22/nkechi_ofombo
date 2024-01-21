@@ -2,9 +2,7 @@ import telepot
 import subprocess
 from datetime import datetime, timedelta
 import time
-import requests
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
-
 
 with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
@@ -16,47 +14,16 @@ domain_file_path = 'pydomain.txt'
 # Dictionary to store user verification status
 user_verification_status = {}
 
-# ... (existing code)
-
-# GitHub repository information
-github_repo_owner = 'Lordsniffer22'
-github_repo_name = 'nkechi_ofombo'
-github_file_path = 'messages.txt'
-https://raw.githubusercontent.com//nkechi_ofombo/main/
-github_raw_base_url = f'https://raw.githubusercontent.com/{github_repo_owner}/{github_repo_name}/main/{github_file_path}'
-
-# Local file path to store updates
-local_updates_file_path = 'updates.txt'
-def check_for_updates():
-    try:
-        # Fetch the content of the updates file from GitHub
-        response = requests.get(github_raw_base_url)
-        response.raise_for_status()
-
-        # Check if the content is different from the local file
-        new_content = response.text.strip()
-        with open(local_updates_file_path, 'r') as local_file:
-            local_content = local_file.read().strip()
-
-        if new_content != local_content:
-            # Save the new content to the local file
-            with open(local_updates_file_path, 'w') as local_file:
-                local_file.write(new_content)
-
-            # Notify the user about the updates
-            bot.sendMessage(chat_id, "🔔 New updates available! Here are the latest changes:\n\n" + new_content)
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching updates from GitHub: {e}")
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
         domain_file.write(domain)
+
 def get_domain():
     try:
         with open(domain_file_path, 'r') as domain_file:
             return domain_file.read().strip()
     except FileNotFoundError:
         return None
-
 
 def add_user(username, password, days, user_info, chat_id):
     # Check if the user is verified
@@ -80,9 +47,7 @@ def add_user(username, password, days, user_info, chat_id):
 
     # Create user
     try:
-        subprocess.run(
-            ['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}',
-             '-p', passs, '-c', f'{user_info},{password}', username], check=True)
+        subprocess.run(['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
         # Get server IP address or saved domain
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
@@ -92,7 +57,6 @@ def add_user(username, password, days, user_info, chat_id):
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
-
 
 def remove_user(username, chat_id):
     # Check if the user is verified
@@ -105,7 +69,6 @@ def remove_user(username, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 
-
 def list_users(chat_id):
     # Check if the user is verified
     if not user_verified(chat_id):
@@ -117,8 +80,7 @@ def list_users(chat_id):
         users_days_remaining = []
 
         for user in users_list:
-            remaining_days = \
-            subprocess.check_output(['sudo', 'chage', '-l', user]).decode('utf-8').split('\n')[1].split(':')[1].strip()
+            remaining_days = subprocess.check_output(['sudo', 'chage', '-l', user]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
@@ -129,11 +91,9 @@ def list_users(chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
-
 def user_verified(chat_id):
     # Check if the user is verified
     return user_verification_status.get(chat_id, False)
-
 
 def verify_user(chat_id, secret_key):
     # Verify the secret key against the stored key
@@ -145,11 +105,8 @@ def verify_user(chat_id, secret_key):
         return "Verification successful! You can now use /add, /remove, and /users commands."
     else:
         return "Verification failed. Please provide the correct secret key."
-
-
+    
 pending_add_user_command = None
-
-
 def handle(msg):
     global pending_add_user_command
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -166,17 +123,12 @@ def handle(msg):
 
     if content_type == 'text':
         command = msg['text']
-        # Check for updates when the bot starts
-        if content_type == 'start':
-            check_for_updates()
 
         if command.lower() == 'start' or command == '/start':
-            bot.sendMessage(chat_id,
-                            "Welcome to Tesla SSH Bot👽\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
+            bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot👽\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
             user_verification_status[chat_id] = False
 
         elif command.lower() == 'restart':
-            check_for_updates()
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
                              "\n"
@@ -196,7 +148,7 @@ def handle(msg):
 
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
-
+            
         elif command.lower() == 'dev team':
             start_message = ("♻️ ZERO ONE LLC 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
@@ -241,8 +193,7 @@ def handle(msg):
 
         elif command.lower() == 'verify':
             # Prompt user to enter the secret key for verification
-            bot.sendMessage(chat_id,
-                            "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
+            bot.sendMessage(chat_id, "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
             user_verification_status[chat_id] = False
 
         elif command.lower().startswith('/verify'):
@@ -251,10 +202,8 @@ def handle(msg):
                 response = verify_user(chat_id, secret_key)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id,
-                                "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻",
-                                reply_markup=keyboard)
-        ###########
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
+###########
 
         if command.lower().startswith('/domain'):
 
@@ -273,14 +222,11 @@ def handle(msg):
         if command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id,
-                                "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
                 # Set the pending "Add User" command
                 pending_add_user_command = command
-                bot.sendMessage(chat_id,
-                                "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
-                                reply_markup=keyboard)
+                bot.sendMessage(chat_id, "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30", reply_markup=keyboard)
 
         elif pending_add_user_command:
             # Process the pending "Add User" command
@@ -289,8 +235,7 @@ def handle(msg):
                 response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
-                                reply_markup=keyboard)
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.", reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
@@ -298,37 +243,29 @@ def handle(msg):
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id,
-                                "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
-                bot.sendMessage(chat_id,
-                                "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n",
-                                reply_markup=keyboard)
+                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
         elif command.lower().startswith('/remove'):
             # Check if the user is verified before allowing to use /remove command
             if not user_verified(chat_id):
-                bot.sendMessage(chat_id,
-                                "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
+                bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
             else:
                 try:
                     _, username = command.split()
                     response = remove_user(username, chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
                 except ValueError:
-                    bot.sendMessage(chat_id,
-                                    "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n",
-                                    reply_markup=keyboard)
+                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
-
 # Set the command handler
 bot.message_loop(handle)
 
-# Check for updates every hour
+# Keep the program running
 while True:
-    check_for_updates()
-    time.sleep(3600)  # 1 hour
+    pass
