@@ -127,7 +127,6 @@ bot_update() {
   print_center -ama "UPDATING THE BOT".....
   sudo rm -f /etc/hsm/toxic/olwa.py
   wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &>/dev/null
-  sudo mv olwa.py /etc/hsm/toxic/
   sudo rm -f /usr/bin/bot
   wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
   chmod +x /usr/bin/bot
