@@ -126,7 +126,7 @@ bot_update() {
   ban_me
   print_center -ama "UPDATING THE BOT".....
   sudo rm -f /etc/hsm/toxic/olwa.py
-  wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/olwa.py &>/dev/null
+  wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &>/dev/null
   sudo mv olwa.py /etc/hsm/toxic/
   sudo rm -f /usr/bin/bot
   wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
@@ -147,7 +147,7 @@ bot_install() {
     sudo touch seckey.txt
    # Download teslbot from git
     teslbot_fetch() {
-      wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/olwa.py &&
+      wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
       sudo mkdir -p /etc/hsm/toxic/ &&
       sudo rm -f /etc/hsm/toxic/olwa.py
       sudo mv olwa.py /etc/hsm/toxic/
