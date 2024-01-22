@@ -37,7 +37,7 @@ def add_user(username, password, days, user_info, chat_id):
     # Check if the user already exists
     existing_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
     if f'{username}:' in existing_users and user_info.lower() not in existing_users.lower():
-        return f"User {username} already exists with a different info."
+        return f"{username} already exists with a different info."
 
     # Generate hashed password
     osl_version = subprocess.check_output(['openssl', 'version']).decode('utf-8')
@@ -53,7 +53,7 @@ def add_user(username, password, days, user_info, chat_id):
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
 
         # Send success message with details
-        success_message = f"User {username} added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
+        success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
@@ -65,7 +65,7 @@ def remove_user(username, chat_id):
 
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
-        return f"User {username} removed successfully!"
+        return f"{username} Has been removed successfully! \n Who else? 😳"
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 
@@ -102,7 +102,7 @@ def verify_user(chat_id, secret_key):
 
     if secret_key == stored_secret_key:
         user_verification_status[chat_id] = True
-        return "Verification successful! You can now use /add, /remove, and /users commands."
+        return "Verification successful! You can now use use the bot as a Super Admin."
     else:
         return "Verification failed. Please provide the correct secret key."
     
@@ -136,8 +136,8 @@ def handle(msg):
                              "\n"
                              "To reload the bot, Press /start\n"
                              "To see the usage guide, Press /help\n"
-                             "To add user, Press /add \n"
-                             "To remove user, Press /remove \n"
+                             "To add user, Press the add user button \n"
+                             "To remove user, Send /remove \n"
                              "To list users, Press /users \n"
                              "\n"
                              "🔰 Made with spirit. \n"
@@ -169,24 +169,26 @@ def handle(msg):
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
 
         elif command.lower() == 'help' or command == '/help':
-            help_message = ("HOW TO USE BOT:\n"
+            help_message = ("⚙️ HOW TO USE BOT:\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━"
                             "\n"
-                            "- To Add a new user, \n"
+                            "- 📌 To Add a new user, \n"
                             'Cick on "Add User" Button, and then send me the user details to be added. in the format below: \n [username] [password] [days]\n'
                             "\n"
                             "Example: \n Nicholas passwad 30\n"
                             "...........................................................\n"
 
-                            "- To Remove a user, \n"
+                            "- 📵 To Remove a user, \n"
                             "Send /remove [username]\n"
                             "\n"
                             "Example: \n /remove Nicholas\n"
                             "...........................................................\n"
-                            "- To List all users, \n"
+                            "- 💰 To List all users, \n"
                             'Click on "List Users" button\n'
                             "\n"
-                            "if you are facing issues with the bot,\n"
+                            "-🌐 To add a domain or sub-domain, \n"
+                            "send /domain [ your domain ] \n\n Example: /domain sub.domain.com. \n\n"
+                            "🆘 if you are facing issues with the bot,\n"
                             "Contact: @teslassh"
                             )
             bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
