@@ -255,11 +255,12 @@ bot_menu() {
   # print options menu
   print_center -ama "${a12:-CHOOSE AN OPTION}"
   msg -bar3
-  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ♞}")"
+  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ☢️}")"
   echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-INSTALL BOT ✳️}")"
   echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY 🔑}")"
-  echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ♞}")"
-  echo " $(msg -verd "[5]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN♞}")"
+  echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ⛔}")"
+  echo " $(msg -verd "[5]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN 🔁")"
+  echo " $(msg -verd "[6]") $(msg -verm2 '>') $(msg -ama "${a6:-UPDATE BOT ♻️}")"
   exit2home
 
   # prompt user for option selection
@@ -281,6 +282,9 @@ bot_menu() {
     ;;
   5)
     ch_token
+    ;;
+  6)
+    bot_update
     ;;
   0)
     exit
