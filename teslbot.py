@@ -49,11 +49,11 @@ def add_user(username, password, days, user_info, chat_id):
     try:
         subprocess.run(['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
-        # Get server IP address or saved domain
+        # Get server IP address or saved domain 
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
 
         # Send success message with details
-        success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
+        success_message = f"😍 {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
@@ -65,7 +65,7 @@ def remove_user(username, chat_id):
 
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
-        return f"{username} Has been removed successfully! \n Who else? 😳"
+        return f"🙆‍♂️ {username} Has been removed successfully! \n Who else? 😳"
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 
