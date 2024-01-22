@@ -146,17 +146,13 @@ bot_install() {
     sudo touch tokenz.txt
     sudo touch seckey.txt
    # Download teslbot from git
-   teslbot_fetch() {
+    teslbot_fetch() {
       wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/olwa.py &&
-
-   # Create the directory with to store the python_bot
       sudo mkdir -p /etc/hsm/toxic/ &&
-
-   # Move the olwa.py to the directory
       sudo rm -f /etc/hsm/toxic/olwa.py
       sudo mv olwa.py /etc/hsm/toxic/
-      
-    }
+   }
+
     teslbot_fetch &>/dev/null
     sudo mv tokenz.txt /etc/hsm/toxic/
     #creste file command
