@@ -132,6 +132,7 @@ bot_update() {
   chmod +x /usr/bin/bot
   sleep 4
   print_pink "Your bot has been Updated successfully"
+  restart_bot
 }
 bot_install() {
     cd
