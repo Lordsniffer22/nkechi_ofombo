@@ -34,7 +34,7 @@ see_key() {
       print_center -ama " Made By TeslaSSH, t.me/teslassh"
       sleep 4
 
-   done < /octopo/tgb/seckey.txt
+   done < /etc/hsm/toxic/seckey.txt
    press_back
 }
 press_back() {
@@ -74,8 +74,8 @@ run_bot() {
     else
       echo ""
     fi
-    cd /octopo/tgb/
-    screen -dmS Tesla_SSH_BOT /usr/bin/python3 teslbot.py
+    cd /etc/hsm/toxic/
+    screen -dmS Tesla_SSH_BOT /usr/bin/python3 olwa.py
     print_pink "Cheers! Your bot is now running."
     echo ""
     sleep 2
@@ -115,39 +115,52 @@ ch_token() {
             print_yellow "The Bot Token entered already exists"
             bot_menu
         fi
-    done < /octopo/tgb/tokenz.txt
+    done < /etc/hsm/toxic/tokenz.txt
 
-    echo "$new_token" > /octopo/tgb/tokenz.txt
+    echo "$new_token" > /etc/hsm/toxic/tokenz.txt
     print_pink "A new Bot token has been Saved!"
     bot_menu
 }
 
-
+bot_update() {
+  ban_me
+  print_center -ama "UPDATING THE BOT".....
+  
+  sudo rm -f /etc/hsm/toxic/olwa.py
+  wget -O /etc/hsm/toxic/olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/olwa.py &>/dev/null
+  sudo rm -f /usr/bin/bot
+  wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
+  chmod +x /usr/bin/bot
+  sleep 4
+  print_pink "Your bot has been Updated successfully"
+}
 bot_install() {
     cd
     clear
+
     #sudo apt update && apt upgrade -y
     sudo apt-get install screen
     sudo apt install python3-pip
     sudo pip install telepot &>/dev/null
     sudo pip install telepot --upgrade &>/dev/null
     sudo touch tokenz.txt
-    sudo seckey.txt
+    sudo touch seckey.txt
    # Download teslbot from git
    teslbot_fetch() {
-      wget -O teslbot.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
+      wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/olwa.py &&
 
    # Create the directory with to store the python_bot
-      sudo mkdir -p /octopo/tgb/ &&
+      sudo mkdir -p /etc/hsm/toxic/ &&
 
-   # Move the teslbot.py to the directory
-      sudo rm -f /octopo/tgb/teslbot.py
-      sudo mv teslbot.py /octopo/tgb/
+   # Move the olwa.py to the directory
+      sudo rm -f /etc/hsm/toxic/olwa.py
+      sudo mv olwa.py /etc/hsm/toxic/
       
     }
     teslbot_fetch &>/dev/null
-    sudo mv tokenz.txt /octopo/tgb/
+    sudo mv tokenz.txt /etc/hsm/toxic/
     #creste file command
+    sudo rm -f /usr/bin/bot
     wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
     chmod +x /usr/bin/bot
     
@@ -166,7 +179,7 @@ bot_install() {
     clear
 
     # save the Bot Token
-    echo "$btoken" > /octopo/tgb/tokenz.txt
+    echo "$btoken" > /etc/hsm/toxic/tokenz.txt
 
 
     # Function to generate a random 12-character key
@@ -179,7 +192,7 @@ bot_install() {
 
    # Store the new key in seckey.txt
     echo "$secretk" > seckey.txt
-    sudo mv -f seckey.txt /octopo/tgb/
+    sudo mv -f seckey.txt /etc/hsm/toxic/
 
    # Display a message
     ban_me
@@ -199,14 +212,28 @@ bot_install() {
       print_blu "You can use it to verify your bot ownership on Telegram."
       print_center -ama " Made By TeslaSSH, t.me/teslassh"
       sleep 5
-    done < /octopo/tgb/seckey.txt
+    done < /etc/hsm/toxic/seckey.txt
     # Search and remove raw files
-    find / -type f -name "bot_runner.sh" 2>/dev/null | while read -r file;
+    find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
       do
         rm -f "$file"
       done
     run_bot
 }
+bot_installer() {
+      # Check if mana.sh exists
+    if [ -f ~/udp/mana.sh ]; then
+      bot_install
+    else
+      print_viola "You did not install teslassh udp script on your server."
+      echo ""
+      print_yellow "Go visit github to install The Script"
+      sleep 4
+      exit
+    fi
+
+}
+
 
 ban_me() {
   clear
