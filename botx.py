@@ -1,9 +1,12 @@
 import telepot
-from telepot.loop import MessageLoop
+from telepot.loop import MessageLoop, InlineQueryHandler
 from telepot.namedtuple import InlineQueryResultArticle, InputTextMessageContent
 from googleapiclient.discovery import build
 
+# Replace 'YOUR_BOT_TOKEN' with the token obtained from BotFather
 TELEGRAM_BOT_TOKEN = '6643175652:AAH6haOsyYIUmw6ql8U_5-Bmdocguwzwolc'
+
+# Replace 'YOUR_YOUTUBE_API_KEY' with your YouTube API key
 YOUTUBE_API_KEY = 'AIzaSyAa-43K1ZF6xYlbPW7A7ufHTpgzkUwsGas'
 
 def handle_messages(msg):
@@ -16,27 +19,20 @@ def handle_messages(msg):
             results = search_youtube(search_query)
             send_youtube_results(chat_id, results)
 
-def on_inline_query(msg):
+def handle_inline_query(msg):
     query_id, from_id, query_string = telepot.glance(msg, flavor='inline_query')
     results = search_youtube(query_string)
-    articles = []
-
-    for idx, result in enumerate(results):
-        title = result['title']
-        video_id = result['video_id']
-        link = f"https://www.youtube.com/watch?v={video_id}"
-        content = f"{title}\n{link}"
-
-        articles.append(
-            InlineQueryResultArticle(
-                id=str(idx),
-                title=title,
-                input_message_content=InputTextMessageContent(
-                    message_text=content
-                )
+    articles = [
+        InlineQueryResultArticle(
+            id=str(idx),
+            title=result['title'],
+            input_message_content=InputTextMessageContent(
+                message_text=f"Title: {result['title']}\n"
+                             f"Video ID: {result['video_id']}\n"
+                             f"Link: https://www.youtube.com/watch?v={result['video_id']}"
             )
-        )
-
+        ) for idx, result in enumerate(results)
+    ]
     bot.answerInlineQuery(query_id, articles)
 
 def search_youtube(query):
@@ -59,7 +55,7 @@ def send_youtube_results(chat_id, results):
         bot.sendMessage(chat_id, message)
 
 bot = telepot.Bot(TELEGRAM_BOT_TOKEN)
-MessageLoop(bot, {'chat': handle_messages, 'inline_query': on_inline_query}).run_as_thread()
+MessageLoop(bot, {'inline_query': handle_inline_query, 'chat': handle_messages}).run_as_thread()
 
 print('Bot is listening...')
 
