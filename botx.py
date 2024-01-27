@@ -15,8 +15,8 @@ def handle_messages(msg):
     if content_type == 'text':
         username = bot.getMe()['username']
         if f'@{username}' in msg['text']:
-            search_query = msg['text'].replace(f'@{username}', '').strip()
-            results = search_youtube(search_query)
+            query_string = msg['text'].replace(f'@{username}', '').strip()
+            results = search_youtube(query_string)
             send_youtube_results(chat_id, results)
 
 def search_youtube(query):
