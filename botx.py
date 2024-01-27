@@ -1,66 +1,102 @@
-import telepot
-from telepot.namedtuple import InlineQueryResultArticle, InputTextMessageContent
-from youtube_search import YoutubeSearch  # You can install it with: pip install youtube-search
-import youtube_dl
+import requests
+import json
+from Crypto.Cipher import AES
+from base64 import b64encode, b64decode
 
-# Telegram bot API token
-TELEGRAM_API_TOKEN = '6724007051:AAG_ZXO7N__TwMQlVFvJuuJmJ1ViBIRWchY'
+# Set your Telegram bot API token
+API_KEY = "YOUR_TOKEN"
 
-# Youtube DL options for downloading in mp3 format
-ydl_opts = {
-    'format': 'bestaudio/best',
-    'extractaudio': True,
-    'audioformat': 'mp3',
-    'outtmpl': '%(title)s.%(ext)s',
-    'noplaylist': True,
-}
+def bot(method, datas=None):
+    url = f"https://api.telegram.org/bot{API_KEY}/{method}"
+    response = requests.post(url, data=datas)
+    return response.json()
 
-# Function to handle inline queries
-def on_inline_query(msg):
-    query_id, from_id, query_string = telepot.glance(msg, flavor='inline_query')
+def aes_ecb_decrypt(data, key):
+    cipher = AES.new(key, AES.MODE_ECB)
+    decrypted = cipher.decrypt(b64decode(data))
+    return decrypted.rstrip(b"\0").decode()
 
-    # Search YouTube videos based on the user's query
-    videos = YoutubeSearch(query_string, max_results=5).to_dict()
+def aes_ecb_encrypt(data, key):
+    cipher = AES.new(key, AES.MODE_ECB)
+    encrypted = cipher.encrypt(data)
+    return b64encode(encrypted).decode()
 
-    results = []
-    for video in videos:
-        title = video['title']
-        link = f"https://www.youtube.com/watch?v={video['id']}"
-        thumb_url = video['thumbnails'][0]
+def get_file(file_id):
+    response = requests.get(f'https://api.telegram.org/bot{API_KEY}/getFile?file_id={file_id}')
+    return response.json()['result']
 
-        # Create an InlineQueryResultArticle with a button to download in mp3
-        results.append(InlineQueryResultArticle(
-            id=video['id'],
-            title=title,
-            input_message_content=InputTextMessageContent(
-                message_text=f"Click the button to download [**{title}**]({link}) in mp3 format."),
-            reply_markup={'inline_keyboard': [[{'text': 'Download Mp3', 'callback_data': video['id']}]]},
-            thumb_url=thumb_url
-        ))
+def process_document(update):
+    file_name = update['message']['document']['file_name']
 
-    # Answer the inline query with the search results
-    bot.answerInlineQuery(query_id, results)
+    if '.hat' in file_name:
+        file_id = update['message']['document']['file_id']
+        file_path = get_file(file_id)['file_path']
+        r = str(random.randint(1111, 9999))
+        with open(f"{r}.hat", "wb") as file:
+            file.write(requests.get(f'https://api.telegram.org/file/bot{API_KEY}/{file_path}').content)
 
+        with open(f"{r}.hat", "rb") as file:
+            key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
+            data = json.loads(aes_ecb_decrypt(file.read(), key))
 
-# Function to handle callback queries (i.e., when the user clicks on the download button)
-def on_callback_query(msg):
-    query_id, from_id, data = telepot.glance(msg, flavor='callback_query')
+        caption = update['message']['caption'] if 'caption' in update['message'] else "NuLL"
+        data['descriptionv5'] = caption
+        data['protextras']['password'] = False
+        data['protextras']['expiry'] = False
+        data['protextras']['id_lock'] = False
+        data['protextras']['block_root'] = False
+        data['protextras']['anti_sniff'] = False
+        encrypted_data = aes_ecb_encrypt(json.dumps(data), key)
 
-    # Download the selected video in mp3 format
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        video_info = ydl.extract_info(f'https://www.youtube.com/watch?v={data}', download=True)
-        audio_url = video_info['formats'][0]['url']
+        with open(f"{r}.hat", "wb") as file:
+            file.write(encrypted_data.encode())
 
-        # Send the mp3 file to the user
-        bot.sendAudio(from_id, audio_url, title=video_info['title'])
+        cp = f"""
+        ├ • Developer : @BOOS_TOOLS
+        ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+        ├ • 💠 Expiry Time  :  Disabled
+        ├ • 💠 ID_Lock :  Disabled
+        ├ • 💠 Password :  Disabled
+        ├ • 💠 Block_Root :  Disabled
+        ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+        ├ • 💠 Description : {caption}
+        ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+        ├ • BoT ID : @derypterbot
+        """
 
+        bot('sendDocument', {
+            'chat_id': update['message']['chat']['id'],
+            'document': open(f"{r}.hat", "rb"),
+            'caption': cp,
+        })
 
-# Create the Telegram bot
-bot = telepot.Bot(TELEGRAM_API_TOKEN)
+        os.remove(f"{r}.hat")
 
-# Set the callback functions
-bot.message_loop({'inline_query': on_inline_query, 'callback_query': on_callback_query})
+if __name__ == "__main__":
+    update = json.loads(input())  # Replace with actual input or webhook handling
+    if 'message' in update and 'document' in update['message']:
+        process_document(update)
+    elif 'message' in update and 'text' in update['message'] and update['message']['text'] == '/start':
+        bot('sendMessage', {
+            'chat_id': update['message']['chat']['id'],
+            'text': """
+            <strong>
+            <u>🇪🇬This project was made by an Iranian 🇪🇬</u>
 
-print('Bot is listening...')
-while True:
-    pass
+            💠 Send Me Ha Tunnel Plus Config and write Caption For Description
+
+            ♻️ The tasks performed by this robot:
+
+            🔹Only Ha Tunnel Plus - .HAT 🔹
+            🔻Time makes the use of config unlimited
+            🔻The number of users is unlimited
+            🔻The password disables the file
+            🔻Allows root users to use
+
+            🔹Change the description as desired 🔹
+
+            💠 Channel: @decrypt_file
+            💠 Developer: @BOOS_TOOLS</strong>
+            """,
+            'parse_mode': "html",
+        })
