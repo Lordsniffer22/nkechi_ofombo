@@ -50,6 +50,10 @@ def get_file(file_id):
     response = requests.get(f'https://api.telegram.org/bot{API_KEY}/getFile?file_id={file_id}')
     return response.json()['result']
 
+import base64
+
+# ... (your existing code)
+
 def process_document(msg):
     file_name = msg['document']['file_name']
 
@@ -61,9 +65,16 @@ def process_document(msg):
         with open(f"{r}.hat", "wb") as file:
             file.write(requests.get(f'https://api.telegram.org/file/bot{API_KEY}/{file_path}').content)
 
-        with open(f"{r}.hat", "r") as file:
+        with open(f"{r}.hat", "rb") as file:
             file_content = file.read()
-            print("File Content:", repr(file_content))  # Print the file content
+
+        # Check if the content is base64-encoded and decode it
+        try:
+            file_content = base64.b64decode(file_content).decode('utf-8')
+        except UnicodeDecodeError:
+            pass  # If not base64-encoded, continue with the original content
+
+        print("File Content:", repr(file_content))  # Print the file content
 
         key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
 
@@ -101,6 +112,7 @@ def process_document(msg):
         bot.sendDocument(msg['chat']['id'], open(f"{r}.hat", "rb"), caption=cp, parse_mode="html")
 
         os.remove(f"{r}.hat")
+
 
 if __name__ == "__main__":
     bot = telepot.Bot(API_KEY)
