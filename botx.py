@@ -1,15 +1,40 @@
 import requests
 import json
+import os
+import random
 from Crypto.Cipher import AES
 from base64 import b64encode, b64decode
+import telepot
 
 # Set your Telegram bot API token
 API_KEY = "6643175652:AAH6haOsyYIUmw6ql8U_5-Bmdocguwzwolc"
 
-def bot(method, datas=None):
-    url = f"https://api.telegram.org/bot{API_KEY}/{method}"
-    response = requests.post(url, data=datas)
-    return response.json()
+def on_chat_message(msg):
+    content_type, chat_type, chat_id = telepot.glance(msg)
+
+    if 'document' in msg:
+        process_document(msg)
+
+    elif 'text' in msg and msg['text'] == '/start':
+        bot.sendMessage(chat_id, """
+        <strong>
+        <u>🇪🇬This project was made by an Iranian 🇪🇬</u>
+
+        💠 Send Me Ha Tunnel Plus Config and write Caption For Description
+
+        ♻️ The tasks performed by this robot:
+
+        🔹Only Ha Tunnel Plus - .HAT 🔹
+        🔻Time makes the use of config unlimited
+        🔻The number of users is unlimited
+        🔻The password disables the file
+        🔻Allows root users to use
+
+        🔹Change the description as desired 🔹
+
+        💠 Channel: @decrypt_file
+        💠 Developer: @BOOS_TOOLS</strong>
+        """, parse_mode="html")
 
 def aes_ecb_decrypt(data, key):
     cipher = AES.new(key, AES.MODE_ECB)
@@ -25,13 +50,14 @@ def get_file(file_id):
     response = requests.get(f'https://api.telegram.org/bot{API_KEY}/getFile?file_id={file_id}')
     return response.json()['result']
 
-def process_document(update):
-    file_name = update['message']['document']['file_name']
+def process_document(msg):
+    file_name = msg['document']['file_name']
 
     if '.hat' in file_name:
-        file_id = update['message']['document']['file_id']
+        file_id = msg['document']['file_id']
         file_path = get_file(file_id)['file_path']
         r = str(random.randint(1111, 9999))
+
         with open(f"{r}.hat", "wb") as file:
             file.write(requests.get(f'https://api.telegram.org/file/bot{API_KEY}/{file_path}').content)
 
@@ -39,7 +65,7 @@ def process_document(update):
             key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
             data = json.loads(aes_ecb_decrypt(file.read(), key))
 
-        caption = update['message']['caption'] if 'caption' in update['message'] else "NuLL"
+        caption = msg['caption'] if 'caption' in msg else "NuLL"
         data['descriptionv5'] = caption
         data['protextras']['password'] = False
         data['protextras']['expiry'] = False
@@ -64,39 +90,14 @@ def process_document(update):
         ├ • BoT ID : @derypterbot
         """
 
-        bot('sendDocument', {
-            'chat_id': update['message']['chat']['id'],
-            'document': open(f"{r}.hat", "rb"),
-            'caption': cp,
-        })
+        bot.sendDocument(msg['chat']['id'], open(f"{r}.hat", "rb"), caption=cp, parse_mode="html")
 
         os.remove(f"{r}.hat")
 
 if __name__ == "__main__":
-    update = json.loads(input())  # Replace with actual input or webhook handling
-    if 'message' in update and 'document' in update['message']:
-        process_document(update)
-    elif 'message' in update and 'text' in update['message'] and update['message']['text'] == '/start':
-        bot('sendMessage', {
-            'chat_id': update['message']['chat']['id'],
-            'text': """
-            <strong>
-            <u>🇪🇬This project was made by an Iranian 🇪🇬</u>
+    bot = telepot.Bot(API_KEY)
+    bot.message_loop({'chat': on_chat_message})
 
-            💠 Send Me Ha Tunnel Plus Config and write Caption For Description
-
-            ♻️ The tasks performed by this robot:
-
-            🔹Only Ha Tunnel Plus - .HAT 🔹
-            🔻Time makes the use of config unlimited
-            🔻The number of users is unlimited
-            🔻The password disables the file
-            🔻Allows root users to use
-
-            🔹Change the description as desired 🔹
-
-            💠 Channel: @decrypt_file
-            💠 Developer: @BOOS_TOOLS</strong>
-            """,
-            'parse_mode': "html",
-        })
+    print('Listening for messages...')
+    while True:
+        pass
