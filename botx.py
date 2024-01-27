@@ -63,6 +63,7 @@ def process_document(msg):
 
         with open(f"{r}.hat", "r") as file:
             file_content = file.read()
+            print("File Content:", repr(file_content))  # Print the file content
 
         key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
 
