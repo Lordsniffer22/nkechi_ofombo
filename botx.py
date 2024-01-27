@@ -1,40 +1,13 @@
 import requests
 import json
-import os
-import random
+import telepot
 from Crypto.Cipher import AES
 from base64 import b64encode, b64decode
-import telepot
+import os
+import random
 
 # Set your Telegram bot API token
 API_KEY = "6643175652:AAH6haOsyYIUmw6ql8U_5-Bmdocguwzwolc"
-
-def on_chat_message(msg):
-    content_type, chat_type, chat_id = telepot.glance(msg)
-
-    if 'document' in msg:
-        process_document(msg)
-
-    elif 'text' in msg and msg['text'] == '/start':
-        bot.sendMessage(chat_id, """
-        <strong>
-        <u>🇪🇬This project was made by an Iranian 🇪🇬</u>
-
-        💠 Send Me Ha Tunnel Plus Config and write Caption For Description
-
-        ♻️ The tasks performed by this robot:
-
-        🔹Only Ha Tunnel Plus - .HAT 🔹
-        🔻Time makes the use of config unlimited
-        🔻The number of users is unlimited
-        🔻The password disables the file
-        🔻Allows root users to use
-
-        🔹Change the description as desired 🔹
-
-        💠 Channel: @decrypt_file
-        💠 Developer: @BOOS_TOOLS</strong>
-        """, parse_mode="html")
 
 def aes_ecb_decrypt(data, key):
     cipher = AES.new(key, AES.MODE_ECB)
@@ -50,8 +23,6 @@ def get_file(file_id):
     response = requests.get(f'https://api.telegram.org/bot{API_KEY}/getFile?file_id={file_id}')
     return response.json()['result']
 
-import base64
-
 def process_document(msg):
     file_name = msg['document']['file_name']
 
@@ -59,22 +30,12 @@ def process_document(msg):
         file_id = msg['document']['file_id']
         file_path = get_file(file_id)['file_path']
         r = str(random.randint(1111, 9999))
-
         with open(f"{r}.hat", "wb") as file:
             file.write(requests.get(f'https://api.telegram.org/file/bot{API_KEY}/{file_path}').content)
 
         with open(f"{r}.hat", "rb") as file:
-            file_content = file.read()
-
-        key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
-
-        decrypted_content = aes_ecb_decrypt(file_content, key)
-
-        try:
-            data = json.loads(decrypted_content)
-        except json.decoder.JSONDecodeError as e:
-            print(f"Error decoding JSON: {e}")
-            return
+            key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
+            data = json.loads(aes_ecb_decrypt(file.read(), key))
 
         caption = msg['caption'] if 'caption' in msg else "NuLL"
         data['descriptionv5'] = caption
@@ -101,14 +62,37 @@ def process_document(msg):
         ├ • BoT ID : @derypterbot
         """
 
-        bot.sendDocument(msg['chat']['id'], open(f"{r}.hat", "rb"), caption=cp, parse_mode="html")
+        bot.sendDocument(msg['chat']['id'], document=open(f"{r}.hat", "rb"), caption=cp)
 
         os.remove(f"{r}.hat")
 
-if __name__ == "__main__":
-    bot = telepot.Bot(API_KEY)
-    bot.message_loop({'chat': on_chat_message})
+def on_chat_message(msg):
+    content_type, chat_type, chat_id = telepot.glance(msg)
+    if 'document' in msg:
+        process_document(msg)
 
-    print('Listening for messages...')
-    while True:
-        pass
+    elif 'text' in msg and msg['text'] == '/start':
+        bot.sendMessage(chat_id, """
+            <strong>
+            <u>🇪🇬This project was made by an Iranian 🇪🇬</u>
+
+            💠 Send Me Ha Tunnel Plus Config and write Caption For Description
+
+            ♻️ The tasks performed by this robot:
+
+            🔹Only Ha Tunnel Plus - .HAT 🔹
+            🔻Time makes the use of config unlimited
+            🔻The number of users is unlimited
+            🔻The password disables the file
+            🔻Allows root users to use
+
+            🔹Change the description as desired 🔹
+
+            💠 Channel: @decrypt_file
+            💠 Developer: @BOOS_TOOLS</strong>
+        """, parse_mode="html")
+
+bot = telepot.Bot(API_KEY)
+bot.message_loop(on_chat_message)
+
+print('Listening for messages...')
