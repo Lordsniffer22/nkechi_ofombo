@@ -58,8 +58,7 @@ def on_inline_query(msg):
         bot.answerInlineQuery(query_id, articles)
 
 bot = telepot.Bot(TELEGRAM_BOT_TOKEN)
-MessageLoop(bot, {'inline_query': on_inline_query}).run_as_thread()
-MessageLoop(bot, handle_messages).run_as_thread()
+MessageLoop(bot, {'inline_query': on_inline_query, 'chat': handle_messages}).run_as_thread()
 
 print('Bot is listening...')
 
