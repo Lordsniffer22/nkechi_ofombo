@@ -52,8 +52,6 @@ def get_file(file_id):
 
 import base64
 
-# ... (your existing code)
-
 def process_document(msg):
     file_name = msg['document']['file_name']
 
@@ -68,18 +66,12 @@ def process_document(msg):
         with open(f"{r}.hat", "rb") as file:
             file_content = file.read()
 
-        # Check if the content is base64-encoded and decode it
-        try:
-            file_content = base64.b64decode(file_content).decode('utf-8')
-        except UnicodeDecodeError:
-            pass  # If not base64-encoded, continue with the original content
-
-        print("File Content:", repr(file_content))  # Print the file content
-
         key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
 
+        decrypted_content = aes_ecb_decrypt(file_content, key)
+
         try:
-            data = json.loads(aes_ecb_decrypt(file_content, key))
+            data = json.loads(decrypted_content)
         except json.decoder.JSONDecodeError as e:
             print(f"Error decoding JSON: {e}")
             return
@@ -112,7 +104,6 @@ def process_document(msg):
         bot.sendDocument(msg['chat']['id'], open(f"{r}.hat", "rb"), caption=cp, parse_mode="html")
 
         os.remove(f"{r}.hat")
-
 
 if __name__ == "__main__":
     bot = telepot.Bot(API_KEY)
