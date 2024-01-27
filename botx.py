@@ -61,7 +61,7 @@ def process_document(msg):
         r = str(random.randint(1111, 9999))
 
         with open(f"{r}.hat", "wb") as file:
-            file.write(bot.getFile(file_path)['file'])
+            file.write(requests.get(f'https://api.telegram.org/file/bot{API_KEY}/{file_path}').content)
 
         with open(f"{r}.hat", "rb") as file:
             key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
