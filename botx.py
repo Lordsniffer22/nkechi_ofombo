@@ -1,5 +1,5 @@
 import telepot
-from telepot.loop import MessageLoop, InlineUserHandler
+from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineQueryResultArticle, InputTextMessageContent
 from googleapiclient.discovery import build
 
