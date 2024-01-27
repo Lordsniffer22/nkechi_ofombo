@@ -4,7 +4,7 @@ from Crypto.Cipher import AES
 from base64 import b64encode, b64decode
 
 # Set your Telegram bot API token
-API_KEY = "YOUR_TOKEN"
+API_KEY = "6643175652:AAH6haOsyYIUmw6ql8U_5-Bmdocguwzwolc"
 
 def bot(method, datas=None):
     url = f"https://api.telegram.org/bot{API_KEY}/{method}"
