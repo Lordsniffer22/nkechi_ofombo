@@ -61,9 +61,16 @@ def process_document(msg):
         with open(f"{r}.hat", "wb") as file:
             file.write(requests.get(f'https://api.telegram.org/file/bot{API_KEY}/{file_path}').content)
 
-        with open(f"{r}.hat", "rb") as file:
-            key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
-            data = json.loads(aes_ecb_decrypt(file.read(), key))
+        with open(f"{r}.hat", "r") as file:
+            file_content = file.read()
+
+        key = b64decode("zbNkuNCGSLivpEuep3BcNA==")
+
+        try:
+            data = json.loads(aes_ecb_decrypt(file_content, key))
+        except json.decoder.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
+            return
 
         caption = msg['caption'] if 'caption' in msg else "NuLL"
         data['descriptionv5'] = caption
