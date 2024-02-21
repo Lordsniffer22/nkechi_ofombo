@@ -49,11 +49,11 @@ def add_user(username, password, days, user_info, chat_id):
     try:
         subprocess.run(['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
-        # Get server IP address or saved domain 
+        # Get server IP address or saved domain
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
 
         # Send success message with details
-        success_message = f"😍 {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
+        success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
@@ -65,9 +65,10 @@ def remove_user(username, chat_id):
 
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
-        return f"🙆‍♂️ {username} Has been removed successfully! \n Who else? 😳"
+        return f"{username} Has been removed successfully! \n Who else? 😳"
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
+
 
 def list_users(chat_id):
     # Check if the user is verified
@@ -76,18 +77,22 @@ def list_users(chat_id):
 
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
-        users_list = [line.split(':')[0] for line in users_info.split('\n') if line]
-        users_days_remaining = []
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
 
-        for user in users_list:
-            remaining_days = subprocess.check_output(['sudo', 'chage', '-l', user]).decode('utf-8').split('\n')[1].split(':')[1].strip()
+        users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            password = user_info[1]
+            remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                users_days_remaining.append(f"│ {user}  ⇿     {remaining_days}")
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days}"
+                users_details.append(user_details)
 
-        users_message = "\n".join(users_days_remaining)
-        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
+        users_message = "\n".join(users_details)
+        return f"╭─👩🏻‍🦰USERS───pass──🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
