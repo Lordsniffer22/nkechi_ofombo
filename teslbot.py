@@ -83,7 +83,8 @@ def list_users(chat_id):
 
         for user_info in users_list:
             username = user_info[0]
-            password = user_info[5]
+            password_info = user_info[4].split(',')[1]  # Extract the second part after splitting by ','
+            password = password_info.split(':')[1].strip()
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
             # Exclude users with expiry set to "never"
