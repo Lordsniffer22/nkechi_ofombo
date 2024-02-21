@@ -83,19 +83,23 @@ def list_users(chat_id):
 
         for user_info in users_list:
             username = user_info[0]
-            password_info = user_info[4].split(',')[1]  # Extract the second part after splitting by ','
-            password = password_info.split(':')[1].strip()
+            gecos_field = user_info[4]
+            
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else '' 
+
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days}"
+                user_details = f"│ {username}  ⇿     {remaining_days}  ⇿  {password}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS───pass──🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
+
 
 def user_verified(chat_id):
     # Check if the user is verified
