@@ -65,10 +65,17 @@ def remove_user(username, chat_id):
 
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
-        return f"{username} Has been removed successfully! \n Who else? 😳"
+        return f"{username} Has been removed successfully!"
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
-
+def restart_udp_daemon(chat_id):
+    if not user_verified(chat_id):
+        return "🔐 You need to verify yourself first by providing the secret key using /verify command."
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
+        return f"\n Who else? 😳"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to restart daemons. Error: {e}"
 
 def list_users(chat_id):
     # Check if the user is verified
@@ -90,16 +97,24 @@ def list_users(chat_id):
 
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
-            # Exclude users with expiry set to "never"
+            # Check if the user has expired
             if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  ⇿     {remaining_days}  ⇿  {password}"
-                users_details.append(user_details)
+                remaining_days = int(remaining_days)
+                if remaining_days <= 0:
+                    expiration_status = "EXPIRED"
+                else:
+                    expiration_status = remaining_days
+            else:
+                expiration_status = "NEVER"
+
+            # Include the expiration status in the user details
+            user_details = f"│ {username}  ⇿     {expiration_status}  ⇿  {password}"
+            users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS ──🔑PASSWD──🕗EXPIRES ON─╮\n{users_message} \n╰───────────────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
-
 
 def user_verified(chat_id):
     # Check if the user is verified
@@ -215,7 +230,7 @@ def handle(msg):
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
-###########
+
 
         if command.lower().startswith('/domain'):
 
@@ -267,6 +282,8 @@ def handle(msg):
                 try:
                     _, username = command.split()
                     response = remove_user(username, chat_id)
+                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                    response = restart_udp_daemon(chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
