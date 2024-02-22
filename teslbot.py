@@ -99,11 +99,11 @@ def list_users(chat_id):
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  ⇿   {password}  ⇿  {remaining_days}"
+                user_details = f"│ {username}  ⇿   {password}   ⇿    {remaining_days}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS ──🔑PASSWD──🕗EXPIRES ON─╮\n{users_message} \n╰───────────────────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS ─🔑PASS─🕗EXPIRES ON─╮\n{users_message} \n╰───────────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
