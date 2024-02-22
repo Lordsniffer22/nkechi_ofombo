@@ -97,25 +97,13 @@ def list_users(chat_id):
 
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
-            # Convert remaining days to an integer
-            remaining_days = int(remaining_days)
-
-            # Get the current date
-            current_date = datetime.now()
-
-            # Calculate the expiry date
-            expiry_date = current_date + timedelta(days=remaining_days)
-
-            if remaining_days <= 0:
-                status = "EXPIRED"
-            else:
-                status = f"{remaining_days} days"
-
-            user_details = f"│ {username}  ⇿  {status}  ⇿  {password}"
-            users_details.append(user_details)
+            # Exclude users with expiry set to "never"
+            if remaining_days.lower() != 'never':
+                user_details = f"│ {username}  ⇿   {password}  ⇿  {remaining_days}"
+                users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS ──🔑PASSWD──🕗EXPIRES ON─╮\n{users_message} \n╰───────────────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
