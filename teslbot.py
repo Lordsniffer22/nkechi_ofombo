@@ -97,19 +97,10 @@ def list_users(chat_id):
 
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
-            # Check if the user has expired
+            # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                remaining_days = int(remaining_days)
-                if remaining_days <= 0:
-                    expiration_status = "EXPIRED"
-                else:
-                    expiration_status = remaining_days
-            else:
-                expiration_status = "NEVER"
-
-            # Include the expiration status in the user details
-            user_details = f"│ {username}  ⇿     {expiration_status}  ⇿  {password}"
-            users_details.append(user_details)
+                user_details = f"│ {username}  ⇿   {password}  ⇿  {remaining_days}"
+                users_details.append(user_details)
 
         users_message = "\n".join(users_details)
         return f"╭─👩🏻‍🦰USERS ──🔑PASSWD──🕗EXPIRES ON─╮\n{users_message} \n╰───────────────────────────────────╯"
