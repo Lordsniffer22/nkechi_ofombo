@@ -99,7 +99,7 @@ def list_users(chat_id):
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  ⇿     {remaining_days}  ⇿  {password}"
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
@@ -274,8 +274,9 @@ def handle(msg):
                     _, username = command.split()
                     response = remove_user(username, chat_id)
                     bot.sendMessage(chat_id, response, reply_markup=keyboard)
-                    response = restart_udp_daemon(chat_id)
-                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                    # Restart the UDP daemon immediately after removing the user
+                    response_restart = restart_udp_daemon(chat_id)
+                    bot.sendMessage(chat_id, response_restart, reply_markup=keyboard)
                 except ValueError:
                     bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
