@@ -76,7 +76,6 @@ def restart_udp_daemon(chat_id):
         return f"\n Who else? 😳"
     except subprocess.CalledProcessError as e:
         return f"Failed to restart daemons. Error: {e}"
-from datetime import datetime, timedelta
 
 def list_users(chat_id):
     # Check if the user is verified
@@ -89,6 +88,8 @@ def list_users(chat_id):
 
         users_details = []
 
+        today = datetime.now()
+
         for user_info in users_list:
             username = user_info[0]
             gecos_field = user_info[4]
@@ -98,19 +99,20 @@ def list_users(chat_id):
 
             remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
 
-            # Check if the user is expired
-            expiration_date = (datetime.now() + timedelta(days=int(remaining_days))).strftime('%Y-%m-%d')
-            status = "EXPIRED" if datetime.now() > datetime.strptime(expiration_date, '%Y-%m-%d') else remaining_days
+            # Check if the user has expired
+            expiry_date = today + timedelta(days=int(remaining_days))
+            expiry_status = "Expired" if expiry_date < today else remaining_days
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  ⇿     {status}  ⇿  {password}"
+                user_details = f"│ {username}  ⇿     {expiry_status}  ⇿  {password}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS ─🔑PASS─🕗EXPIRES ON─╮\n{users_message} \n╰───────────────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
+
 def user_verified(chat_id):
     # Check if the user is verified
     return user_verification_status.get(chat_id, False)
