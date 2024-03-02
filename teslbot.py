@@ -42,14 +42,16 @@ def is_verified(chat_id):
     return verified_users.get(chat_id, False)
 
 def verify_user(chat_id, secret_key):
+    with open(seckey_file_path, 'r') as seckey_file:
+       stored_secret_key = seckey_file.read().strip()
     if secret_key == stored_secret_key:
         verified_users[chat_id] = True
         save_verified_users()
         return "Verification successful! You can now use use the bot as a Super Admin."
     else:
         return "Verification failed. Please provide the correct secret key."
-
-
+# Load verified users on startup
+load_verified_users()
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
         domain_file.write(domain)
@@ -322,8 +324,7 @@ def handle(msg):
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
-# Load verified users on startup
-load_verified_users()
+
 # Set the command handler
 bot.message_loop(handle)
 
