@@ -3,6 +3,7 @@
 # #You are allowed to use the tool in any way you wish
 import telepot
 import subprocess
+import os
 from datetime import datetime, timedelta
 import time
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
