@@ -16,21 +16,17 @@ bot = telepot.Bot(bot_token)
 seckey_file_path = 'seckey.txt'
 domain_file_path = 'pydomain.txt'
 
-# Dictionary to store user verification status
-#user_verification_status = {}
-
-# Single dictionary for verification status
-verified_users = {}
 def load_verified_users():
     if os.path.exists('database.txt'):
         try:
             with open('database.txt', 'r') as file:
-                verified_users = json.loads(file.read())
+                return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             # Handle potential errors during file reading or parsing
             pass
+    return {}
 
-def save_verified_users():
+def save_verified_users(verified_users):
     try:
         with open('database.txt', 'w') as file:
             json.dump(verified_users, file)
@@ -38,20 +34,22 @@ def save_verified_users():
         # Handle potential errors during file writing
         pass
 
+# Initialize the verified_users dictionary from the file
+verified_users = load_verified_users()
+
 def is_verified(chat_id):
-    return verified_users.get(chat_id, False)
+    return chat_id in verified_users
 
 def verify_user(chat_id, secret_key):
     with open(seckey_file_path, 'r') as seckey_file:
-       stored_secret_key = seckey_file.read().strip()
+        stored_secret_key = seckey_file.read().strip()
     if secret_key == stored_secret_key:
         verified_users[chat_id] = True
-        save_verified_users()
-        return "Verification successful! You can now use use the bot as a Super Admin."
+        save_verified_users(verified_users)
+        return "Verification successful! You can now use the bot as a Super Admin."
     else:
         return "Verification failed. Please provide the correct secret key."
-# Load verified users on startup
-load_verified_users()
+
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
         domain_file.write(domain)
