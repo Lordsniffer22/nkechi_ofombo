@@ -1,3 +1,6 @@
+# Made with love by Teslassh
+# Stealing this source code is illegal as always.
+# #You are allowed to use the tool in any way you wish
 import telepot
 import subprocess
 from datetime import datetime, timedelta
@@ -12,7 +15,38 @@ seckey_file_path = 'seckey.txt'
 domain_file_path = 'pydomain.txt'
 
 # Dictionary to store user verification status
-user_verification_status = {}
+#user_verification_status = {}
+
+# Single dictionary for verification status
+verified_users = {}
+def load_verified_users():
+    if os.path.exists('database.txt'):
+        try:
+            with open('database.txt', 'r') as file:
+                verified_users = json.loads(file.read())
+        except (FileNotFoundError, json.JSONDecodeError):
+            # Handle potential errors during file reading or parsing
+            pass
+
+def save_verified_users():
+    try:
+        with open('database.txt', 'w') as file:
+            json.dump(verified_users, file)
+    except (IOError, json.JSONDecodeError):
+        # Handle potential errors during file writing
+        pass
+
+def is_verified(chat_id):
+    return verified_users.get(chat_id, False)
+
+def verify_user(chat_id, secret_key):
+    if secret_key == stored_secret_key:
+        verified_users[chat_id] = True
+        save_verified_users()
+        return "Verification successful! You can now use use the bot as a Super Admin."
+    else:
+        return "Verification failed. Please provide the correct secret key."
+
 
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
@@ -27,7 +61,7 @@ def get_domain():
 
 def add_user(username, password, days, user_info, chat_id):
     # Check if the user is verified
-    if not user_verified(chat_id):
+    if not is_verified(chat_id):
         return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
     current_date = datetime.now()
@@ -60,7 +94,7 @@ def add_user(username, password, days, user_info, chat_id):
 
 def remove_user(username, chat_id):
     # Check if the user is verified
-    if not user_verified(chat_id):
+    if not is_verified(chat_id):
         return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
     try:
@@ -69,7 +103,7 @@ def remove_user(username, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 def restart_udp_daemon(chat_id):
-    if not user_verified(chat_id):
+    if not is_verified(chat_id):
         return "🔐 You need to verify yourself first by providing the secret key using /verify command."
     try:
         subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
@@ -79,7 +113,7 @@ def restart_udp_daemon(chat_id):
 
 def list_users(chat_id):
     # Check if the user is verified
-    if not user_verified(chat_id):
+    if not is_verified(chat_id):
         return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
     try:
@@ -99,28 +133,31 @@ def list_users(chat_id):
 
             # Exclude users with expiry set to "never"
             if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  {password}       {remaining_days}"
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS──PASS──🕗EXPIRY ─╮\n{users_message} \n╰───────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
-def user_verified(chat_id):
+#STORES THE OLD VERIF LOGK
+
+
+#def user_verified(chat_id):
     # Check if the user is verified
-    return user_verification_status.get(chat_id, False)
+   # return user_verification_status.get(chat_id, False)
 
-def verify_user(chat_id, secret_key):
+#def verify_user(chat_id, secret_key):
     # Verify the secret key against the stored key
-    with open(seckey_file_path, 'r') as seckey_file:
-        stored_secret_key = seckey_file.read().strip()
+   # with open(seckey_file_path, 'r') as seckey_file:
+    #    stored_secret_key = seckey_file.read().strip()
 
-    if secret_key == stored_secret_key:
-        user_verification_status[chat_id] = True
-        return "Verification successful! You can now use use the bot as a Super Admin."
-    else:
-        return "Verification failed. Please provide the correct secret key."
+    #if secret_key == stored_secret_key:
+    #    user_verification_status[chat_id] = True
+    #    return "Verification successful! You can now use use the bot as a Super Admin."
+    #else:
+     #   return "Verification failed. Please provide the correct secret key."
     
 pending_add_user_command = None
 def handle(msg):
@@ -142,7 +179,7 @@ def handle(msg):
 
         if command.lower() == 'start' or command == '/start':
             bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot👽\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
-            user_verification_status[chat_id] = False
+            verified_users[chat_id] = False
 
         elif command.lower() == 'restart':
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
@@ -212,7 +249,7 @@ def handle(msg):
         elif command.lower() == 'verify':
             # Prompt user to enter the secret key for verification
             bot.sendMessage(chat_id, "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
-            user_verification_status[chat_id] = False
+            verified_users[chat_id] = False
 
         elif command.lower().startswith('/verify'):
             try:
@@ -239,7 +276,7 @@ def handle(msg):
 
         if command.lower() == 'add user':
             # Check if the user is verified before allowing to use /add command
-            if not user_verified(chat_id):
+            if not is_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
             else:
                 # Set the pending "Add User" command
@@ -260,14 +297,14 @@ def handle(msg):
 
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
-            if not user_verified(chat_id):
+            if not is_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
             else:
                 bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
         elif command.lower().startswith('/remove'):
             # Check if the user is verified before allowing to use /remove command
-            if not user_verified(chat_id):
+            if not is_verified(chat_id):
                 bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
             else:
                 try:
@@ -283,7 +320,8 @@ def handle(msg):
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
-
+# Load verified users on startup
+load_verified_users()
 # Set the command handler
 bot.message_loop(handle)
 
