@@ -156,26 +156,10 @@ def handle(msg):
 
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
-        elif command.lower() == 'refresh udp':
 
-            refresh_msg = (
-                """
-                UDP service has been successfully Refreshed. If it still giving a issues, try Rebooting your Server. 
-                 
-                """
-            )
-
-            #send refresh message
-            bot.sendMessage(chat_id, refresh_msg, reply_markup=keyboard)
         elif command.lower() == 'power i/o':
             reboot_msg = (
-                """
-                😳You pressed the Power ON/OFF switch. 
-                Currently running services will stop running if you reboot. 
-                This will disturb your udp clients for about 60 seconds but it will be good for them afterwards.
-                
-                To continue rebooting the server, send me this command: /reboot          
-                """
+                f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
             )
             bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
         elif command.lower() == '/reboot':
@@ -184,7 +168,7 @@ def handle(msg):
                 bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id,
-                                "😳 Oh Oooh...! VPS Reboot command didnt work. You must install bot as a sudoer",
+                                f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
                                 reply_markup=keyboard)
 
         elif command.lower == 'enable bbr':
@@ -200,7 +184,7 @@ def handle(msg):
             bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}")
 
         elif command.lower() == 'add ram':
-            swap_add = 'sudo fallocate -l 8G /swapfile'
+            swap_add = 'sudo fallocate -l 1G /swapfile'
             format_swap = 'sudo mksawp /swapfile && sudo swapon /swapfile'
             permanet_swap = 'sudo echo "/swapfile none sw 0 0" >> /etc/fstab'
             temporary_swap_size = 'sudo sysctl vm.swappiness=10'
@@ -208,7 +192,7 @@ def handle(msg):
             subprocess.run(format_swap, shell=True)
             subprocess.run(permanet_swap, shell=True)
             subprocess.run(temporary_swap_size, shell=True)
-            bot.sendMessage(chat_id, f"You have added 8GB Virtual RAM. Its a swap memory my Boss!")
+            bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
             start_message = ("♻️ ZERO ONE LLC 💻. \n"
