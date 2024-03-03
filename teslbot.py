@@ -84,11 +84,12 @@ def reboot_server(chat_id):
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
+def enable_bbr(chat_id):
+    try:
+        subprocess.run(['echo', ''], check=True)
+    except subprocess.CalledProcessError as e:
+        return f"Failed to activate BBR. Error {e}"
 def list_users(chat_id):
-    # Check if the user is verified
-   # if not is_verified(chat_id):
-    #    return "🔐 You need to verify yourself first by providing the secret key using /verify command."
-
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
         users_list = [line.split(':') for line in users_info.split('\n') if line]
@@ -96,6 +97,7 @@ def list_users(chat_id):
         users_details = []
 
         for user_info in users_list:
+
             username = user_info[0]
             gecos_field = user_info[4]
             
@@ -171,12 +173,10 @@ def handle(msg):
                                 f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
                                 reply_markup=keyboard)
 
-        elif command.lower == 'enable bbr':
+        elif command.lower() == 'enable bbr':
             bot.sendMessage(chat_id, f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
-            bbr_cmd1 = 'echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf'
-            bbr_cmd2 = 'echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf'
-            subprocess.run(bbr_cmd1, shell=True)
-            subprocess.run(bbr_cmd2, shell=True)
+            subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], shell=True)
+            subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], shell=True)
 
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
@@ -184,14 +184,10 @@ def handle(msg):
             bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}")
 
         elif command.lower() == 'add ram':
-            swap_add = 'sudo fallocate -l 1G /swapfile'
-            format_swap = 'sudo mksawp /swapfile && sudo swapon /swapfile'
-            permanet_swap = 'sudo echo "/swapfile none sw 0 0" >> /etc/fstab'
-            temporary_swap_size = 'sudo sysctl vm.swappiness=10'
-            subprocess.run(swap_add, shell=True)
-            subprocess.run(format_swap, shell=True)
-            subprocess.run(permanet_swap, shell=True)
-            subprocess.run(temporary_swap_size, shell=True)
+            subprocess.run(['sudo', 'fallocate', '-l', '1G', '/swapfile'], shell=True)
+            subprocess.run(['sudo', 'mksawp', '/swapfile', '&&', 'sudo', 'swapon', '/swapfile'], shell=True)
+            subprocess.run(['sudo', 'echo', '"/swapfile none sw 0 0"', '>>', '/etc/fstab'], shell=True)
+            subprocess.run(['sudo', 'sysctl', 'vm.swappiness=10'], shell=True)
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
