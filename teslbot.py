@@ -81,7 +81,7 @@ def restart_udp_daemon(chat_id):
         return f"Failed to restart daemons. Error: {e}"
 def reboot_server(chat_id):
     try:
-        subprocess.run(['sudo', 'reboot'], check=True)
+        subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
 def list_users(chat_id):
