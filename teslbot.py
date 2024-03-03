@@ -177,15 +177,16 @@ def handle(msg):
             bot.sendMessage(chat_id, f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
             subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], shell=True)
             subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], shell=True)
-
+            subprocess.run(['sudo', 'sysctl', '-p'], shell=True)
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}")
 
+
         elif command.lower() == 'add ram':
             subprocess.run(['sudo', 'fallocate', '-l', '1G', '/swapfile'], shell=True)
-            subprocess.run(['sudo', 'mksawp', '/swapfile', '&&', 'sudo', 'swapon', '/swapfile'], shell=True)
+            subprocess.run(['sudo', 'mkswap', '/swapfile', '&&', 'sudo', 'swapon', '/swapfile'], shell=True)
             subprocess.run(['sudo', 'echo', '"/swapfile none sw 0 0"', '>>', '/etc/fstab'], shell=True)
             subprocess.run(['sudo', 'sysctl', 'vm.swappiness=10'], shell=True)
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
