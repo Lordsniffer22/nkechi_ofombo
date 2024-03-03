@@ -79,7 +79,11 @@ def restart_udp_daemon(chat_id):
         return f"\n Who else? 😳"
     except subprocess.CalledProcessError as e:
         return f"Failed to restart daemons. Error: {e}"
-
+def reboot_server(chat_id):
+    try:
+        subprocess.run(['sudo', 'reboot'], check=True)
+    except subprocess.CalledProcessError as e:
+        return f"Failed to reboot server. Error: {e}"
 def list_users(chat_id):
     # Check if the user is verified
    # if not is_verified(chat_id):
@@ -109,24 +113,6 @@ def list_users(chat_id):
         return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
-
-#STORES THE OLD VERIF LOGK
-
-
-#def user_verified(chat_id):
-    # Check if the user is verified
-   # return user_verification_status.get(chat_id, False)
-
-#def verify_user(chat_id, secret_key):
-    # Verify the secret key against the stored key
-   # with open(seckey_file_path, 'r') as seckey_file:
-    #    stored_secret_key = seckey_file.read().strip()
-
-    #if secret_key == stored_secret_key:
-    #    user_verification_status[chat_id] = True
-    #    return "Verification successful! You can now use use the bot as a Super Admin."
-    #else:
-     #   return "Verification failed. Please provide the correct secret key."
     
 pending_add_user_command = None
 def handle(msg):
@@ -138,7 +124,11 @@ def handle(msg):
         [KeyboardButton(text='Add User', resize_keyboard=True),
          KeyboardButton(text='Remove User', resize_keyboard=True),
          KeyboardButton(text='List Users', resize_keyboard=True)],
-        [KeyboardButton(text='Restart', resize_keyboard=True),
+        [KeyboardButton(text='Enable BBR', resize_keyboard=True),
+         KeyboardButton(text='Add RAM', resize_keyboard=True),
+         KeyboardButton(text='Power I/O', resize_keyboard=True)],
+
+        [KeyboardButton(text='Region', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
          KeyboardButton(text='Dev Team', resize_keyboard=True)],
     ], resize_keyboard=True)
@@ -147,10 +137,6 @@ def handle(msg):
         command = msg['text']
 
         if command.lower() == 'start' or command == '/start':
-            bot.sendMessage(chat_id, "Welcome to Tesla SSH Bot👽\n\n This is a server administration Tool. To use the Bot as a SUPER USER, please verify your server ownership using /verify command.")
-            #verified_users[chat_id] = False
-
-        elif command.lower() == 'restart':
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
                              "\n"
@@ -170,7 +156,60 @@ def handle(msg):
 
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
-            
+        elif command.lower() == 'refresh udp':
+
+            refresh_msg = (
+                """
+                UDP service has been successfully Refreshed. If it still giving a issues, try Rebooting your Server. 
+                 
+                """
+            )
+
+            #send refresh message
+            bot.sendMessage(chat_id, refresh_msg, reply_markup=keyboard)
+        elif command.lower() == 'power i/o':
+            reboot_msg = (
+                """
+                😳You pressed the Power ON/OFF switch. 
+                Currently running services will stop running if you reboot. 
+                This will disturb your udp clients for about 60 seconds but it will be good for them afterwards.
+                
+                To continue rebooting the server, send me this command: /reboot          
+                """
+            )
+            bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
+        elif command.lower() == '/reboot':
+            try:
+                response_reboot = reboot_server(chat_id)
+                bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id,
+                                "😳 Oh Oooh...! VPS Reboot command didnt work. You must install bot as a sudoer",
+                                reply_markup=keyboard)
+
+        elif command.lower == 'enable bbr':
+            bot.sendMessage(chat_id, f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
+            bbr_cmd1 = 'echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf'
+            bbr_cmd2 = 'echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf'
+            subprocess.run(bbr_cmd1, shell=True)
+            subprocess.run(bbr_cmd2, shell=True)
+
+        elif command.lower() =='region':
+            result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
+            region = result.stdout.decode('utf-8').strip()
+            bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}")
+
+        elif command.lower() == 'add ram':
+            swap_add = 'sudo fallocate -l 8G /swapfile'
+            format_swap = 'sudo mksawp /swapfile && sudo swapon /swapfile'
+            permanet_swap = 'sudo echo "/swapfile none sw 0 0" >> /etc/fstab'
+            temporary_swap_size = 'sudo sysctl vm.swappiness=10'
+            subprocess.run(swap_add, shell=True)
+            subprocess.run(format_swap, shell=True)
+            subprocess.run(permanet_swap, shell=True)
+            subprocess.run(temporary_swap_size, shell=True)
+            bot.sendMessage(chat_id, f"You have added 8GB Virtual RAM. Its a swap memory my Boss!")
+
         elif command.lower() == 'dev team':
             start_message = ("♻️ ZERO ONE LLC 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
