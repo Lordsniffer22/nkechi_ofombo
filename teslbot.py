@@ -84,11 +84,6 @@ def reboot_server(chat_id):
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
-def enable_bbr(chat_id):
-    try:
-        subprocess.run(['echo', ''], check=True)
-    except subprocess.CalledProcessError as e:
-        return f"Failed to activate BBR. Error {e}"
 def list_users(chat_id):
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
@@ -174,10 +169,11 @@ def handle(msg):
                                 reply_markup=keyboard)
 
         elif command.lower() == 'enable bbr':
-            bot.sendMessage(chat_id, f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
-            subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], shell=True)
-            subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], shell=True)
-            subprocess.run(['sysctl', '-p'], shell=True)
+            subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], check=True)
+            subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], check=True)
+            subprocess.run(['sysctl', '-p'], check=True)
+            bot.sendMessage(chat_id,
+                            f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
@@ -185,10 +181,10 @@ def handle(msg):
 
 
         elif command.lower() == 'add ram':
-            subprocess.run(['fallocate', '-l', '1G', '/swapfile'], shell=True)
-            subprocess.run(['mkswap', '/swapfile', '&&', 'swapon', '/swapfile'], shell=True)
-            subprocess.run(['echo', '"/swapfile none sw 0 0"', '>>', '/etc/fstab'], shell=True)
-            subprocess.run(['sysctl', 'vm.swappiness=10'], shell=True)
+            subprocess.run(['fallocate', '-l', '1G', '/swapfile'], check=True)
+            subprocess.run(['mkswap', '/swapfile', '&&', 'swapon', '/swapfile'], check=True)
+            subprocess.run(['echo', '"/swapfile none sw 0 0"', '>>', '/etc/fstab'], check=True)
+            subprocess.run(['sysctl', 'vm.swappiness=10'], check=True)
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
