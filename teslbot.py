@@ -3,7 +3,7 @@
 # #You are allowed to use the tool in any way you wish
 import telepot
 import subprocess
-#import os
+import os
 #import json
 from datetime import datetime, timedelta
 import time
@@ -85,6 +85,7 @@ def reboot_server(chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
 def list_users(chat_id):
+
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
         users_list = [line.split(':') for line in users_info.split('\n') if line]
@@ -92,24 +93,28 @@ def list_users(chat_id):
         users_details = []
 
         for user_info in users_list:
-
             username = user_info[0]
             gecos_field = user_info[4]
-            
+
             # Extract password part after the comma
-            password = gecos_field.split(',')[1] if ',' in gecos_field else '' 
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
 
-            remaining_days = subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip()
+            # Check if the user has an expiry date
+            if 'never' not in subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8'):
+                remaining_days = int(subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip())
 
-            # Exclude users with expiry set to "never"
-            if remaining_days.lower() != 'never':
-                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days}"
+                # Format the remaining days or check if expired
+                remaining_days_str = f"{remaining_days} Days" if remaining_days > 0 else "Expired"
+
+                # Exclude users with expiry set to "never"
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days_str}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
         return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
+
     
 pending_add_user_command = None
 def handle(msg):
@@ -181,10 +186,14 @@ def handle(msg):
 
 
         elif command.lower() == 'add ram':
-            subprocess.run(['fallocate', '-l', '1G', '/swapfile'], check=True)
-            subprocess.run(['mkswap', '/swapfile', '&&', 'swapon', '/swapfile'], check=True)
-            subprocess.run(['echo', '"/swapfile none sw 0 0"', '>>', '/etc/fstab'], check=True)
-            subprocess.run(['sysctl', 'vm.swappiness=10'], check=True)
+            os.system("sudo fallocate -l 1024M /swapfile")
+            os.system("sudo chmod 600 /swapfile")
+            os.system("sudo mkswap /swapfile")
+            os.system("sudo swapon /swapfile")
+            with open('/etc/fstab', 'a') as f:
+                f.write('/swapfile none swap sw 0 0\n')
+
+            os.system('sysctl vm.swappiness=10')
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
