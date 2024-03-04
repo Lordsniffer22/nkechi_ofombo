@@ -84,8 +84,8 @@ def reboot_server(chat_id):
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
-def list_users(chat_id):
 
+def list_users(chat_id):
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
         users_list = [line.split(':') for line in users_info.split('\n') if line]
@@ -99,23 +99,35 @@ def list_users(chat_id):
             # Extract password part after the comma
             password = gecos_field.split(',')[1] if ',' in gecos_field else ''
 
-            # Check if the user has an expiry date
-            if 'never' not in subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8'):
-                remaining_days = int(subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[1].strip())
+            # Get the expiration date
+            expiration_date_str = \
+            subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                1].strip()
 
-                # Format the remaining days or check if expired
-                remaining_days_str = f"{remaining_days} Days" if remaining_days > 0 else "Expired"
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
 
-                # Exclude users with expiry set to "never"
-                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days_str}"
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days > 0:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days"
+                users_details.append(user_details)
+            else:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  Expired"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS────🕗EXPIRY DATES─╮\n{user_details} \n╰───────────────────────╯"
+        return f"╭─👩🏻‍🦰USERS────🕗REMAINING DAYS─╮\n{users_message} \n╰───────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
-    
+
 pending_add_user_command = None
 def handle(msg):
     global pending_add_user_command
