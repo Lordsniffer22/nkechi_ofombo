@@ -109,7 +109,7 @@ def list_users(chat_id):
                 continue
 
             # Convert expiration date to a datetime object
-            expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
 
             # Calculate remaining days
             remaining_days = (expiration_date - datetime.now()).days
@@ -123,7 +123,8 @@ def list_users(chat_id):
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        return f"╭─👩🏻‍🦰USERS────🕗REMAINING DAYS─╮\n{users_message} \n╰───────────────────────╯"
+        organzn = '│     ZERO ONE COMPUTING       │ '
+        return f"╭──────────────────────────────╮\n{organzn} \n╰──────────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n│─ ──  ── ──  ── ──  ─ ── ─ ─\n{users_message}\n╰──────────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
