@@ -125,7 +125,7 @@ def list_users(chat_id):
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        organzn = '│       ZERO ONE COMPUTING               │ '
+        organzn = '│       ZERO ONE COMPUTING   @scriptx13   │ '
         return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
@@ -154,7 +154,7 @@ def handle(msg):
         command = msg['text']
 
         if command.lower() == 'start' or command == '/start':
-            start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
+            start_message = ("♻️ WELCOME TO ScriptX BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
                              "\n"
                              "You can use me to manage users on your server!\n"
@@ -216,7 +216,7 @@ def handle(msg):
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
-            start_message = ("♻️ ZERO ONE LLC 💻. \n"
+            start_message = ("♻️ Script X13 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
                              "\n"
                              "Hello, thanks for choosing our cloud projects!\n"
@@ -229,7 +229,7 @@ def handle(msg):
                              "To list users, Press /users \n"
                              "\n"
                              "💖Made with spirit. \n"
-                             "Join @udpcustom")
+                             "Join @scriptx13")
 
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
