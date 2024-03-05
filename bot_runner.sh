@@ -69,7 +69,8 @@ run_bot() {
     systemctl daemon-reload &>/dev/null
     systemctl enable sshbt &>/dev/null
     systemctl start sshbt &>/dev/null
-    pri0nt_pink "Cheers! Your bot is now running."
+    systemctl restart sshbt &>/dev/null
+    print_pink "Cheers! Your bot is now running."
     echo ""
     sleep 2
     sudo bot
@@ -115,12 +116,14 @@ bot_remove() {
   ban_me
   print_center -ama "Removing. Please wait...."
   sleep 3
+  systemctl stop sshbt
+  systemctl disable sshbt
   sudo rm -f /etc/hsm/toxic/olwa.py
-  sudo rm -f /usr/bin/bot
+  sudo rm -f /usr/bin/bot 
   print_pink "Your bot has been Uninstalled Successfully"
   sleep 3
   clear
-  sudo udp
+  exit
 }
 bot_install() {
     cd
