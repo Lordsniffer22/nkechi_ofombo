@@ -62,9 +62,6 @@ def add_user(username, password, days, user_info, chat_id):
         return f"Failed to add user {username}. Error: {e}"
 
 def remove_user(username, chat_id):
-    # Check if the user is verified
-   # if not is_verified(chat_id):
-   #     return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
@@ -72,8 +69,7 @@ def remove_user(username, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
 def restart_udp_daemon(chat_id):
-   # if not is_verified(chat_id):
-    #    return "🔐 You need to verify yourself first by providing the secret key using /verify command."
+
     try:
         subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
         return f"\n Who else? 😳"
@@ -116,15 +112,15 @@ def list_users(chat_id):
 
             # Exclude users with expiry set to "never"
             if remaining_days > 0:
-                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days"
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
                 user_details = f"│ {username}  ⇿     {password}  ⇿  Expired"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        organzn = '│     ZERO ONE COMPUTING             │ '
-        return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n│─ ──  ── ──  ── ──  ─ ── ─ ─\n{users_message}\n╰──────────────────────────╯"
+        organzn = '│       ZERO ONE COMPUTING               │ '
+        return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
