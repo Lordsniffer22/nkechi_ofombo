@@ -115,7 +115,7 @@ def list_users(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                user_details = f"│ {username}  ⇿     {password}  ⇿  Expired"
+                user_details = f"│ {username}  ⇿     {password}  ⇿  Expired\n│──────────────────────────│"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
