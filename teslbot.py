@@ -80,7 +80,13 @@ def reboot_server(chat_id):
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
-
+def enable_bbr(chat_id):
+    try:
+        subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], check=True)
+        subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], check=True)
+        subprocess.run(['sysctl', '-p'], check=True)
+    except subprocess.CalledProcessError as e:
+        return f"BBR was not enabled. sorry {e}"
 def list_users(chat_id):
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
@@ -183,11 +189,15 @@ def handle(msg):
                                 reply_markup=keyboard)
 
         elif command.lower() == 'enable bbr':
-            subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], check=True)
-            subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], check=True)
-            subprocess.run(['sysctl', '-p'], check=True)
-            bot.sendMessage(chat_id,
+            try:
+                response_bbr = enable_bbr(chat_id)
+                bot.sendMessage(chat_id, response_bbr, reply_markup=keyboard)
+                bot.sendMessage(chat_id,
                             f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
+            except ValueError:
+                 bot.sendMessage(chat_id,
+                                f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
+                                reply_markup=keyboard)
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
