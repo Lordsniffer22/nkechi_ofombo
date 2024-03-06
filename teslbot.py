@@ -203,7 +203,7 @@ def handle(msg):
                                 reply_markup=keyboard)
         elif command.lower() == 'enable bbr':
             try:
-                if check_bbr_status():
+                if check_bbr_status(chat_id):
                     bot.sendMessage(chat_id, 'BBR is already running. No need to activate it again.')
                 else:
                     enable_bbr()
