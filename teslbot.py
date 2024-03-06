@@ -22,25 +22,28 @@ def save_domain(domain):
         domain_file.write(domain)
 
 def check_bbr_status(chat_id):
-    status = subprocess.check_output(['sysctl', 'net.ipv4.tcp_congestion_control']).decode('utf-8')
-    if 'bbr' in status:
-        return True
-    else:
-        return enable_bbr()
-
-def enable_bbr():
     try:
-        # Check if BBR is already enabled
-        subprocess.check_output(['modprobe', 'tcp_bbr'])
-        with open('/etc/sysctl.conf', 'r') as f:
-            if 'nnet.ipv4.tcp_congestion_control=bbr' not in f.read():
-                with open('/etc/sysctl.conf', 'a') as f:
-                    f.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
-                subprocess.run(['sysctl', '-p'])
-        return True
+        status = subprocess.check_output(['sysctl', 'net.ipv4.tcp_congestion_control']).decode('utf-8')
+        return 'bbr' in status
+    except subprocess.CalledProcessError as e:
+        print(f"Error checking BBR status: {e}")
+        return False
+
+def enable_bbr(chat_id):
+    try:
+        if not check_bbr_status(chat_id):
+            subprocess.run(['modprobe', 'tcp_bbr'])
+            with open('/etc/sysctl.conf', 'r') as f:
+                if 'net.ipv4.tcp_congestion_control=bbr' not in f.read():
+                    with open('/etc/sysctl.conf', 'a') as f:
+                        f.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
+            subprocess.run(['sysctl', '-p'])
+            bot.sendMessage(chat_id, 'BBR has been enabled successfully! Enjoy the better connections')
+        else:
+            bot.sendMessage(chat_id, 'BBR is already running. No need to activate it again.')
     except subprocess.CalledProcessError as e:
         print(f"Error enabling BBR: {e}")
-        return False
+        bot.sendMessage(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
 
 def get_domain():
     try:
@@ -203,11 +206,7 @@ def handle(msg):
                                 reply_markup=keyboard)
         elif command.lower() == 'enable bbr':
             try:
-                if check_bbr_status(chat_id):
-                    bot.sendMessage(chat_id, 'BBR is already running. No need to activate it again.')
-                else:
-                    enable_bbr()
-                    bot.sendMessage(chat_id, 'BBR has been enabled successfully! Enjoy the better connections')
+                enable_bbr(chat_id)
             except ValueError:
                 bot.sendMessage(chat_id,
                                 f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
