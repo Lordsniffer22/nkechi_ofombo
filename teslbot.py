@@ -13,7 +13,7 @@ with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
 bot = telepot.Bot(bot_token)
 # File path to store the secret key
-seckey_file_path = 'seckey.txt'
+#seckey_file_path = 'seckey.txt'
 domain_file_path = 'pydomain.txt'
 
 
@@ -62,7 +62,6 @@ def add_user(username, password, days, user_info, chat_id):
         return f"Failed to add user {username}. Error: {e}"
 
 def remove_user(username, chat_id):
-
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
         return f"{username} Has been removed successfully!"
@@ -125,7 +124,7 @@ def list_users(chat_id):
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        organzn = '│       ZERO ONE COMPUTING   @scriptx13  │ '
+        organzn =  '│       ZERO ONE COMPUTING   @scriptx13  │ '
         return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
@@ -154,7 +153,7 @@ def handle(msg):
         command = msg['text']
 
         if command.lower() == 'start' or command == '/start':
-            start_message = ("♻️ WELCOME TO ScriptX BOT👌. \n"
+            start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
                              "\n"
                              "You can use me to manage users on your server!\n"
@@ -190,13 +189,14 @@ def handle(msg):
 
         elif command.lower() == 'enable bbr':
             try:
-                response_bbr = enable_bbr(chat_id)
-                bot.sendMessage(chat_id, response_bbr, reply_markup=keyboard)
+                with open('/etc/sysctl.conf', 'a') as k:
+                    k.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
+                os.system("sysctl -p")
                 bot.sendMessage(chat_id,
-                            f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm will be ACTIVATED on your server")
+                            f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm has been ACTIVATED on your server")
             except ValueError:
                  bot.sendMessage(chat_id,
-                                f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
+                                f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
                                 reply_markup=keyboard)
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
@@ -216,7 +216,7 @@ def handle(msg):
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
-            start_message = ("♻️ Script X13 💻. \n"
+            start_message = ("♻️ ZERO ONE LLC 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
                              "\n"
                              "Hello, thanks for choosing our cloud projects!\n"
@@ -229,7 +229,7 @@ def handle(msg):
                              "To list users, Press /users \n"
                              "\n"
                              "💖Made with spirit. \n"
-                             "Join @scriptx13")
+                             "Join @udpcustom")
 
             # Send the start message with the custom keyboard
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
