@@ -21,6 +21,27 @@ def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
         domain_file.write(domain)
 
+def check_bbr_status(chat_id):
+    status = subprocess.check_output(['sysctl', 'net.ipv4.tcp_congestion_control']).decode('utf-8')
+    if 'bbr' in status:
+        return True
+    else:
+        return enable_bbr()
+
+def enable_bbr():
+    try:
+        # Check if BBR is already enabled
+        subprocess.check_output(['modprobe', 'tcp_bbr'])
+        with open('/etc/sysctl.conf', 'r') as f:
+            if 'nnet.ipv4.tcp_congestion_control=bbr' not in f.read():
+                with open('/etc/sysctl.conf', 'a') as f:
+                    f.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
+                subprocess.run(['sysctl', '-p'])
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error enabling BBR: {e}")
+        return False
+
 def get_domain():
     try:
         with open(domain_file_path, 'r') as domain_file:
@@ -79,13 +100,6 @@ def reboot_server(chat_id):
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
-def enable_bbr(chat_id):
-    try:
-        subprocess.run(['echo', '"net.core.default_qdisc=fq"', '>>', '/etc/sysctl.conf'], check=True)
-        subprocess.run(['echo', '"net.ipv4.tcp_congestion_control=bbr"', '>>', '/etc/sysctl.conf'], check=True)
-        subprocess.run(['sysctl', '-p'], check=True)
-    except subprocess.CalledProcessError as e:
-        return f"BBR was not enabled. sorry {e}"
 def list_users(chat_id):
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
@@ -147,6 +161,7 @@ def handle(msg):
         [KeyboardButton(text='Region', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
          KeyboardButton(text='Dev Team', resize_keyboard=True)],
+
     ], resize_keyboard=True)
 
     if content_type == 'text':
@@ -186,16 +201,15 @@ def handle(msg):
                 bot.sendMessage(chat_id,
                                 f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
                                 reply_markup=keyboard)
-
         elif command.lower() == 'enable bbr':
             try:
-                with open('/etc/sysctl.conf', 'a') as k:
-                    k.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
-                os.system("sysctl -p")
-                bot.sendMessage(chat_id,
-                            f"Bottleneck Bandwidth and Round=Trip Propagation Time, BBR congestion control algorithm has been ACTIVATED on your server")
+                if check_bbr_status():
+                    bot.sendMessage(chat_id, 'BBR is already running. No need to activate it again.')
+                else:
+                    enable_bbr()
+                    bot.sendMessage(chat_id, 'BBR has been enabled successfully! Enjoy the better connections')
             except ValueError:
-                 bot.sendMessage(chat_id,
+                bot.sendMessage(chat_id,
                                 f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
                                 reply_markup=keyboard)
         elif command.lower() =='region':
@@ -288,11 +302,6 @@ def handle(msg):
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /domain [your_domain]")
 
         if command.lower() == 'add user':
-            # Check if the user is verified before allowing to use /add command
-           # if not is_verified(chat_id):
-              #  bot.sendMessage(chat_id, "🔐 You need to verify yourself first to be a super user! Pass your secret key to the /verify command.")
-           # else:
-                # Set the pending "Add User" command
                 pending_add_user_command = command
                 bot.sendMessage(chat_id, "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30", reply_markup=keyboard)
 
