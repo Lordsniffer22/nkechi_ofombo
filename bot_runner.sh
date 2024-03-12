@@ -141,6 +141,8 @@ bot_install() {
       sudo mkdir -p /etc/hsm/toxic/ &&
       sudo rm -f /etc/hsm/toxic/olwa.py
       sudo mv olwa.py /etc/hsm/toxic/
+      wget -O /etc/hsm/toxic/shell.sh https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/shell.sh
+      chmod 777 /etc/hsm/toxic/shell.sh
    }
 
     teslbot_fetch &>/dev/null
