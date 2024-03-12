@@ -13,7 +13,7 @@ with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
 bot = telepot.Bot(bot_token)
 # File path to store the secret key
-seckey_file_path = 'seckey.txt'
+#seckey_file_path = 'seckey.txt'
 domain_file_path = 'pydomain.txt'
 
 
