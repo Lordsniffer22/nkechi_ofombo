@@ -326,7 +326,7 @@ def handle(msg):
            # if not is_verified(chat_id):
             #    bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
           #  else:
-                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n 🚮🚮🚮🚮", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
 
         elif command.lower().startswith('/remove'):
             # Check if the user is verified before allowing to use /remove command
