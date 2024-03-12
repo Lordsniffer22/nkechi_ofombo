@@ -44,7 +44,6 @@ def enable_bbr(chat_id):
     except subprocess.CalledProcessError as e:
         print(f"Error enabling BBR: {e}")
         bot.sendMessage(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
-
 def get_domain():
     try:
         with open(domain_file_path, 'r') as domain_file:
@@ -189,8 +188,13 @@ def handle(msg):
                              "Join @udpcustom")
 
             # Send the start message with the custom keyboard
+
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
 
+        elif command.lower() == '/update':
+            updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
+            updater=updet.stdout.decode('utf-8').strip()
+            bot.sendMessage(chat_id, f"Your bot {updater}")
         elif command.lower() == 'power i/o':
             reboot_msg = (
                 f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
