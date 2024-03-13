@@ -228,7 +228,7 @@ def handle(msg):
             # Calculate free memory
             free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
             # Format the output
-            formatted_output = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
+            formatted_out = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
             bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\n\n{formatted_out}")
 
 
@@ -363,3 +363,4 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
+    
