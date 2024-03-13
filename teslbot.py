@@ -1,10 +1,10 @@
 # Made with love by Teslassh
 # Stealing this source code is illegal as always.
-#######You are allowed to use the tool in any way you wish
+# #You are allowed to use the tool in any way you wish
 import telepot
 import subprocess
 import os
-import json
+#import json
 from datetime import datetime, timedelta
 import time
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
@@ -219,11 +219,18 @@ def handle(msg):
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             commando = ["neofetch", "|", "grep", "\"Memory\"", "|", "cut", "-d:", "-f2", "|", "sed", "'s/ //g'"]
-            result1 = subprocess.run(commando, stdout=subprocess.PIPE)
-            output = result1.stdout.strip()
+            # Define the command as a list of strings
+            command = ["neofetch | grep 'Memory' | cut -d: -f2 | sed 's/ //g'"]
+            # Execute the command and capture stdout
+            result = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
+            # Decode the stdout bytes to a string
+            output = result.stdout.decode('utf-8').strip()
+            # Split the output into used and total memory
             used_memory, total_memory = output.split('/')
+            # Calculate free memory
             free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
-            formatted_out = f"Used Memory: {used_memory}\nFree Memory: {free_memory}"
+            # Format the output
+            formatted_output = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
             bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\n\n{formatted_out}")
 
 
