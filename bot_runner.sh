@@ -1,344 +1,360 @@
-#!/bin/bash
-#Prepare the environment
-print_blue() {
-    echo -e "\e[1;34m$1\e[0m"
-}
-print_blu() {
-    echo -e "\e[34m$1\e[0m"
-}
-print_yellow() {
-    echo -e "\e[1;33m$1\e[0m"
-}
-print_pink() {
-    echo -e "\e[1;95m$1\e[0m"
-}
-print_viola() {
-    echo -e "\e[1;35m$1\e[0m"
-}
-see_key() {
-    ban_me
-    msg -bar
-    print_center -ama "SERVER KEY Manager"
-    msg -bar0
-    echo ""
-    
-  # print options menu
-    print_center -ama "${a12:-BOT SECRET KEY}"
-    msg -bar3
-    gamba="Bot secret:"
-    echo ""
-    while read -r line; do
-      echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
-      echo ""
-      print_blu "You can use it to verify your bot ownership on Telegram."
-      print_center -ama " Made By TeslaSSH, t.me/teslassh"
-      sleep 4
+# Made with love by Teslassh
+# Stealing this source code is illegal as always.
+# #You are allowed to use the tool in any way you wish
+import telepot
+import subprocess
+import os
+#import json
+from datetime import datetime, timedelta
+import time
+from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
-   done < /etc/hsm/toxic/seckey.txt
-   press_back
-}
-press_back() {
- echo ""
- read -p "Press Enter to go back" confm
- sleep 1
- case $confm in
-   [Yy]* ) bot_menu ;;
-   [Nn]* ) bot_menu ;;
-   * ) bot_menu ;;
- esac
-}
-
-restart_bot() {
-    #Run the bot
-    ban_me
-    print_center -ama "RESTARTING THE BOT".....
-    sleep 2
-    systemctl daemon-reload &>/dev/null
-    systemctl restart sshbt &>/dev/null
-    echo ""
-    sleep 2
-    bot_menu
-
-}
-run_bot() {
-    #Run the bot
-    ban_me
-    print_center -ama "BOT INITIALISING....."
-    sleep 3
-    chmod 640 /etc/systemd/system/sshbt.service
-    systemctl daemon-reload &>/dev/null
-    systemctl enable sshbt &>/dev/null
-    systemctl start sshbt &>/dev/null
-    systemctl restart sshbt &>/dev/null
-    print_pink "Cheers! Your bot is now running."
-    echo ""
-    sleep 2
-    sudo bot
-
-}
-
-stop_bot() {
-    #Run the bot
-    ban_me
-    print_center -ama "STOPPING THE BOT".....
-    systemctl stop sshbt
-    sleep 2
-    print_pink "Your Bot has been stopped"
-    sleep 2
-    bot_menu
-
-}
-ch_token() {
-    # Run the bot
-    ban_me
-    print_center -ama "CHANGE YOUR BOT TOKEN"
-    msg -bar3
-    sleep 1
-    echo ""
-    print_blue "Enter new token"
-    echo ""
-    read -p "NEW TOKEN: " new_token
-    sleep 3
-
-    while IFS= read -r line; do
-        if [ "$line" == "$new_token" ]; then
-            print_yellow "The Bot Token entered already exists"
-            bot_menu
-        fi
-    done < /etc/hsm/toxic/tokenz.txt
-
-    echo "$new_token" > /etc/hsm/toxic/tokenz.txt
-    print_pink "A new Bot token has been Saved!"
-    bot_menu
-}
-
-bot_remove() {
-  ban_me
-  print_center -ama "Removing. Please wait...."
-  sleep 3
-  systemctl stop sshbt
-  systemctl disable sshbt
-  sudo rm -f /etc/hsm/toxic/olwa.py
-  sudo rm -f /usr/bin/bot 
-  print_pink "Your bot has been Uninstalled Successfully"
-  sleep 3
-  clear
-  exit
-}
-bot_install() {
-    cd
-    clear
-    #sudo apt update && apt upgrade -y
-   # sudo apt-get install screen
-    sudo apt install python3-pip
-    sudo pip install telepot &>/dev/null
-    sudo pip install telepot --upgrade &>/dev/null
-    sudo touch tokenz.txt
-    sudo touch seckey.txt
-   # Download teslbot from git
-    teslbot_fetch() {
-      wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
-      sudo mkdir -p /etc/hsm/toxic/ &&
-      sudo rm -f /etc/hsm/toxic/olwa.py
-      sudo mv olwa.py /etc/hsm/toxic/
-      wget -O /etc/hsm/toxic/shell.sh https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/shell.sh
-      chmod 777 /etc/hsm/toxic/shell.sh
-   }
-
-    teslbot_fetch &>/dev/null
-    sudo mv tokenz.txt /etc/hsm/toxic/
-    #creste file command
-    sudo rm -f /usr/bin/bot
-    wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
-    chmod +x /usr/bin/bot
-
-    clear
-    print_center -ama "BOT TOKEN REQUIRED"
-    sleep 2
-    msg -bar3
-    echo ""
-    read -p "Enter Token: " btoken
-    sleep 2
-    print_center -ama "You entered: \e[1;95m$btoken\e[0m"
-    sleep 2
-    clear
-
-    # save the Bot Token
-    echo "$btoken" > /etc/hsm/toxic/tokenz.txt
+with open('tokenz.txt', 'r') as file:
+    bot_token = file.read().strip()
+bot = telepot.Bot(bot_token)
+# File path to store the secret key
+#seckey_file_path = 'seckey.txt'
+domain_file_path = 'pydomain.txt'
 
 
-    # Function to generate a random 12-character key
-    generate_key() {
-      tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 12
-    }
+def save_domain(domain):
+    with open(domain_file_path, 'w') as domain_file:
+        domain_file.write(domain)
 
-   # generate the key
-    secretk=$(generate_key)
+def check_bbr_status(chat_id):
+    try:
+        status = subprocess.check_output(['sysctl', 'net.ipv4.tcp_congestion_control']).decode('utf-8')
+        return 'bbr' in status
+    except subprocess.CalledProcessError as e:
+        print(f"Error checking BBR status: {e}")
+        return False
 
-   # Store the new key in seckey.txt
-    echo "$secretk" > seckey.txt
-    sudo mv -f seckey.txt /etc/hsm/toxic/
+def enable_bbr(chat_id):
+    try:
+        if not check_bbr_status(chat_id):
+            subprocess.run(['modprobe', 'tcp_bbr'])
+            with open('/etc/sysctl.conf', 'r') as f:
+                if 'net.ipv4.tcp_congestion_control=bbr' not in f.read():
+                    with open('/etc/sysctl.conf', 'a') as f:
+                        f.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
+            subprocess.run(['sysctl', '-p'])
+            bot.sendMessage(chat_id, 'BBR has been enabled successfully! Enjoy the better connections')
+        else:
+            bot.sendMessage(chat_id, 'BBR is already running. No need to activate it again.')
+    except subprocess.CalledProcessError as e:
+        print(f"Error enabling BBR: {e}")
+        bot.sendMessage(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
+def get_domain():
+    try:
+        with open(domain_file_path, 'r') as domain_file:
+            return domain_file.read().strip()
+    except FileNotFoundError:
+        return None
 
-   # Display a message
-    ban_me
-    msg -bar
-    print_center -ama "SERVER KEY Manager"
-    msg -bar0
-    echo ""
-    
-  # print options menu
-    print_center -ama "${a12:-BOT SECRET KEY}"
-    msg -bar3
-    gamba="Bot secret:"
-    echo ""
-    while read -r line; do
-      echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
-      echo ""
-      print_blu "You can use it to verify your bot ownership on Telegram."
-      print_center -ama " Made By TeslaSSH, t.me/teslassh"
-      sleep 5
-    done < /etc/hsm/toxic/seckey.txt
-    # Search and remove raw files
-    find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
-      do
-        rm -f "$file"
-      done
-    
-    # [make service file]
-    echo '[Unit]
-    Description=Made by Teslassh (( ZERO ONE LLC ))
-    After=network.target
+def add_user(username, password, days, user_info, chat_id):
+    # Check if the user is verified
+    #if not is_verified(chat_id):
+    #    return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
-    [Service]
-    User=root
-    Type=simple
-    ExecStart=/usr/bin/python3 /etc/hsm/toxic/olwa.py 
-    WorkingDirectory=/etc/hsm/toxic/
-    Restart=always
+    current_date = datetime.now()
+    expiration_date = current_date + timedelta(days=int(days))
+    expiration_date_str = expiration_date.strftime('%Y-%m-%d')
 
-    [Install]
-    WantedBy=multi-user.target' > /etc/systemd/system/sshbt.service
+    # Check if the user already exists
+    existing_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+    if f'{username}:' in existing_users and user_info.lower() not in existing_users.lower():
+        return f"{username} already exists with a different info."
 
-    # Activate the service
-    run_bot
-}
-#bot_installer() {
-      # Check if mana.sh exists
-    #if [ -f ~/udp/mana.sh ]; then
-    #  bot_install
-   # else
-   #   print_viola "You did not install teslassh udp script on your server."
-     # echo ""
-    #  print_yellow "Go visit github to install The Script"
-     # sleep 4
-     # exit
-    #fi
+    # Generate hashed password
+    osl_version = subprocess.check_output(['openssl', 'version']).decode('utf-8')
+    osl_version = osl_version.split()[1][:5]
+    password_option = '-6' if osl_version == '1.1.1' else '-1'
+    passs = subprocess.check_output(['openssl', 'passwd', password_option, password]).decode('utf-8').strip()
 
-#}
+    # Create user
+    try:
+        subprocess.run(['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
+        # Get server IP address or saved domain
+        server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
 
-ban_me() {
-  clear
-  print_pink " _____ _____ ____  _        _      ____ ____  _   _ "
-  print_pink "|_   _| ____/ ___|| |      / \    / ___/ ___|| | | |"
-  print_blue "  | | |  _| \___ \| |     / _ \   \___ \___ \| |_| |"
-  print_yellow "  | | | |___ ___) | |___ / ___ \   ___) |__) |  _  |"
-  print_pink "  |_| |_____|____/|_____/_/   \_\ |____/____/|_| |_|" 
-  echo ""
-}
-#check system
-os_check() {
-  if [ -f /etc/os-release ]; then
-      . /etc/os-release
-      if [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "22.04" ]]; then
-          bot_install
-      elif [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "23.10" ]]; then
-          bot_install
-      else
-          print_pink "THE BOT IS MEANT TO RUN ON UBUNTU 22.04 AND 23.10"
-          exit 1
-      fi
-  fi 
-}
-install_udp_first() {
-    print_center 'After the server reboots, Login amd type "bot"'
-    sleep 4
-    rm -f install.sh
-    wget --no-cache  "https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/install.sh" -O install.sh
-    chmod +x install.sh 
-    ./install.sh
-}
+        # Send success message with details
+        success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
+        return success_message
+    except subprocess.CalledProcessError as e:
+        return f"Failed to add user {username}. Error: {e}"
 
-menu_real() {
-    ban_me
-    msg -bar
-    print_center -ama "BOT MANAGER By TeslaSSH"
-    msg -bar0
-    echo ""
-    # print options menu
-    print_center -ama "${a12:-CHOOSE AN OPTION}"
-    msg -bar3
-    echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ☢️}")"
-    echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-Install UDP BOT }")"
-    echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY 🔑}")"
-    echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ⛔}")"
-    echo " $(msg -verd "[5]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN 🔁}")"
-    echo " $(msg -verd "[6]") $(msg -verm2 '>') $(msg -ama "${a6:-Uninstall Bot}")"
-    exit2home
+def remove_user(username, chat_id):
+    try:
+        subprocess.run(['sudo', 'userdel', '--force', username], check=True)
+        return f"{username} Has been removed successfully!"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to remove user {username}. Error: {e}"
+def restart_udp_daemon(chat_id):
 
-    # prompt user for option selection
-    read -p " ⇢  Enter your selection: " option
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
+        return f"\n Who else? 😳"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to restart daemons. Error: {e}"
+def reboot_server(chat_id):
+    try:
+        subprocess.run(['reboot'], check=True)
+    except subprocess.CalledProcessError as e:
+        return f"Failed to reboot server. Error: {e}"
+def list_users(chat_id):
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
 
-    # handle option selection
-    case $option in
-    1)
-      restart_bot
-      ;;
-    2)
-      os_check #checks os and installs bot
-      ;;
-    3)
-      see_key
-      ;;
-    4)
-      stop_bot
-      ;;
-    5)
-      ch_token
-      ;;
-    6)
-      bot_remove
-      ;;
-    0)
-      exit
-      ;;
-    esac
-}
+        users_details = []
 
-bot_menu() {
-  source <(curl -sSL 'https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/module/module')
-  report=$(systemctl is-active udp-custom)
-  if [ "$report" == "active" ] || [ -f /etc/hsm/toxic/olwa.py ]; then
-      menu_real
-  else
-      print_pink "IT APPEARS THAT UDP CUSTOM IS NOT INSTALLED YET ON THIS VPS"
-      echo ""
-      echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a8:-Install UDP CUSTOM First✳️}")"
-      echo " $(msg -verd "[0]") $(msg -verm2 '>') $(msg -ama "${a8:-Exit installer}")"
-      echo ""
-      read -p " ⇢  Enter your selection: " ansa
-      case $ansa in
-      1)
-        install_udp_first
-        ;;
-      0)
-        exit
-        ;;
-      esac
-   fi   
-}
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
 
-bot_menu
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+            subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days > 0:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
+                users_details.append(user_details)
+            else:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  Expired\n│──────────────────────────│"
+                users_details.append(user_details)
+
+        users_message = "\n".join(users_details)
+        organzn =  '│       ZERO ONE COMPUTING   @scriptx13  │ '
+        return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to list users. Error: {e}"
 
 
+pending_add_user_command = None
+def handle(msg):
+    global pending_add_user_command
+    content_type, chat_type, chat_id = telepot.glance(msg)
 
+    # Define custom keyboard buttons with smaller size in a single row
+    keyboard = ReplyKeyboardMarkup(keyboard=[
+        [KeyboardButton(text='Add User', resize_keyboard=True),
+         KeyboardButton(text='Remove User', resize_keyboard=True),
+         KeyboardButton(text='List Users', resize_keyboard=True)],
+        [KeyboardButton(text='Enable BBR', resize_keyboard=True),
+         KeyboardButton(text='Add RAM', resize_keyboard=True),
+         KeyboardButton(text='Power I/O', resize_keyboard=True)],
+
+        [KeyboardButton(text='Region', resize_keyboard=True),
+         KeyboardButton(text='Help', resize_keyboard=True),
+         KeyboardButton(text='Dev Team', resize_keyboard=True)],
+
+    ], resize_keyboard=True)
+
+    if content_type == 'text':
+        command = msg['text']
+
+        if command.lower() == 'start' or command == '/start':
+            start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
+                             "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
+                             "\n"
+                             "You can use me to manage users on your server!\n"
+                             "\n"
+                             "To reload the bot, Press /start\n"
+                             "To see the usage guide, Press /help\n"
+                             "To add user, Press the add user button \n"
+                             "To remove user, Send /remove \n"
+                             "To list users, Press /users \n"
+                             "\n"
+                             "🔰 Made with spirit. \n"
+                             "========================= \n"
+                             "By: @TESLASSH \n"
+                             "Mastered by: @hackwell101 \n"
+                             "Join @udpcustom")
+
+            # Send the start message with the custom keyboard
+
+            bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
+
+        elif command.lower() == '/update':
+            updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
+            updater=updet.stdout.decode('utf-8').strip()
+            bot.sendMessage(chat_id, f"Your bot {updater}")
+        elif command.lower() == 'power i/o':
+            reboot_msg = (
+                f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
+            )
+            bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
+        elif command.lower() == '/reboot':
+            try:
+                response_reboot = reboot_server(chat_id)
+                bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id,
+                                f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
+                                reply_markup=keyboard)
+        elif command.lower() == 'enable bbr':
+            try:
+                enable_bbr(chat_id)
+            except ValueError:
+                bot.sendMessage(chat_id,
+                                f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
+                                reply_markup=keyboard)
+        elif command.lower() =='region':
+            result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
+            region = result.stdout.decode('utf-8').strip()
+            commando = ["neofetch", "|", "grep", "\"Memory\"", "|", "cut", "-d:", "-f2", "|", "sed", "'s/ //g'"]
+            result = subprocess.run(commando, stdout=subprocess.PIPE)
+            output = result.stdout.strip()
+            used_memory, total_memory = output.split('/')
+            free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
+            formatted_out = f"Used Memory: {used_memory}\nFree Memory: {free_memory}"
+            bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\n\n{formatted_out}")
+
+
+        elif command.lower() == 'add ram':
+            os.system("sudo fallocate -l 1024M /swapfile")
+            os.system("sudo chmod 600 /swapfile")
+            os.system("sudo mkswap /swapfile")
+            os.system("sudo swapon /swapfile")
+            with open('/etc/fstab', 'a') as f:
+                f.write('/swapfile none swap sw 0 0\n')
+
+            os.system('sysctl vm.swappiness=10')
+            bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
+
+        elif command.lower() == 'dev team':
+            start_message = ("♻️ ZERO ONE LLC 💻. \n"
+                             "━━━━━━━━━━━━━━━━ \n"
+                             "\n"
+                             "Hello, thanks for choosing our cloud projects!\n"
+                             "\n"
+                             "This Tool was an imagination from @hackwell101, our Team member and founder of @udpcustom\n\n"
+                             "Super thanks to the developers:\n"
+                             "=============================== \n"
+                             "Bot Logic: Ted ( @hackwell101 ) \n"
+                             "Program Lang: Tesla SSH ( @teslassh ) \n"
+                             "To list users, Press /users \n"
+                             "\n"
+                             "💖Made with spirit. \n"
+                             "Join @udpcustom")
+
+            # Send the start message with the custom keyboard
+            bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
+
+        elif command.lower() == 'help' or command == '/help':
+            help_message = ("⚙️ HOW TO USE BOT:\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━━━━"
+                            "\n"
+                            "- 📌 To Add a new user, \n"
+                            'Cick on "Add User" Button, and then send me the user details to be added. in the format below: \n [username] [password] [days]\n'
+                            "\n"
+                            "Example: \n Nicholas passwad 30\n"
+                            "...........................................................\n"
+
+                            "- 📵 To Remove a user, \n"
+                            "Send /remove [username]\n"
+                            "\n"
+                            "Example: \n /remove Nicholas\n"
+                            "...........................................................\n"
+                            "- 💰 To List all users, \n"
+                            'Click on "List Users" button\n'
+                            "\n"
+                            "-🌐 To add a domain or sub-domain, \n"
+                            "send /domain [ your domain ] \n\n Example: /domain sub.domain.com. \n\n"
+                            "🆘 if you are facing issues with the bot,\n"
+                            "Contact: @teslassh"
+                            )
+            bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
+
+        elif command.lower() == 'verify':
+            # Prompt user to enter the secret key for verification
+            bot.sendMessage(chat_id, "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
+         #   verified_users[chat_id] = False
+
+        elif command.lower().startswith('/verify'):
+            try:
+                _, secret_key = command.split()
+           #     response = verify_user(chat_id, secret_key)
+          #      bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
+
+
+        if command.lower().startswith('/domain'):
+
+            try:
+
+                _, domain = command.split(maxsplit=1)
+
+                save_domain(domain)
+
+                bot.sendMessage(chat_id, f"Domain '{domain}' saved successfully!")
+
+            except ValueError:
+
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /domain [your_domain]")
+
+        if command.lower() == 'add user':
+                pending_add_user_command = command
+                bot.sendMessage(chat_id, "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30", reply_markup=keyboard)
+
+        elif pending_add_user_command:
+            # Process the pending "Add User" command
+            try:
+                _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
+                response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.", reply_markup=keyboard)
+            finally:
+                # Reset the pending command after processing
+                pending_add_user_command = None
+
+        elif command.lower() == 'remove user':
+            # Check if the user is verified before allowing to use /remove command
+           # if not is_verified(chat_id):
+            #    bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
+          #  else:
+                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+
+        elif command.lower().startswith('/remove'):
+            # Check if the user is verified before allowing to use /remove command
+           # if not is_verified(chat_id):
+            #    bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
+           # else:
+                try:
+                    _, username = command.split()
+                    response = remove_user(username, chat_id)
+                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                    # Restart the UDP daemon immediately after removing the user
+                    response_restart = restart_udp_daemon(chat_id)
+                    bot.sendMessage(chat_id, response_restart, reply_markup=keyboard)
+                except ValueError:
+                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+
+        elif command.lower() == 'list users' or command == '/users':
+            response = list_users(chat_id)
+            bot.sendMessage(chat_id, response, reply_markup=keyboard)
+
+# Set the command handler
+bot.message_loop(handle)
+
+# Keep the program running
+while True:
+    pass
