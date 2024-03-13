@@ -1,6 +1,6 @@
 # Made with love by Teslassh
 # Stealing this source code is illegal as always.
-# #You are allowed to use the tool in any way you wish
+#######You are allowed to use the tool in any way you wish
 import telepot
 import subprocess
 import os
