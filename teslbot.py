@@ -219,22 +219,14 @@ def handle(msg):
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             # Define the path to the bash script
-            bash_script_path = "/etc/hsm/toxic/ham.sh"
+            #bash_script_path = "/etc/hsm/toxic/ham.sh"
+            command = ["neofetch", "|", "grep", "\"Memory\"", "|", "cut", "-d:", "-f2", "|", "sed", "'s/ //g'"]
 
             # Execute the bash script and capture stdout
-            result1 = subprocess.run([bash_script_path], stdout=subprocess.PIPE)
+            result1 = subprocess.run(command, stdout=subprocess.PIPE)
 
             # Decode the stdout bytes to a string
             output = result1.stdout.decode('utf-8').strip()
-
-            # Split the output into used and total memory
-            #used_memory, total_memory = output.split('/')
-
-            # Calculate free memory
-            #free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
-
-            # Format the output
-            #formatted_out = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
             bot.sendMessage(chat_id, f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   USAGE: {output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
 
 
