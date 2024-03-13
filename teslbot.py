@@ -218,15 +218,21 @@ def handle(msg):
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
-            commando = ["neofetch", "|", "grep", "\"Memory\"", "|", "cut", "-d:", "-f2", "|", "sed", "'s/ //g'"]
-            # Execute the command and capture stdout
-            result1 = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
+            # Define the path to the bash script
+            bash_script_path = "/etc/hsm/toxic/ham.sh"
+
+            # Execute the bash script and capture stdout
+            result1 = subprocess.run([bash_script_path], stdout=subprocess.PIPE)
+
             # Decode the stdout bytes to a string
             output = result1.stdout.decode('utf-8').strip()
+
             # Split the output into used and total memory
             used_memory, total_memory = output.split('/')
+
             # Calculate free memory
             free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
+
             # Format the output
             formatted_out = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
             bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\n\n{formatted_out}")
@@ -363,4 +369,3 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
-    
