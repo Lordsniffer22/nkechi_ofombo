@@ -219,12 +219,10 @@ def handle(msg):
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             commando = ["neofetch", "|", "grep", "\"Memory\"", "|", "cut", "-d:", "-f2", "|", "sed", "'s/ //g'"]
-            # Define the command as a list of strings
-            command = ["neofetch | grep 'Memory' | cut -d: -f2 | sed 's/ //g'"]
             # Execute the command and capture stdout
-            result = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
+            result1 = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
             # Decode the stdout bytes to a string
-            output = result.stdout.decode('utf-8').strip()
+            output = result1.stdout.decode('utf-8').strip()
             # Split the output into used and total memory
             used_memory, total_memory = output.split('/')
             # Calculate free memory
