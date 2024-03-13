@@ -227,13 +227,12 @@ def handle(msg):
             # Decode the stdout bytes to a string
             output = result1.stdout.decode('utf-8').strip()
 
-            # Remove the extraneous characters from the output
-            clean_output = ''.join(char for char in output if char.isalnum() or char in [' ', '/', 'MiB'])
+            # Remove the '[0m' substrings from the output
+            clean_output = output.replace('[0m', '')
 
             # Send the message with the cleaned output
             bot.sendMessage(chat_id,
                             f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   USAGE: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
-
 
         elif command.lower() == 'add ram':
             os.system("sudo fallocate -l 1024M /swapfile")
