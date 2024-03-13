@@ -235,7 +235,7 @@ def handle(msg):
 
             # Format the output
             #formatted_out = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
-            bot.sendMessage(chat_id, f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n  LOCATION: {region}\n  ─────────────\nUSAGE: {output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
+            bot.sendMessage(chat_id, f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   USAGE: {output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
 
 
         elif command.lower() == 'add ram':
