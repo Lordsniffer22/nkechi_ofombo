@@ -1,7 +1,6 @@
 # Made with love by Teslassh
 # Stealing this source code is illegal as always.
 # #You are allowed to use the tool in any way you wish
-
 import telepot
 import subprocess
 import os
@@ -219,7 +218,13 @@ def handle(msg):
         elif command.lower() =='region':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
-            bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}")
+            commando = ["neofetch", "|", "grep", "\"Memory\"", "|", "cut", "-d:", "-f2", "|", "sed", "'s/ //g'"]
+            result = subprocess.run(commando, stdout=subprocess.PIPE)
+            output = result.stdout.strip()
+            used_memory, total_memory = output.split('/')
+            free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
+            formatted_out = f"Used Memory: {used_memory}\nFree Memory: {free_memory}"
+            bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\n\n{formatted_out}")
 
 
         elif command.lower() == 'add ram':
