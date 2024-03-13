@@ -228,14 +228,14 @@ def handle(msg):
             output = result1.stdout.decode('utf-8').strip()
 
             # Split the output into used and total memory
-            used_memory, total_memory = output.split('/')
+            #used_memory, total_memory = output.split('/')
 
             # Calculate free memory
-            free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
+            #free_memory = int(total_memory.replace('MiB', '').strip()) - int(used_memory.replace('MiB', '').strip())
 
             # Format the output
-            formatted_out = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
-            bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\n\n{formatted_out}")
+            #formatted_out = f"Used memory: {used_memory}\nFree memory: {free_memory}MiB"
+            bot.sendMessage(chat_id, f"Basing on my understanding, \nYour VPS is located in {region}\nMemory usage: {output}")
 
 
         elif command.lower() == 'add ram':
