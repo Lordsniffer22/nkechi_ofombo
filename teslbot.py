@@ -205,7 +205,7 @@ def handle(msg):
                 response_reboot = reboot_server(chat_id)
                 first_inform = ( "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
                 bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
-                time.sleep(1)
+                time.sleep(3)
                 bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id,
