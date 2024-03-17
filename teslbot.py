@@ -99,6 +99,7 @@ def restart_udp_daemon(chat_id):
         return f"Failed to restart daemons. Error: {e}"
 def reboot_server(chat_id):
     try:
+        time.sleep(4)
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
@@ -202,10 +203,9 @@ def handle(msg):
             bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
         elif command.lower() == '/reboot':
             try:
-                response_reboot = reboot_server(chat_id)
                 first_inform = ( "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
                 bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
-                time.sleep(3)
+                response_reboot = reboot_server(chat_id)
                 bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id,
