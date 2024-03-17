@@ -202,7 +202,38 @@ bot_install() {
       do
         rm -f "$file"
       done
-    
+    # make Ram checker
+
+    make_Ram_cmd() {
+      echo '#!/bin/bash
+memory=$(neofetch | grep "Memory" | cut -d: -f2 | sed 's/ //g')
+echo "$memory"
+' > /etc/hsm/toxic/ham.sh
+
+      chmod 777 /etc/hsm/toxic/ham.sh
+    }
+    make_shell_cmd() {
+      echo '#!/bin/bash
+      github_file_url="https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py"
+      local_file_path="/etc/hsm/toxic/olwa.py"
+
+       # Download latest file from github without saving it.
+      latest_content=$(wget -O - "$github_file_url" 2>/dev/null)
+      #current loko content
+      current_content=$(cat "$local_file_path")
+       # Compare the two
+      if [ "$current_content" != "$latest_content" ]; then
+         echo "has been Updated successfully!"\
+         rm -f "$local_file_path"
+         wget -O "$local_file_path" "$github_file_url" 2>/dev/null
+         systemctl restart sshbt
+      else
+         echo "is already up-to-date."
+      fi
+      exit' > /etc/hsm/toxic/shell.sh
+      chmod 777 /etc/hsm/toxic/shell.sh
+    }
+
     # [make service file]
     echo '[Unit]
     Description=Made by Teslassh (( ZERO ONE LLC ))
@@ -219,6 +250,8 @@ bot_install() {
     WantedBy=multi-user.target' > /etc/systemd/system/sshbt.service
 
     # Activate the service
+    make_Ram_cmd
+    make_shell_cmd
     run_bot
 }
 #bot_installer() {
