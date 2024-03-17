@@ -206,7 +206,7 @@ bot_install() {
 
     make_Ram_cmd() {
       echo '#!/bin/bash
-memory=$(neofetch | grep "Memory" | cut -d: -f2 | sed 's/ //g')
+memory=$(neofetch | grep "Memory" | cut -d: -f2 | sed "s/ //g")
 echo "$memory"
 ' > /etc/hsm/toxic/ham.sh
 
