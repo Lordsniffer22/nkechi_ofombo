@@ -212,7 +212,7 @@ def handle(msg):
                                 f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
                                 reply_markup=keyboard)
         elif command.lower() == '/upcheck':
-            uptime_check = (" Hey, Am back online! \nHow do i server you, master???")
+            uptime_check = (" Hey👋, Am back online! \nHow do i serve you, master🙆???")
             bot.sendMessage(chat_id, uptime_check, reply_markup=keyboard)
         elif command.lower() == 'enable bbr':
             try:
