@@ -203,11 +203,17 @@ def handle(msg):
         elif command.lower() == '/reboot':
             try:
                 response_reboot = reboot_server(chat_id)
+                first_inform = ( "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
+                bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
+                time.sleep(1)
                 bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id,
                                 f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
                                 reply_markup=keyboard)
+        elif command.lower() == '/upcheck':
+            uptime_check = (" Hey, Am back online! \nHow do i server you, master???")
+            bot.sendMessage(chat_id, uptime_check, reply_markup=keyboard)
         elif command.lower() == 'enable bbr':
             try:
                 enable_bbr(chat_id)
