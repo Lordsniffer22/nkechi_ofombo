@@ -160,7 +160,7 @@ def handle(msg):
          KeyboardButton(text='Add RAM', resize_keyboard=True),
          KeyboardButton(text='Power I/O', resize_keyboard=True)],
 
-        [KeyboardButton(text='Region', resize_keyboard=True),
+        [KeyboardButton(text='VPS INFO', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
          KeyboardButton(text='Dev Team', resize_keyboard=True)],
 
@@ -215,7 +215,7 @@ def handle(msg):
                 bot.sendMessage(chat_id,
                                 f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
                                 reply_markup=keyboard)
-        elif command.lower() =='region':
+        elif command.lower() =='vps info':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             # Define the path to the bash script
@@ -325,7 +325,7 @@ def handle(msg):
             # Process the pending "Add User" command
             try:
                 _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
-                response = add_user(username, password, days, user_info="bot", chat_id=chat_id)
+                response = add_user(username, password, days, user_info="1", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.", reply_markup=keyboard)
