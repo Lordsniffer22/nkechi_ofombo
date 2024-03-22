@@ -7,35 +7,14 @@ def handle_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
 
     if content_type == 'text':
-        text = msg['text']
-        if is_youtube_link(text):
-            send_options(chat_id)
-        else:
-            search_results = search_youtube(text)
-            send_mp3_files(chat_id, search_results)
-
-    elif content_type == 'callback_query':
-        query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
-        send_file_based_on_option(query_data, from_id, query_id)
+        query = msg['text']
+        if is_youtube_link(query):
+            # If the message is a YouTube link, download and send the MP3 file
+            send_mp3_file(chat_id, query)
 
 # Function to check if a message is a YouTube link
 def is_youtube_link(text):
     return text.startswith('https://www.youtube.com/')
-
-# Function to send options to the user (360p video or MP3)
-def send_options(chat_id):
-    keyboard = {'inline_keyboard': [[
-        {'text': '360p Video', 'callback_data': '360p'},
-        {'text': 'MP3', 'callback_data': 'mp3'}
-    ]]}
-    bot.sendMessage(chat_id, 'Choose an option:', reply_markup=keyboard)
-
-# Function to search YouTube for the specified query
-def search_youtube(query):
-    # Use YouTube API or web scraping to search for videos based on the query
-    # Return a list of video URLs or IDs
-    # For demonstration purposes, return an empty list
-    return []
 
 # Function to download a YouTube video and convert it to MP3
 def download_and_convert_to_mp3(video_url):
@@ -57,24 +36,6 @@ def send_mp3_file(chat_id, video_url):
         with open(mp3_file, 'rb') as f:
             bot.sendAudio(chat_id, f)
         os.remove(mp3_file)  # Remove the MP3 file after sending
-
-# Function to send multiple MP3 files to the user
-def send_mp3_files(chat_id, search_results):
-    for result in search_results:
-        mp3_file = download_and_convert_to_mp3(result)
-        if mp3_file:
-            with open(mp3_file, 'rb') as f:
-                bot.sendAudio(chat_id, f)
-            os.remove(mp3_file)  # Remove the MP3 file after sending
-
-# Function to handle user's option selection
-def send_file_based_on_option(option, chat_id, query_id):
-    if option == '360p':
-        # Send the 360p video to the user
-        pass  # Implement sending 360p video
-    elif option == 'mp3':
-        # Send the MP3 file to the user
-        send_mp3_file(chat_id, query_id)
 
 # Set up the bot
 TOKEN = '7021922965:AAHIt6RrH6Tw4mVHh_QLCe-OpakH03igMvk'  # Replace with your actual bot token
