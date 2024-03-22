@@ -11,11 +11,15 @@ def handle_message(msg):
         query = msg['text']
         if is_youtube_link(query):
             # If the message is a YouTube link, download and send the MP3 file
-            processing = (f"Processing...")
-            bot.sendMessage(chat_id, processing)
+            processing = "Processing..."
+            # Send the processing message and get the message ID
+            processing_message = bot.sendMessage(chat_id, processing)
             send_mp3_file(chat_id, query)
+            # Delete the processing message
+            bot.deleteMessage((chat_id, processing_message['message_id']))
             # Delete the message containing the YouTube link
             bot.deleteMessage((chat_id, msg['message_id']))
+
 
 # Function to check if a message is a YouTube link
 def is_youtube_link(text):
