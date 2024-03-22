@@ -1,6 +1,7 @@
 import telepot
 from pytube import YouTube
 import os
+import time
 
 # Function to handle incoming messages
 def handle_message(msg):
@@ -10,6 +11,8 @@ def handle_message(msg):
         query = msg['text']
         if is_youtube_link(query):
             # If the message is a YouTube link, download and send the MP3 file
+            processing = (f"Processing...")
+            bot.sendMessage(chat_id, processing)
             send_mp3_file(chat_id, query)
             # Delete the message containing the YouTube link
             bot.deleteMessage((chat_id, msg['message_id']))
@@ -36,7 +39,7 @@ def send_mp3_file(chat_id, video_url):
     mp3_file = download_and_convert_to_mp3(video_url)
     if mp3_file:
         # Add a caption to the audio file
-        caption = "Hey your music is here.\n\n➤Bot: @tubyDo_Bot \n➤By: @hackwell101.\n╰┈➤Join @udpcustom"
+        caption = "Hey your music is here.\n\n➤Bot: @tubyDo_Bot \n│\n╰┈➤Join @udpcustom"
         with open(mp3_file, 'rb') as f:
             bot.sendAudio(chat_id, f, caption=caption)
         os.remove(mp3_file)  # Remove the MP3 file after sending
