@@ -1,4 +1,3 @@
-
 import telepot
 from pytube import YouTube
 import os
@@ -12,6 +11,8 @@ def handle_message(msg):
         if is_youtube_link(query):
             # If the message is a YouTube link, download and send the MP3 file
             send_mp3_file(chat_id, query)
+            # Delete the message containing the YouTube link
+            bot.deleteMessage((chat_id, msg['message_id']))
 
 # Function to check if a message is a YouTube link
 def is_youtube_link(text):
