@@ -77,7 +77,7 @@ def send_file_based_on_option(option, chat_id, query_id):
         send_mp3_file(chat_id, query_id)
 
 # Set up the bot
-TOKEN = 'YOUR_BOT_TOKEN'  # Replace with your actual bot token
+TOKEN = '7021922965:AAHIt6RrH6Tw4mVHh_QLCe-OpakH03igMvk'  # Replace with your actual bot token
 bot = telepot.Bot(TOKEN)
 bot.message_loop(handle_message)
 
