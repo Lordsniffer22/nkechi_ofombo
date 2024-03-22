@@ -35,10 +35,10 @@ def download_and_convert_to_mp3(video_url):
 def send_mp3_file(chat_id, video_url):
     mp3_file = download_and_convert_to_mp3(video_url)
     if mp3_file:
-        # Add a caption to the audio file
-        caption = "Hey your music is here.\n\n➤**Bot:** @tubyDo_Bot \n➤**By:** @hackwell101.\n╰┈➤**Join** @udpcustom"
+        # Add a caption to the audio file with Markdown formatting
+        caption = "Hey, your music is here.\n\n*Bot:* [@tubyDo_Bot](https://t.me/tubyDo_Bot)\n*By:* [@hackwell101](https://t.me/hackwell101)\n\nJoin [UDPCustom](https://t.me/udpcustom)"
         with open(mp3_file, 'rb') as f:
-            bot.sendAudio(chat_id, f, caption=caption)
+            bot.sendAudio(chat_id, f, caption=caption, parse_mode='Markdown')
         os.remove(mp3_file)  # Remove the MP3 file after sending
 
 # Set up the bot
