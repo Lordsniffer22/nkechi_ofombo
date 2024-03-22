@@ -32,29 +32,38 @@ def on_callback_query(msg):
         bot.sendMessage(from_id, 'Downloading audio in MP3 format...')
         send_mp3_file(from_id, msg['message']['text'])
 
-# Function to download a YouTube video in MP4 format (360p)
-def download_video(video_url):
-    yt = YouTube(video_url)
-    video_title = yt.title
-    stream = yt.streams.filter(res="360p", mime_type="video/mp4").first()
-    if stream:
-        file_path = stream.download()
-        return file_path
-    else:
-        return None
-
 # Function to download a YouTube video and convert it to MP3
 def download_and_convert_to_mp3(video_url):
-    yt = YouTube(video_url)
-    video_title = yt.title
-    stream = yt.streams.filter(only_audio=True).first()
-    if stream:
-        file_path = stream.download()
-        mp3_file = f"{video_title}.mp3"
-        os.rename(file_path, mp3_file)
-        return mp3_file
-    else:
+    try:
+        yt = YouTube(video_url)
+        video_title = yt.title
+        stream = yt.streams.filter(only_audio=True).first()
+        if stream:
+            file_path = stream.download()
+            mp3_file = f"{video_title}.mp3"
+            os.rename(file_path, mp3_file)
+            return mp3_file
+        else:
+            return None
+    except Exception as e:
+        print(f"Error downloading and converting to MP3: {e}")
         return None
+
+# Function to download a YouTube video in MP4 format (360p)
+def download_video(video_url):
+    try:
+        yt = YouTube(video_url)
+        video_title = yt.title
+        stream = yt.streams.filter(res="360p", mime_type="video/mp4").first()
+        if stream:
+            file_path = stream.download()
+            return file_path
+        else:
+            return None
+    except Exception as e:
+        print(f"Error downloading video: {e}")
+        return None
+
 
 # Function to send an MP3 file to the user
 def send_mp3_file(chat_id, video_url):
