@@ -31,12 +31,14 @@ def download_and_convert_to_mp3(video_url):
     else:
         return None
 
-# Function to send an MP3 file to the user
+# Function to send an MP3 file to the user with a caption
 def send_mp3_file(chat_id, video_url):
     mp3_file = download_and_convert_to_mp3(video_url)
     if mp3_file:
+        # Add a caption to the audio file
+        caption = "Here is the audio from the YouTube video."
         with open(mp3_file, 'rb') as f:
-            bot.sendAudio(chat_id, f)
+            bot.sendAudio(chat_id, f, caption=caption)
         os.remove(mp3_file)  # Remove the MP3 file after sending
 
 # Set up the bot
