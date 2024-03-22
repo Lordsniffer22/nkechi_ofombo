@@ -42,7 +42,7 @@ def send_mp3_file(chat_id, video_url):
         os.remove(mp3_file)  # Remove the MP3 file after sending
 
 # Set up the bot
-TOKEN = '7021922965:AAHIt6RrH6Tw4mVHh_QLCe-OpakH03igMvk'  # Replace with your actual bot token
+TOKEN = '6750684509:AAEQkwX5DyWSlHV14UNwynjspZwiUpkQOkM'  # Replace with your actual bot token
 bot = telepot.Bot(TOKEN)
 bot.message_loop(handle_message)
 
