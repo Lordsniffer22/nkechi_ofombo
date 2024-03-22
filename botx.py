@@ -19,14 +19,16 @@ def is_youtube_link(text):
 # Function to download a YouTube video in MP4 format
 def download_video(video_url):
     yt = YouTube(video_url)
-    video_title = yt.title
+    video_title = yt.title.replace('"', '')  # Remove quotes from the title
     stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
     if stream:
+        file_path = stream.download()
         mp4_file = f"{video_title}.mp4"
-        stream.download(output_path='downloads/', filename=video_title)
-        return os.path.join('downloads', mp4_file)
+        os.rename(file_path, mp4_file)
+        return mp4_file
     else:
         return None
+
 
 # Function to send an MP4 video file to the user
 def send_mp4_file(chat_id, video_url):
