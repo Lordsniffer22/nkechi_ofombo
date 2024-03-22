@@ -10,8 +10,8 @@ def handle_message(msg):
     if content_type == 'text':
         query = msg['text']
         if is_youtube_link(query):
-            time.sleep(3)
-            processing = "Processing..."
+            time.sleep(2)
+            processing = "Processing... \n Hang on tight🤙"
             processing_message = bot.sendMessage(chat_id, processing)
             send_mp3_file(chat_id, query)
             bot.deleteMessage((chat_id, msg['message_id']))
