@@ -1,5 +1,4 @@
 #!/bin/bash
-}
 print_pink() {
     echo -e "\e[1;95m$1\e[0m"
 }
