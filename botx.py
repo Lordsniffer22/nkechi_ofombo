@@ -22,10 +22,9 @@ def download_video(video_url):
     video_title = yt.title
     stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
     if stream:
-        file_path = stream.download()
         mp4_file = f"{video_title}.mp4"
-        os.rename(file_path, mp4_file)
-        return mp4_file
+        stream.download(output_path='downloads/', filename=video_title)
+        return os.path.join('downloads', mp4_file)
     else:
         return None
 
