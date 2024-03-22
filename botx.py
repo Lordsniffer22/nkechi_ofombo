@@ -16,10 +16,10 @@ def handle_message(msg):
             bot.deleteMessage((chat_id, msg['message_id']))
             bot.deleteMessage((chat_id, processing_message['message_id']))
 
-
 # Function to check if a message is a YouTube link
 def is_youtube_link(text):
-    return text.startswith('https://www.youtube.com/')
+    return text.startswith('https://www.youtube.com/') or text.startswith('https://youtu.be/')
+
 
 # Function to download a YouTube video and convert it to MP3
 def download_and_convert_to_mp3(video_url):
