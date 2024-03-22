@@ -1,3 +1,4 @@
+
 import telepot
 from pytube import YouTube
 import os
@@ -9,34 +10,33 @@ def handle_message(msg):
     if content_type == 'text':
         query = msg['text']
         if is_youtube_link(query):
-            # If the message is a YouTube link, download and send the MP4 video file
-            send_mp4_file(chat_id, query)
+            # If the message is a YouTube link, download and send the MP3 file
+            send_mp3_file(chat_id, query)
 
 # Function to check if a message is a YouTube link
 def is_youtube_link(text):
     return text.startswith('https://www.youtube.com/')
 
-# Function to download a YouTube video in MP4 format
-def download_video(video_url):
+# Function to download a YouTube video and convert it to MP3
+def download_and_convert_to_mp3(video_url):
     yt = YouTube(video_url)
-    video_title = yt.title.replace('"', '')  # Remove quotes from the title
-    stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
+    video_title = yt.title
+    stream = yt.streams.filter(only_audio=True).first()
     if stream:
         file_path = stream.download()
-        mp4_file = f"{video_title}.mp4"
-        os.rename(file_path, mp4_file)
-        return mp4_file
+        mp3_file = f"{video_title}.mp3"
+        os.rename(file_path, mp3_file)
+        return mp3_file
     else:
         return None
 
-
-# Function to send an MP4 video file to the user
-def send_mp4_file(chat_id, video_url):
-    mp4_file = download_video(video_url)
-    if mp4_file:
-        with open(mp4_file, 'rb') as f:
-            bot.sendVideo(chat_id, f)
-        os.remove(mp4_file)  # Remove the MP4 file after sending
+# Function to send an MP3 file to the user
+def send_mp3_file(chat_id, video_url):
+    mp3_file = download_and_convert_to_mp3(video_url)
+    if mp3_file:
+        with open(mp3_file, 'rb') as f:
+            bot.sendAudio(chat_id, f)
+        os.remove(mp3_file)  # Remove the MP3 file after sending
 
 # Set up the bot
 TOKEN = '7021922965:AAHIt6RrH6Tw4mVHh_QLCe-OpakH03igMvk'  # Replace with your actual bot token
