@@ -31,6 +31,7 @@ install_tuby() {
 }
 
 initialise_tuby() {
+  systemctl stop tuby
   chmod 640 /etc/systemd/system/tuby.service
   systemctl daemon-reload
   systemctl enable tuby
