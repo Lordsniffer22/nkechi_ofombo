@@ -39,13 +39,13 @@ def send_mp3_file(chat_id, video_url):
     mp3_file = download_and_convert_to_mp3(video_url)
     if mp3_file:
         # Add a caption to the audio file
-        caption = "Hey your music is here.\n\n➤Bot: @tubyDo_Bot \n│\n╰┈➤Join @udpcustom"
+        caption = "Hey your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
         with open(mp3_file, 'rb') as f:
             bot.sendAudio(chat_id, f, caption=caption)
         os.remove(mp3_file)  # Remove the MP3 file after sending
 
 # Set up the bot
-TOKEN = '6750684509:AAG8DZCVphgq93VHlHgQeZA-AKOYpwBLm7M'  # Replace with your actual bot token
+TOKEN = '7167940962:AAGFe2jy93eZSTuLuR0wR9SngQmk6vi2FNg'  # Replace with your actual bot token
 bot = telepot.Bot(TOKEN)
 bot.message_loop(handle_message)
 
