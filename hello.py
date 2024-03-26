@@ -9,8 +9,8 @@ payment_url = 'https://api.flutterwave.com/v3/payments'
 
 # Sample payload for initiating payment
 payload = {
-    "tx_ref": "ABDS",
-    "amount": "100",
+    "tx_ref": "AB0DS",
+    "amount": "500",
     "currency": "UGX",
     "payment_options": "mobilemoneyuganda",
     "redirect_url": "https://your-redirect-url.com",
@@ -20,7 +20,7 @@ payload = {
     },
     "customer": {
         "email": "user@example.com",
-        "phone_number": "256742067406",  # Replace with your phone number
+        "phone_number": "256758199642",  # Replace with your phone number
         "name": "OWORI NICHOLOUS"
     },
     "customizations": {
