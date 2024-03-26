@@ -5,23 +5,23 @@ FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK-0e4658e40b88a018d1451da348f9acab-X'
 FLUTTERWAVE_SECRET_KEY = 'FLWSECK-2cfcb60ea041cb576453e651c9ee2e43-18e7acefd71vt-X'
 
 # Endpoint for initiating payment
-payment_url = 'https://api.flutterwave.com/v3/payments'
+payment_url = 'https://api.flutterwave.com/v3/charges?type=ussd_payment'
 
 # Sample payload for initiating payment
 payload = {
-    "tx_ref": "AB0DS",
-    "amount": "500",
+    "tx_ref": "test_transaction",
+    "amount": "100",
     "currency": "UGX",
-    "payment_options": "mobilemoneyuganda",
     "redirect_url": "https://your-redirect-url.com",
+    "payment_options": "mobilemoneyuganda",
+    "customer": {
+        "email": "user@example.com",
+        "phone_number": "256773343130",  # Replace with your phone number
+        "name": "Test User"
+    },
     "meta": {
         "consumer_id": 23,
         "consumer_mac": "92a3-912ba-1192a"
-    },
-    "customer": {
-        "email": "user@example.com",
-        "phone_number": "256758199642",  # Replace with your phone number
-        "name": "OWORI NICHOLOUS"
     },
     "customizations": {
         "title": "Test Payment",
