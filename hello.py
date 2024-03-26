@@ -1,8 +1,8 @@
 import requests
 
 # Replace with your Flutterwave API keys
-FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK_TEST-1b2607d27bedc182f378e2f7d763f9ae-X'
-FLUTTERWAVE_SECRET_KEY = 'FLWSECK_TEST-a589b84f8c701ed15fa08014d7c778ff-X'
+FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK-0e4658e40b88a018d1451da348f9acab-X'
+FLUTTERWAVE_SECRET_KEY = 'FLWSECK-2cfcb60ea041cb576453e651c9ee2e43-18e7acefd71vt-X'
 
 # Endpoint for initiating payment
 payment_url = 'https://api.flutterwave.com/v3/payments'
@@ -10,8 +10,8 @@ payment_url = 'https://api.flutterwave.com/v3/payments'
 # Sample payload for initiating payment
 payload = {
     "tx_ref": "test_transaction",
-    "amount": "100",
-    "currency": "USD",
+    "amount": "40000",
+    "currency": "UGX",
     "redirect_url": "https://t.me/hackwell101",
     "payment_options": "card",
     "meta": {
@@ -19,7 +19,7 @@ payload = {
         "consumer_mac": "92a3-912ba-1192a"
     },
     "customer": {
-        "email": "user@example.com",
+        "email": "user@udpcustom.com",
         "phone_number": "08102909304",
         "name": "Test User"
     },
