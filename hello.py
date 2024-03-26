@@ -4,6 +4,7 @@ import requests
 FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK-0e4658e40b88a018d1451da348f9acab-X'
 FLUTTERWAVE_SECRET_KEY = 'FLWSECK-2cfcb60ea041cb576453e651c9ee2e43-18e7acefd71vt-X'
 
+
 # Endpoint for initiating payment
 payment_url = 'https://api.flutterwave.com/v3/charges?type=ussd_payment'
 
@@ -15,9 +16,8 @@ payload = {
     "redirect_url": "https://your-redirect-url.com",
     "payment_options": "mobilemoneyuganda",
     "customer": {
-
-        "phone_number": "256773343130",  # Replace with your phone number
-        
+        "phone_number": "256742067406",  # Replace with your phone number
+        "name": "Test User"
     },
     "meta": {
         "consumer_id": 23,
