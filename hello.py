@@ -10,18 +10,18 @@ payment_url = 'https://api.flutterwave.com/v3/payments'
 # Sample payload for initiating payment
 payload = {
     "tx_ref": "test_transaction",
-    "amount": "40000",
+    "amount": "100",
     "currency": "UGX",
-    "redirect_url": "https://t.me/hackwell101",
-    "payment_options": "card",
+    "payment_options": "mobilemoneyuganda",
+    "redirect_url": "https://your-redirect-url.com",
     "meta": {
         "consumer_id": 23,
         "consumer_mac": "92a3-912ba-1192a"
     },
     "customer": {
-        "email": "user@udpcustom.com",
-        "phone_number": "08102909304",
-        "name": "Test User"
+        "email": "user@example.com",
+        "phone_number": "256742067406",  # Replace with your phone number
+        "name": "OWORI NICHOLOUS"
     },
     "customizations": {
         "title": "Test Payment",
@@ -40,7 +40,7 @@ response = requests.post(payment_url, json=payload, headers=headers)
 # Check response
 if response.status_code == 200:
     payment_data = response.json()
-    payment_link = payment_data['data']['link']
-    print("Payment link:", payment_link)
+    payment_details = payment_data['data']
+    print("Payment details:", payment_details)
 else:
     print("Failed to initiate payment:", response.text)
