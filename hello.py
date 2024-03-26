@@ -31,11 +31,7 @@ def handle(msg):
             bot.sendMessage(chat_id, "I'm sorry, I don't understand that command.")
 
     # Handle inline button clicks
-    elif content_type == 'callback_query':
-        query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
-        
-        # User clicked on Pay button
-        if query_data == 'pay':
+    elif command == '/pay':
             bot.sendMessage(chat_id, "Please provide your details in the format: Full Name, Phone Number (with country code), Email.")
 
 def initiate_payment(full_name, phone_number, email):
