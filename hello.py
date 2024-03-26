@@ -69,3 +69,7 @@ bot = telepot.Bot('6533833584:AAHPalg1HywEshspXgeGAYOjWRG95jx8X4Q')
 MessageLoop(bot, handle).run_as_thread()
 
 print('Bot is listening...')
+
+# Keep the program running
+while True:
+    pass
