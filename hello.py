@@ -9,7 +9,7 @@ payment_url = 'https://api.flutterwave.com/v3/payments'
 
 # Sample payload for initiating payment
 payload = {
-    "tx_ref": "test_transaction",
+    "tx_ref": "ABDS",
     "amount": "100",
     "currency": "UGX",
     "payment_options": "mobilemoneyuganda",
