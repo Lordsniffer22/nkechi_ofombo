@@ -15,7 +15,7 @@ payload = {
     "redirect_url": "https://your-redirect-url.com",
     "payment_options": "mobilemoneyuganda",
     "customer": {
-        "email": "user@example.com",  # Placeholder email
+        "email","data":null # Placeholder email
         "phone_number": "256773343130",  # Replace with your phone number
         "name": "Test User"
     },
