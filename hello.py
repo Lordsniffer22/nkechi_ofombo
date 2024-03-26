@@ -10,66 +10,62 @@ FLUTTERWAVE_SECRET_KEY = 'FLWSECK-2cfcb60ea041cb576453e651c9ee2e43-18e7acefd71vt
 
 # Telegram bot token
 TELEGRAM_TOKEN = '6533833584:AAHPalg1HywEshspXgeGAYOjWRG95jx8X4Q'
-# Replace with your Flutterwave API keys
-
 
 # Function to handle incoming messages
-def handle_message(msg):
+def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
-
     if content_type == 'text':
-        if msg['text'] == '/start':
-            # Send welcome message and payment button
-            bot.sendMessage(chat_id, "Welcome to our Telegram Bot! Click the button below to make a payment.",
-                            reply_markup={'keyboard': [['Pay']],'one_time_keyboard': True})
-        elif msg['text'] == 'Pay':
-            bot.sendMessage(chat_id, "Please provide your real name, phone number (starting with 256), and email address in the format:\n\n"
-                                      "Name: [Your Name]\n"
-                                      "Phone: [256XXXXXXXXX]\n"
-                                      "Email: [Your Email]")
-        elif 'Name:' in msg['text'] and 'Phone:' in msg['text'] and 'Email:' in msg['text']:
-            # Extract user information
-            name = msg['text'].split('Name: ')[1].split('\n')[0].strip()
-            phone = msg['text'].split('Phone: ')[1].split('\n')[0].strip()
-            email = msg['text'].split('Email: ')[1].strip()
-
-            # Prepare payload for Flutterwave
-            payload = {
-                "tx_ref": "test_transaction",
-                "amount": "100",
-                "currency": "UGX",
-                "payment_options": "mobilemoneyuganda",
-                "redirect_url": "https://your-redirect-url.com",
-                "customer": {
-                    "email": email,
-                    "phone_number": phone,
-                    "name": name
-                },
-                "customizations": {
-                    "title": "Test Payment",
-                    "description": "Payment for test purposes"
-                }
-            }
-
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': f'Bearer {FLUTTERWAVE_SECRET_KEY}'
-            }
-
-            # Initiate payment
-            response = requests.post('https://api.flutterwave.com/v3/payments', json=payload, headers=headers)
-
-            if response.status_code == 200:
-                payment_data = response.json()
-                payment_link = payment_data['data']['link']
-                bot.sendMessage(chat_id, f"Please complete your payment by clicking on the link below:\n{payment_link}")
-            else:
-                bot.sendMessage(chat_id, "Failed to initiate payment. Please try again later.")
+        command = msg['text']
+        if command == '/start':
+            bot.sendMessage(chat_id, "Welcome! Click on the pay button to initiate payment.")
+        elif command == '/pay':
+            bot.sendMessage(chat_id, "Please provide your real name, phone number (starting with 256), and email in the format: Name, 256XXXXXXXXX, email@example.com")
         else:
-            bot.sendMessage(chat_id, "Invalid command. Please click on the 'Pay' button to initiate a payment.")
+            bot.sendMessage(chat_id, "Invalid command. Click on the pay button to initiate payment.")
 
-# Replace 'your_bot_token' with your Telegram bot token
-bot = telepot.Bot('your_bot_token6533833584:AAHPalg1HywEshspXgeGAYOjWRG95jx8X4Q')
-MessageLoop(bot, handle_message).run_as_thread()
+    # Handle user input for payment details
+    elif content_type == 'contact':
+        contact = msg['contact']
+        name = contact['first_name']
+        phone_number = contact['phone_number']
+        email = msg['text']
+        
+        # Call Flutterwave API to initiate payment
+        payment_url = 'https://api.flutterwave.com/v3/payments'
+        payload = {
+            "tx_ref": "test_transaction",
+            "amount": "100",
+            "currency": "UGX",
+            "payment_options": "mobilemoneyuganda",
+            "redirect_url": "https://your-redirect-url.com",
+            "meta": {
+                "consumer_id": 23,
+                "consumer_mac": "92a3-912ba-1192a"
+            },
+            "customer": {
+                "email": email,
+                "phone_number": phone_number,
+                "name": name
+            },
+            "customizations": {
+                "title": "Test Payment",
+                "description": "Payment for test purposes"
+            }
+        }
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {FLUTTERWAVE_SECRET_KEY}'
+        }
+        response = requests.post(payment_url, json=payload, headers=headers)
+        if response.status_code == 200:
+            payment_data = response.json()
+            payment_link = payment_data['data']['link']
+            bot.sendMessage(chat_id, f"Payment link: {payment_link}")
+        else:
+            bot.sendMessage(chat_id, "Failed to initiate payment. Please try again later.")
+
+# Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual bot token
+bot = telepot.Bot('6533833584:AAHPalg1HywEshspXgeGAYOjWRG95jx8X4Q')
+MessageLoop(bot, handle).run_as_thread()
 
 print('Bot is listening...')
