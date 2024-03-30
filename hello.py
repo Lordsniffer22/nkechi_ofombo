@@ -6,70 +6,46 @@ import requests
 # Replace with your Flutterwave API keys
 # Replace with your Flutterwave API keys
 FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK-0e4658e40b88a018d1451da348f9acab-X'
-FLUTTERWAVE_SECRET_KEY = 'FLWSECK-2cfcb60ea041cb576453e651c9ee2e43-18e7acefd71vt-X'
+FLUTTERWAVE_SECRET_KEY = '`FLWSECK-2cfcb60ea041cb576453e651c9ee2e43-18e7acefd71vt-X`'
 
 # Telegram bot token
-TELEGRAM_TOKEN = '6533833584:AAHPalg1HywEshspXgeGAYOjWRG95jx8X4Q'
+#TELEGRAM_TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
+import telepot
+import requests
 
-# Function to handle incoming messages
+# Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual Telegram bot token
+bot = telepot.Bot('7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o')
+
 def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
+
     if content_type == 'text':
-        command = msg['text']
-        if command == '/start':
-            bot.sendMessage(chat_id, "Welcome! Click on the pay button to initiate payment.")
-        elif command == '/pay':
-            bot.sendMessage(chat_id, "Please provide your real name, phone number (starting with 256), and email in the format: Name, 256XXXXXXXXX, email@example.com")
-        else:
-            bot.sendMessage(chat_id, "Invalid command. Click on the pay button to initiate payment.")
+        try:
+            amount = float(msg['text'])
+            payment_link = generate_payment_link(amount)
+            bot.sendMessage(chat_id, payment_link)
+        except ValueError:
+            bot.sendMessage(chat_id, "Please enter a valid amount.")
 
-    # Handle user input for payment details
-    elif content_type == 'contact':
-        contact = msg['contact']
-        name = contact['first_name']
-        phone_number = contact['phone_number']
-        email = msg['text']
-        
-        # Call Flutterwave API to initiate payment
-        payment_url = 'https://api.flutterwave.com/v3/payments'
-        payload = {
-            "tx_ref": "test_transaction",
-            "amount": "100",
-            "currency": "UGX",
-            "payment_options": "mobilemoneyuganda",
-            "redirect_url": "https://your-redirect-url.com",
-            "meta": {
-                "consumer_id": 23,
-                "consumer_mac": "92a3-912ba-1192a"
-            },
-            "customer": {
-                "email": email,
-                "phone_number": phone_number,
-                "name": name
-            },
-            "customizations": {
-                "title": "Test Payment",
-                "description": "Payment for test purposes"
-            }
-        }
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {FLUTTERWAVE_SECRET_KEY}'
-        }
-        response = requests.post(payment_url, json=payload, headers=headers)
-        if response.status_code == 200:
-            payment_data = response.json()
-            payment_link = payment_data['data']['link']
-            bot.sendMessage(chat_id, f"Payment link: {payment_link}")
-        else:
-            bot.sendMessage(chat_id, "Failed to initiate payment. Please try again later.")
+def generate_payment_link(amount):
+    # Replace 'YOUR_FLUTTERWAVE_API_KEY' with your actual Flutterwave API key
+    headers = {
+        'Authorization': 'Bearer FLWPUBK-0e4658e40b88a018d1451da348f9acab-X',
+        'Content-Type': 'application/json',
+    }
+    data = {
+        'amount': amount,
+        'currency': 'UGX',  # Assuming Ugandan Shilling
+        'tx_ref': 'your_transaction_reference',
+        'redirect_url': 'your_redirect_url',
+        'payment_options': 'mobilemoneyuganda',
+        # Add other necessary parameters according to Flutterwave API documentation
+    }
+    response = requests.post('https://api.flutterwave.com/v3/payments', headers=headers, json=data)
+    payment_link = response.json()['data']['link']
+    return payment_link
 
-# Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual bot token
-bot = telepot.Bot('6533833584:AAHPalg1HywEshspXgeGAYOjWRG95jx8X4Q')
-MessageLoop(bot, handle).run_as_thread()
+bot.message_loop(handle)
 
-print('Bot is listening...')
-
-# Keep the program running
 while True:
-    pass
+    pass  # Keep the program running
