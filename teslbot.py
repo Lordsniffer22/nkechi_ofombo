@@ -15,7 +15,14 @@ bot = telepot.Bot(bot_token)
 # File path to store the secret key
 #seckey_file_path = 'seckey.txt'
 domain_file_path = 'pydomain.txt'
+# File path to store the allowed usernames
+allowed_usernames_file = 'boto.txt'
 
+# Function to check if the user is allowed based on their username
+def is_user_allowed(username):
+    with open(allowed_usernames_file, 'r') as file:
+        allowed_usernames = file.read().splitlines()
+    return username in allowed_usernames
 
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
@@ -151,6 +158,7 @@ pending_add_user_command = None
 def handle(msg):
     global pending_add_user_command
     content_type, chat_type, chat_id = telepot.glance(msg)
+    username = msg['from']['username']
 
     # Define custom keyboard buttons with smaller size in a single row
     keyboard = ReplyKeyboardMarkup(keyboard=[
@@ -202,15 +210,19 @@ def handle(msg):
             )
             bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
         elif command.lower() == '/reboot':
-            try:
-                first_inform = ( "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
-                bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
-                response_reboot = reboot_server(chat_id)
-                bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
-            except ValueError:
-                bot.sendMessage(chat_id,
-                                f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
-                                reply_markup=keyboard)
+            if is_user_allowed(username):
+               try:
+                   first_inform = ( "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
+                   bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
+                   response_reboot = reboot_server(chat_id)
+                   bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
+               except ValueError:
+                  bot.sendMessage(chat_id,
+                                   f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
+                                   reply_markup=keyboard)
+            else:
+                # User is not allowed to run commands
+                bot.sendMessage(chat_id, "You are not authorized to use this bot.")
         elif command.lower() == '/upcheck':
             uptime_check = (" Hey, Am back online! \nHow do i server you, master???")
             bot.sendMessage(chat_id, uptime_check, reply_markup=keyboard)
