@@ -14,7 +14,7 @@ from aiogram.utils.markdown import hbold
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
 # Function to check if a message is a YouTube link
 def is_youtube_link(text):
