@@ -8,69 +8,81 @@ from pytube import YouTube
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InputFile
 from aiogram.utils.markdown import hbold
+
+# Initialize the bot
+
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
+bot = Bot(token=TOKEN)
+dp = Dispatcher(bot)
 
-# All handlers should be attached to the Router (or Dispatcher)
-dp = Dispatcher()
+# Function to check if a message is a YouTube link
+def is_youtube_link(text):
+    return text.startswith('https://www.youtube.com/') or text.startswith('https://youtu.be/')
 
-async def download_and_convert_to_mp3(video_url: str) -> str:
-    """
-    Download a YouTube video and convert it to MP3
-    """
-    try:
-        yt = YouTube(video_url)
-        video_title = yt.title
-        stream = yt.streams.filter(only_audio=True).first()
-        if stream:
-            file_path = stream.download()
-            mp3_file = f"{video_title}.mp3"
-            os.rename(file_path, mp3_file)
-            return mp3_file
+# Function to download a YouTube video
+async def download_video(video_url):
+    yt = YouTube(video_url)
+    video_title = yt.title
+    streams = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+    if streams:
+        file_path = streams.download()
+        return file_path, video_title
+    else:
+        return None, None
+
+# Function to download a YouTube video and convert it to MP3
+async def download_and_convert_to_mp3(video_url):
+    yt = YouTube(video_url)
+    video_title = yt.title
+    stream = yt.streams.filter(only_audio=True).first()
+    if stream:
+        file_path = stream.download()
+        mp3_file = f"{video_title}.mp3"
+        os.rename(file_path, mp3_file)
+        return mp3_file, video_title
+    else:
+        return None, None
+
+# Function to handle incoming messages
+@dp.message_handler(content_types=types.ContentType.TEXT)
+async def handle_message(message: types.Message):
+    query = message.text
+    if is_youtube_link(query):
+        processing = "Processing... \n Hang on tight🤙"
+        processing_message = await message.reply(processing)
+        if query.startswith('/v'):
+            await send_video(message.chat.id, query)
         else:
-            return None
-    except Exception as e:
-        logging.error(f"Error downloading and converting to MP3: {e}")
-        return None
+            await send_audio(message.chat.id, query)
+        await asyncio.sleep(3)  # Sleep for 3 seconds
+        await message.delete()
+        await processing_message.delete()
 
-async def send_mp3_file(chat_id: int, video_url: str) -> None:
-    """
-    Send an MP3 file to the user with a caption
-    """
-    mp3_file = await download_and_convert_to_mp3(video_url)
+# Function to send a video file to the user with a caption
+async def send_video(chat_id, video_url):
+    video_file, video_title = await download_video(video_url)
+    if video_file:
+        # Add a caption to the video file
+        caption = "Hey, your video is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
+        with open(video_file, 'rb') as f:
+            await bot.send_video(chat_id, f, caption=caption)
+        os.remove(video_file)  # Remove the video file after sending
+
+# Function to send an MP3 file to the user with a caption
+async def send_audio(chat_id, video_url):
+    mp3_file, video_title = await download_and_convert_to_mp3(video_url)
     if mp3_file:
         # Add a caption to the audio file
-        caption = "Hey your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
-        # Create an instance of InputFile using the mp3_file path
-        input_file = telepot.InputFile(mp3_file)
-        # Send the audio with the caption
-        await bot.send_audio(chat_id, input_file, caption=caption)
-        # Remove the MP3 file after sending
-        os.remove(mp3_file)
-@dp.message()
-async def message_handler(message: types.Message) -> None:
-    """
-    Handler to process incoming messages
-    """
-    try:
-        # Check if the message is a YouTube link
-        if message.text.startswith("https://www.youtube.com/") or message.text.startswith("https://youtu.be/"):
-            # Download the video and send the MP3 file
-            await send_mp3_file(message.chat.id, message.text)
-        else:
-            # Send a copy of the received message
-            await message.copy_to(message.chat.id)
-    except Exception as e:
-        logging.error(f"Error handling message: {e}")
+        caption = "Hey, your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
+        with open(mp3_file, 'rb') as f:
+            await bot.send_audio(chat_id, f, caption=caption)
+        os.remove(mp3_file)  # Remove the MP3 file after sending
 
+# Start polling
+async def main():
+    await bot.start_polling()
 
-async def main() -> None:
-    # Initialize Bot instance with a default parse mode which will be passed to all API calls
-    bot = Bot(TOKEN)
-    # And the run events dispatching
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+if __name__ == '__main__':
     asyncio.run(main())
+
