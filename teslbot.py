@@ -244,10 +244,10 @@ def handle(msg):
             gass = bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news")
             
         elif command.lower() == '/news':
-            bot.deleteMessage((chat_id, gass['message_id']))
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'], stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
             bot.sendMessage(chat_id, news)
+            bot.deleteMessage((chat_id, gass['message_id']))
             
 
         elif command.lower() == 'power i/o':
