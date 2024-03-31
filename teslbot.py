@@ -233,9 +233,19 @@ def handle(msg):
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
 
         elif command.lower() == '/update':
+            gamba = (
+                f"The server is updating. Too see what has changed, click on this command: /news"
+            )
+            bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
             updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
             updater=updet.stdout.decode('utf-8').strip()
             bot.sendMessage(chat_id, f"Your bot {updater}")
+            
+        elif command.lower() == '/news':
+            repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'], stdout=subprocess.PIPE)
+            news = repos.stdout.decode('utf-8').strip()
+            bot.sendMessage(chat_id, news)
+
         elif command.lower() == 'power i/o':
             reboot_msg = (
                 f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
