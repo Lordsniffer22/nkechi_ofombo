@@ -2,6 +2,7 @@ import telepot
 import asyncio
 import logging
 import sys
+import os
 from os import getenv
 from pytube import YouTube
 from aiogram import Bot, Dispatcher, types
