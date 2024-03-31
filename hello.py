@@ -3,7 +3,8 @@ import logging
 import sys
 from os import getenv
 from pytube import YouTube
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
+from aiogram.types import ParseMode
 from aiogram.utils.markdown import hbold
 from aiogram.types import InputFile
 
@@ -67,7 +68,7 @@ async def message_handler(message: types.Message) -> None:
 
 async def main() -> None:
     # Initialize Bot instance with a default parse mode which will be passed to all API calls
-    bot = Bot(TOKEN, parse_mode=types.ParseMode.HTML)
+    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
     # And the run events dispatching
     await dp.start_polling(bot)
 
