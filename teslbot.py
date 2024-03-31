@@ -234,7 +234,7 @@ def handle(msg):
 
         elif command.lower() == '/update':
             gamba = (
-                f"The server is updating. Too see what has changed, click on this command: /news"
+                f"The server is updating...\nPlease leave everything to us."
             )
             kati_gamba = bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
             updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
