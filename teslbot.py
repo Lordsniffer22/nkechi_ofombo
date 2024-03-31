@@ -246,6 +246,7 @@ def handle(msg):
             news = repos.stdout.decode('utf-8').strip()
             time.sleep(1)
             bot.sendMessage(chat_id, news)
+            bot.deleteMessage((chat_id, kati_gamba['message_id']))
 
         elif command.lower() == 'power i/o':
             reboot_msg = (
