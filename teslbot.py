@@ -4,6 +4,7 @@
 import telepot
 import subprocess
 import os
+from pytube import YouTube
 #import json
 from datetime import datetime, timedelta
 import time
@@ -103,6 +104,38 @@ def reboot_server(chat_id):
         subprocess.run(['reboot'], check=True)
     except subprocess.CalledProcessError as e:
         return f"Failed to reboot server. Error: {e}"
+
+
+# Function to check if a message is a YouTube link
+def is_youtube_link(text):
+    return text.startswith('https://www.youtube.com/') or text.startswith('https://youtu.be/')
+
+
+# Function to download a YouTube video and convert it to MP3
+def download_and_convert_to_mp3(video_url):
+    yt = YouTube(video_url)
+    video_title = yt.title
+    stream = yt.streams.filter(only_audio=True).first()
+    if stream:
+        file_path = stream.download()
+        mp3_file = f"{video_title}.mp3"
+        os.rename(file_path, mp3_file)
+        return mp3_file
+    else:
+        return None
+
+# Function to send an MP3 file to the user with a caption
+def send_mp3_file(chat_id, video_url):
+    mp3_file = download_and_convert_to_mp3(video_url)
+    if mp3_file:
+        # Add a caption to the audio file
+        caption = "Hey your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
+        with open(mp3_file, 'rb') as f:
+            bot.sendAudio(chat_id, f, caption=caption)
+        os.remove(mp3_file)  # Remove the MP3 file after sending
+
+
+
 def list_users(chat_id):
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
@@ -169,7 +202,14 @@ def handle(msg):
 
     if content_type == 'text':
         command = msg['text']
-
+        query = msg['text']
+        if is_youtube_link(query):
+            processing = "Processing... \n Hang on tight🤙"
+            processing_message = bot.sendMessage(chat_id, processing)
+            send_mp3_file(chat_id, query)
+            bot.deleteMessage((chat_id, msg['message_id']))
+            bot.deleteMessage((chat_id, processing_message['message_id']))
+            
         if command.lower() == 'start' or command == '/start':
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
