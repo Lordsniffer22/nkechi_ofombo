@@ -66,7 +66,8 @@ async def download_mp3(message: types.Message) -> None:
         # Convert to MP3
         mp3_file = audio_stream.download(filename="temp_audio.mp3")
         # Send the MP3 file to the user
-        await message.answer_document(types.InputFile(mp3_file))
+        with open(mp3_file, "rb") as f:
+            await message.answer_document(f)
     except RegexMatchError:
         await message.answer("Invalid YouTube link!")
     except Exception as e:
