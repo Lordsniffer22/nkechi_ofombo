@@ -1,3 +1,4 @@
+import telepot
 import asyncio
 import logging
 import sys
@@ -40,14 +41,11 @@ async def send_mp3_file(chat_id: int, video_url: str) -> None:
         # Add a caption to the audio file
         caption = "Hey your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
         # Create an instance of InputFile using the mp3_file path
-        input_file = InputFile(mp3_file)
+        input_file = telepot.InputFile(mp3_file)
         # Send the audio with the caption
         await bot.send_audio(chat_id, input_file, caption=caption)
         # Remove the MP3 file after sending
         os.remove(mp3_file)
-
-
-
 @dp.message()
 async def message_handler(message: types.Message) -> None:
     """
