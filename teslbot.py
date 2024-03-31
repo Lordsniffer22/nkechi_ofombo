@@ -239,8 +239,8 @@ def handle(msg):
             kati_gamba = bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
             updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
             updater=updet.stdout.decode('utf-8').strip()
-           # bot.sleep(3)
-           # bot.deleteMessage((chat_id, kati_gamba['message_id']))
+            time.sleep(3)
+            bot.deleteMessage((chat_id, kati_gamba['message_id']))
             bot.sendMessage(chat_id, f"Your bot {updater}")
             
         elif command.lower() == '/news':
