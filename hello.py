@@ -14,44 +14,59 @@ from aiogram.utils.markdown import hbold
 TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
 
 # All handlers should be attached to the Router (or Dispatcher)
+# Initialize Dispatcher instance
 dp = Dispatcher()
 
 
-@dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
+async def check_bbr_status(chat_id: int) -> bool:
     """
-    This handler receives messages with `/start` command
-    """
-    # Most event objects have aliases for API methods that can be called in events' context
-    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
-    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
-    # method automatically or call API method directly via
-    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
-    await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
-
-
-@dp.message()
-async def echo_handler(message: types.Message) -> None:
-    """
-    Handler will forward receive a message back to the sender
-
-    By default, message handler will handle all message types (like a text, photo, sticker etc.)
+    Check if BBR is already enabled
     """
     try:
-        # Send a copy of the received message
-        await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        # But not all the types is supported to be copied so need to handle it
-        await message.answer("Nice try!")
+        status = subprocess.check_output(['sysctl', 'net.ipv4.tcp_congestion_control']).decode('utf-8')
+        return 'bbr' in status
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error checking BBR status: {e}")
+        await bot.send_message(chat_id, 'Failed to check BBR status. Contact the bot administrator.')
+        return False
+
+
+async def enable_bbr(chat_id: int) -> None:
+    """
+    Enable BBR congestion control algorithm
+    """
+    try:
+        if not await check_bbr_status(chat_id):
+            subprocess.run(['modprobe', 'tcp_bbr'])
+            with open('/etc/sysctl.conf', 'r') as f:
+                if 'net.ipv4.tcp_congestion_control=bbr' not in f.read():
+                    with open('/etc/sysctl.conf', 'a') as f:
+                        f.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
+            subprocess.run(['sysctl', '-p'])
+            await bot.send_message(chat_id, 'BBR has been enabled successfully! Enjoy the better connections')
+        else:
+            await bot.send_message(chat_id, 'BBR is already running. No need to activate it again.')
+    except Exception as e:
+        logging.error(f"Error enabling BBR: {e}")
+        await bot.send_message(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
+
+
+@dp.message_handler(commands=['enable_bbr'])
+async def enable_bbr_handler(message: types.Message) -> None:
+    """
+    Handler for enabling BBR
+    """
+    chat_id = message.chat.id
+    await enable_bbr(chat_id)
 
 
 async def main() -> None:
-    # Initialize Bot instance with a default parse mode which will be passed to all API calls
-    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
-    # And the run events dispatching
-    await dp.start_polling(bot)
+    # Start polling for updates
+    await dp.start_polling()
 
 
 if __name__ == "__main__":
+    # Configure logging
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    # Run main function asynchronously
     asyncio.run(main())
