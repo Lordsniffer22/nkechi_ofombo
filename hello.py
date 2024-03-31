@@ -1,3 +1,8 @@
+import asyncio
+import logging
+import sys
+from os import getenv
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.middleware.logging import LoggingMiddleware
 from aiogram.utils import executor
