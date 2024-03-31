@@ -244,9 +244,14 @@ def handle(msg):
         elif command.lower() == '/news':
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'], stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
+
+               # Delete gamba and neera messages
+            bot.deleteMessage((chat_id, kati_gamba['message_id']))
+            bot.deleteMessage((chat_id, neera['message_id']))
+    
             time.sleep(1)
             bot.sendMessage(chat_id, news)
-            bot.deleteMessage((chat_id, kati_gamba['message_id']))
+            
 
         elif command.lower() == 'power i/o':
             reboot_msg = (
