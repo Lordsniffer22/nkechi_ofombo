@@ -141,7 +141,7 @@ def list_users(chat_id):
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        organzn =  '│       SCRIPTX UDP MANAGER   @scriptx13  │ '
+        organzn =  '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
         return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
