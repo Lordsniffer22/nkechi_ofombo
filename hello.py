@@ -1,4 +1,4 @@
-import telepot
+
 import asyncio
 import logging
 import sys
