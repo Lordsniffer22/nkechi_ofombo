@@ -237,6 +237,7 @@ def handle(msg):
                 f"The server is updating. Too see what has changed, click on this command: /news"
             )
             bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
+            time.sleep(3)
             updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
             updater=updet.stdout.decode('utf-8').strip()
             bot.sendMessage(chat_id, f"Your bot {updater}")
