@@ -5,6 +5,7 @@ from os import getenv
 from pytube import YouTube
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils.markdown import hbold
+from aiogram.types import InputFile
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
@@ -42,7 +43,8 @@ async def send_mp3_file(chat_id: int, video_url: str) -> None:
         # Add a caption to the audio file
         caption = "Hey your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
         with open(mp3_file, 'rb') as f:
-            await bot.send_audio(chat_id, f, caption=caption)
+            audio = InputFile(f)
+            await bot.send_audio(chat_id, audio, caption=caption)
         os.remove(mp3_file)  # Remove the MP3 file after sending
 
 
