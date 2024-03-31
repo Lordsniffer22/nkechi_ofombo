@@ -239,8 +239,8 @@ def handle(msg):
             kati_gamba = bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
             updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
             updater=updet.stdout.decode('utf-8').strip()
-            bot.sleep(3)
-            bot.deleteMessage((chat_id, kati_gamba['message_id']))
+           # bot.sleep(3)
+           # bot.deleteMessage((chat_id, kati_gamba['message_id']))
             bot.sendMessage(chat_id, f"Your bot {updater}")
             
         elif command.lower() == '/news':
@@ -272,7 +272,8 @@ def handle(msg):
                 enable_bbr(chat_id)
             except ValueError:
                 bot.sendMessage(chat_id,
-                                f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
+                                f"😳 Oh Oooh...! BBR was not ena
+                                bled. Contact my Master @teslassh",
                                 reply_markup=keyboard)
         elif command.lower() =='vps info':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
