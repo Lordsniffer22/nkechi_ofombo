@@ -11,6 +11,7 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
+from aiogram import types
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
@@ -52,27 +53,40 @@ async def echo_handler(message: types.Message) -> None:
         await message.answer("Nice try!")
 
 
-async def download_mp3(message: types.Message) -> None:
+
+async def download_and_convert_to_mp3(video_url: str) -> str:
     """
-    Download the YouTube video as MP3 and send it to the user
+    Download the YouTube video and convert it to MP3
     """
     try:
         # Get YouTube video
-        yt = YouTube(message.text)
+        yt = YouTube(video_url)
         # Get the best audio stream
         audio_stream = yt.streams.filter(only_audio=True).first()
         # Download the audio stream
         audio_stream.download(output_path=".", filename="temp_audio")
         # Convert to MP3
-        mp3_file = audio_stream.download(filename="temp_audio.mp3")
-        # Send the MP3 file to the user
-        with open(mp3_file, 'rb') as file:
-            await message.answer_document(types.InputFile(file))
-    except RegexMatchError:
-        await message.answer("Invalid YouTube link!")
+        mp3_file = "temp_audio.mp3"
+        os.rename("temp_audio", mp3_file)
+        return mp3_file
     except Exception as e:
-        await message.answer(f"Error: {e}")
+        print(f"Error downloading and converting to MP3: {e}")
+        return None
 
+
+async def send_mp3_file(chat_id: int, video_url: str, bot: types.Bot) -> None:
+    """
+    Send the MP3 file to the user
+    """
+    mp3_file = await download_and_convert_to_mp3(video_url)
+    if mp3_file:
+        # Add a caption to the audio file
+        caption = "Hey, your music is here.\n\n➤ Bot: @tubyDoo_Bot \n│\n╰┈➤ Join @udpcustom"
+        # Send the MP3 file to the user
+        with open(mp3_file, 'rb') as f:
+            input_file = types.InputFile(f)
+            await bot.send_audio(chat_id, audio=input_file, caption=caption)
+        os.remove(mp3_file)  
 
 async def main() -> None:
     # Initialize Bot instance with a default parse mode which will be passed to all API calls
