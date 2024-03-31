@@ -239,11 +239,9 @@ def handle(msg):
             kati_gamba = bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
             updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
             updater=updet.stdout.decode('utf-8').strip()
-            bot.sleep(4)
+            bot.sleep(3)
             bot.deleteMessage((chat_id, kati_gamba['message_id']))
-            neera = bot.sendMessage(chat_id, f"Your bot {updater}")
-            time.sleep(3)
-            bot.deleteMessage((chat_id, neera['message_id']))
+            bot.sendMessage(chat_id, f"Your bot {updater}")
             
         elif command.lower() == '/news':
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'], stdout=subprocess.PIPE)
