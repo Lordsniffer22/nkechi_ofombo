@@ -526,7 +526,7 @@ def handle(msg):
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
         elif command.lower() == 'exp. users':
             expires = list_expired(chat_id)
-            actionas = ("To Remove all these users at once, \n╰┈➤Press /clean")
+            actionas = ("To Remove all expired users at once, \n╰┈➤Press /clean")
             bot.sendMessage(chat_id, expires, reply_markup=keyboard)
             time.sleep(1)
             bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
