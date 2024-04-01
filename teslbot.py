@@ -337,7 +337,7 @@ def handle(msg):
             updater = updet.stdout.decode('utf-8').strip()
             time.sleep(3)
             bot.deleteMessage((chat_id, kati_gamba['message_id']))
-            bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news")
+            bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news", reply_markup=keyboard)
 
         elif command.lower() == 'whats new' or command == '/news':
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
