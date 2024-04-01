@@ -5,7 +5,7 @@ import telepot
 import subprocess
 import os
 from pytube import YouTube
-#import json
+# import json
 from datetime import datetime, timedelta
 import time
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
@@ -14,13 +14,14 @@ with open('tokenz.txt', 'r') as file:
     bot_token = file.read().strip()
 bot = telepot.Bot(bot_token)
 # File path to store the secret key
-#seckey_file_path = 'seckey.txt'
+# seckey_file_path = 'seckey.txt'
 domain_file_path = 'pydomain.txt'
 
 
 def save_domain(domain):
     with open(domain_file_path, 'w') as domain_file:
         domain_file.write(domain)
+
 
 def check_bbr_status(chat_id):
     try:
@@ -29,6 +30,7 @@ def check_bbr_status(chat_id):
     except subprocess.CalledProcessError as e:
         print(f"Error checking BBR status: {e}")
         return False
+
 
 def enable_bbr(chat_id):
     try:
@@ -45,6 +47,8 @@ def enable_bbr(chat_id):
     except subprocess.CalledProcessError as e:
         print(f"Error enabling BBR: {e}")
         bot.sendMessage(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
+
+
 def get_domain():
     try:
         with open(domain_file_path, 'r') as domain_file:
@@ -52,9 +56,10 @@ def get_domain():
     except FileNotFoundError:
         return None
 
+
 def add_user(username, password, days, user_info, chat_id):
     # Check if the user is verified
-    #if not is_verified(chat_id):
+    # if not is_verified(chat_id):
     #    return "🔐 You need to verify yourself first by providing the secret key using /verify command."
 
     current_date = datetime.now()
@@ -74,7 +79,9 @@ def add_user(username, password, days, user_info, chat_id):
 
     # Create user
     try:
-        subprocess.run(['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}', '-p', passs, '-c', f'{user_info},{password}', username], check=True)
+        subprocess.run(
+            ['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}',
+             '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
         # Get server IP address or saved domain
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
@@ -85,19 +92,23 @@ def add_user(username, password, days, user_info, chat_id):
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username}. Error: {e}"
 
+
 def remove_user(username, chat_id):
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
         return f"{username} Has been removed successfully!"
     except subprocess.CalledProcessError as e:
         return f"Failed to remove user {username}. Error: {e}"
-def restart_udp_daemon(chat_id):
 
+
+def restart_udp_daemon(chat_id):
     try:
         subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
         return f"\n Who else? 😳"
     except subprocess.CalledProcessError as e:
         return f"Failed to restart daemons. Error: {e}"
+
+
 def reboot_server(chat_id):
     try:
         time.sleep(4)
@@ -124,6 +135,7 @@ def download_and_convert_to_mp3(video_url):
     else:
         return None
 
+
 # Function to send an MP3 file to the user with a caption
 def send_mp3_file(chat_id, video_url):
     mp3_file = download_and_convert_to_mp3(video_url)
@@ -133,7 +145,6 @@ def send_mp3_file(chat_id, video_url):
         with open(mp3_file, 'rb') as f:
             bot.sendAudio(chat_id, f, caption=caption)
         os.remove(mp3_file)  # Remove the MP3 file after sending
-
 
 
 def list_users(chat_id):
@@ -152,8 +163,8 @@ def list_users(chat_id):
 
             # Get the expiration date
             expiration_date_str = \
-            subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
-                1].strip()
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
 
             # Skip users with expiration set to "never"
             if expiration_date_str.lower() == 'never':
@@ -170,17 +181,93 @@ def list_users(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                user_details = f"│ {username}  ⇿     {password}  ⇿  Expired\n│──────────────────────────│"
+                user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        organzn =  '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
+        organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
+        return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to list users. Error: {e}"
+def list_expired(chat_id):
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
+
+        users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
+
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days <= 0:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
+                users_details.append(user_details)
+
+        users_message = "\n".join(users_details)
+        organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
         return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
 
 
+def cleaner(chat_id):
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
+
+        #users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
+
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days <= 0:
+               subprocess.run(['sudo', 'userdel', username])
+    except subprocess.CalledProcessError as e:
+        print(f"Error {e}")
+
 pending_add_user_command = None
+
+
 def handle(msg):
     global pending_add_user_command
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -190,13 +277,19 @@ def handle(msg):
         [KeyboardButton(text='Add User', resize_keyboard=True),
          KeyboardButton(text='Remove User', resize_keyboard=True),
          KeyboardButton(text='List Users', resize_keyboard=True)],
+
         [KeyboardButton(text='Enable BBR', resize_keyboard=True),
          KeyboardButton(text='Add RAM', resize_keyboard=True),
          KeyboardButton(text='Power I/O', resize_keyboard=True)],
 
+        [KeyboardButton(text='Update Bot', resize_keyboard=True),
+         KeyboardButton(text='Block User', resize_keyboard=True),
+         KeyboardButton(text='Exp. Users', resize_keyboard=True)],
+
         [KeyboardButton(text='VPS INFO', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
          KeyboardButton(text='Dev Team', resize_keyboard=True)],
+
 
     ], resize_keyboard=True)
 
@@ -209,7 +302,7 @@ def handle(msg):
             send_mp3_file(chat_id, query)
             bot.deleteMessage((chat_id, msg['message_id']))
             bot.deleteMessage((chat_id, processing_message['message_id']))
-            
+
         if command.lower() == 'start' or command == '/start':
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
                              "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
@@ -232,23 +325,24 @@ def handle(msg):
 
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
 
-        elif command.lower() == '/update':
+        elif command.lower() == 'update bot' or command == '/update':
             gamba = (
                 f"The server is updating...\nPlease leave everything to us."
             )
             kati_gamba = bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
-            updet=subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
-            updater=updet.stdout.decode('utf-8').strip()
+            updet = subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
+            updater = updet.stdout.decode('utf-8').strip()
             time.sleep(3)
             bot.deleteMessage((chat_id, kati_gamba['message_id']))
-            gass = bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news")
-            
+            bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news")
+
         elif command.lower() == '/news':
-            repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'], stdout=subprocess.PIPE)
+            repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
+                                   stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
             bot.sendMessage(chat_id, news)
-            bot.deleteMessage((chat_id, gass['message_id']))
-            
+
+
 
         elif command.lower() == 'power i/o':
             reboot_msg = (
@@ -257,7 +351,8 @@ def handle(msg):
             bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
         elif command.lower() == '/reboot':
             try:
-                first_inform = ( "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
+                first_inform = (
+                    "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
                 bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
                 response_reboot = reboot_server(chat_id)
                 bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
@@ -275,7 +370,7 @@ def handle(msg):
                 bot.sendMessage(chat_id,
                                 f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
                                 reply_markup=keyboard)
-        elif command.lower() =='vps info':
+        elif command.lower() == 'vps info':
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             # Define the path to the bash script
@@ -292,7 +387,7 @@ def handle(msg):
 
             # Send the message with the cleaned output
             bot.sendMessage(chat_id,
-                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   USAGE: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
+                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
 
         elif command.lower() == 'add ram':
             os.system("sudo fallocate -l 1024M /swapfile")
@@ -351,17 +446,19 @@ def handle(msg):
 
         elif command.lower() == 'verify':
             # Prompt user to enter the secret key for verification
-            bot.sendMessage(chat_id, "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
-         #   verified_users[chat_id] = False
+            bot.sendMessage(chat_id,
+                            "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
+        #   verified_users[chat_id] = False
 
         elif command.lower().startswith('/verify'):
             try:
                 _, secret_key = command.split()
-           #     response = verify_user(chat_id, secret_key)
-          #      bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            #     response = verify_user(chat_id, secret_key)
+            #      bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻", reply_markup=keyboard)
-
+                bot.sendMessage(chat_id,
+                                "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻",
+                                reply_markup=keyboard)
 
         if command.lower().startswith('/domain'):
 
@@ -378,8 +475,10 @@ def handle(msg):
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /domain [your_domain]")
 
         if command.lower() == 'add user':
-                pending_add_user_command = command
-                bot.sendMessage(chat_id, "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30", reply_markup=keyboard)
+            pending_add_user_command = command
+            bot.sendMessage(chat_id,
+                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
+                            reply_markup=keyboard)
 
         elif pending_add_user_command:
             # Process the pending "Add User" command
@@ -388,36 +487,51 @@ def handle(msg):
                 response = add_user(username, password, days, user_info="1", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.", reply_markup=keyboard)
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
+                                reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
 
         elif command.lower() == 'remove user':
             # Check if the user is verified before allowing to use /remove command
-           # if not is_verified(chat_id):
+            # if not is_verified(chat_id):
             #    bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! Pass your secret key to the  /verify command.")
-          #  else:
-                bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+            #  else:
+            bot.sendMessage(chat_id, "To remove a user, send:\n  /remove [username] \n\n Example:\n /remove Nicolas \n",
+                            reply_markup=keyboard)
 
         elif command.lower().startswith('/remove'):
             # Check if the user is verified before allowing to use /remove command
-           # if not is_verified(chat_id):
+            # if not is_verified(chat_id):
             #    bot.sendMessage(chat_id, "🔐 You need to verify yourself first in order to be a super user! \n\n Pass your secret key to the  /verify command.")
-           # else:
-                try:
-                    _, username = command.split()
-                    response = remove_user(username, chat_id)
-                    bot.sendMessage(chat_id, response, reply_markup=keyboard)
-                    # Restart the UDP daemon immediately after removing the user
-                    response_restart = restart_udp_daemon(chat_id)
-                    bot.sendMessage(chat_id, response_restart, reply_markup=keyboard)
-                except ValueError:
-                    bot.sendMessage(chat_id, "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n", reply_markup=keyboard)
+            # else:
+            try:
+                _, username = command.split()
+                response = remove_user(username, chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                # Restart the UDP daemon immediately after removing the user
+                response_restart = restart_udp_daemon(chat_id)
+                bot.sendMessage(chat_id, response_restart, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id,
+                                "😳 Oh Oooh...! You entered it wrongly. \n\n Try:  /remove [username] \n\n Example:\n /remove Nicolas \n",
+                                reply_markup=keyboard)
 
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
+        elif command.lower() == 'exp. users':
+            expires = list_expired(chat_id)
+            actionas = ("To Remove all these users at once, \n╰┈➤Press /clean")
+            bot.sendMessage(chat_id, expires, reply_markup=keyboard)
+            time.sleep(1)
+            clean_msg = bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
+            time.sleep(3)
+            bot.deleteMessage((chat_id, clean_msg['message_id']))
+        elif command == '/clean':
+            cleans = cleaner(chat_id)
+            bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
 # Set the command handler
 bot.message_loop(handle)
