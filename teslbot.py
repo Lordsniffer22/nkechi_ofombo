@@ -302,9 +302,11 @@ def handle(msg):
         if is_youtube_link(query):
             processing = "Processing... \n Hang on tight🤙"
             processing_message = bot.sendMessage(chat_id, processing)
-            send_mp3_file(chat_id, query)
+            
             bot.deleteMessage((chat_id, msg['message_id']))
             bot.deleteMessage((chat_id, processing_message['message_id']))
+            time.sleep(1)
+            send_mp3_file(chat_id, query, reply_markup=keyboard)
 
         if command.lower() == 'start' or command == '/start':
             start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
