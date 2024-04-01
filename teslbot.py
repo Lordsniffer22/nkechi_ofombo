@@ -262,8 +262,9 @@ def cleaner(chat_id):
             # Exclude users with expiry set to "never"
             if remaining_days <= 0:
                subprocess.run(['sudo', 'userdel', username])
+        return f"All exipred Users have been Wiped. Sorry for them😂 "
     except subprocess.CalledProcessError as e:
-        print(f"Error {e}")
+        return f"Hey, i got an arror while wiping. Error: {e}"
 
 pending_add_user_command = None
 
@@ -527,8 +528,8 @@ def handle(msg):
             bot.sendMessage(chat_id, expires, reply_markup=keyboard)
             time.sleep(1)
             clean_msg = bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
-            time.sleep(3)
-            bot.deleteMessage((chat_id, clean_msg['message_id']))
+            #time.sleep(6)
+          #  bot.deleteMessage((chat_id, clean_msg['message_id']))
         elif command == '/clean':
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
@@ -539,3 +540,4 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
+    
