@@ -223,8 +223,7 @@ def list_expired(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                user_details = f" 👍 No expired users yet."
-                users_details.append(user_details)
+                return f"You currently have no expired Clients"
 
         users_message = "\n".join(users_details)
         organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
@@ -344,7 +343,7 @@ def handle(msg):
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
                                    stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
-            bot.sendMessage(chat_id, news)
+            bot.sendMessage(chat_id, news, reply_markup=keyboard)
 
 
 
@@ -530,9 +529,8 @@ def handle(msg):
             actionas = ("To Remove all these users at once, \n╰┈➤Press /clean")
             bot.sendMessage(chat_id, expires, reply_markup=keyboard)
             time.sleep(1)
-            clean_msg = bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
-            #time.sleep(6)
-          #  bot.deleteMessage((chat_id, clean_msg['message_id']))
+            bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
+
         elif command == '/clean':
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
@@ -544,4 +542,3 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
-    
