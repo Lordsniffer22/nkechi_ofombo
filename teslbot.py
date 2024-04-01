@@ -222,6 +222,9 @@ def list_expired(chat_id):
             if remaining_days <= 0:
                 user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
+            else:
+                user_details = f" 👍 No expired users yet."
+                users_details.append(user_details)
 
         users_message = "\n".join(users_details)
         organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
@@ -281,13 +284,13 @@ def handle(msg):
 
         [KeyboardButton(text='Enable BBR', resize_keyboard=True),
          KeyboardButton(text='Add RAM', resize_keyboard=True),
-         KeyboardButton(text='Power I/O', resize_keyboard=True)],
-
-        [KeyboardButton(text='Update Bot', resize_keyboard=True),
-         KeyboardButton(text='Block User', resize_keyboard=True),
          KeyboardButton(text='Exp. Users', resize_keyboard=True)],
 
-        [KeyboardButton(text='VPS INFO', resize_keyboard=True),
+        [KeyboardButton(text='Update Bot', resize_keyboard=True),
+         KeyboardButton(text='VPS INFO', resize_keyboard=True),
+         KeyboardButton(text='Power I/O', resize_keyboard=True)],
+
+        [KeyboardButton(text='Whats New', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
          KeyboardButton(text='Dev Team', resize_keyboard=True)],
 
@@ -337,7 +340,7 @@ def handle(msg):
             bot.deleteMessage((chat_id, kati_gamba['message_id']))
             bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news")
 
-        elif command.lower() == '/news':
+        elif command.lower() == 'whats new' or command == '/news':
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
                                    stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
@@ -534,7 +537,8 @@ def handle(msg):
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
-# Set the command handler
+# Set the command
+
 bot.message_loop(handle)
 
 # Keep the program running
