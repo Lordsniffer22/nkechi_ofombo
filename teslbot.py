@@ -223,7 +223,7 @@ def list_expired(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                return f"You currently have no expired Clients"
+                users_details = f"You have no expired Users yet. \nYou have good clients!"
 
         users_message = "\n".join(users_details)
         organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
@@ -264,7 +264,7 @@ def cleaner(chat_id):
             # Exclude users with expiry set to "never"
             if remaining_days <= 0:
                subprocess.run(['sudo', 'userdel', username])
-        return f"All exipred Users have been Wiped. Sorry for them😂 "
+        return f"I just Wiped the expired Sh*t. Sorry for them😂 "
     except subprocess.CalledProcessError as e:
         return f"Hey, i got an arror while wiping. Error: {e}"
 
