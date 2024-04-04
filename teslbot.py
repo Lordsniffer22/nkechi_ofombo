@@ -483,7 +483,7 @@ def handle(msg):
         if command.lower() == 'domain':
             domain_message = ("Hello {username}, To add a domain to this server use /domain coomand.\nExample:\n\n/domain abc.exanple.com\nMake sure the domain points to this servers IP address.")
             kasumba = bot.sendMessage(chat_id, domain_message, reply_markup=Keyboard)
-            sleep 4 
+            time.sleep(4)
             bot.deleteMessage((chat_id, kasumba['message_id']))
         elif command.lower().startswith('/domain'):
 
