@@ -223,7 +223,7 @@ def list_expired(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                return "No one is expired!"
+                users_details = f"You have no expired Users yet. \nYou have good clients!"
 
         users_message = "\n".join(users_details)
         organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
@@ -330,12 +330,11 @@ def handle(msg):
         elif command == '/backup':
             # Send the /etc/plogs file as a document
             try:
-                with open('/etc/passwd', 'rb') as plogs_file:
-                    bot.sendDocument(chat_id, plogs_file)
+                subprocess.run("cat /etc/passwd | grep "home" | grep "false" > clients", shell=True, Check=True)
+                with open('clients', 'rb') as userz:
+                    bot.sendDocument(chat_id, userz)
             except FileNotFoundError:
-                bot.sendMessage(chat_id, "The /etc/plogs file does not exist.")
-
-        # You can add more commands and logic here as needed
+                bot.sendMessage(chat_id, "The users file does not exist.")
 
         elif command.lower() == 'update bot' or command == '/update':
             gamba = (
