@@ -334,8 +334,7 @@ def handle(msg):
                     bot.sendDocument(chat_id, plogs_file)
             except FileNotFoundError:
                 bot.sendMessage(chat_id, "The /etc/plogs file does not exist.")
-        else:
-            bot.sendMessage(chat_id, "Unknown command. Use /get_plogs to retrieve the /etc/plogs file.")
+
         # You can add more commands and logic here as needed
 
         elif command.lower() == 'update bot' or command == '/update':
