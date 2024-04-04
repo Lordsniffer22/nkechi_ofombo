@@ -267,6 +267,47 @@ def cleaner(chat_id):
         return f"I just Wiped the expired Sh*t. Sorry for them😂 "
     except subprocess.CalledProcessError as e:
         return f"Hey, i got an arror while wiping. Error: {e}"
+def backups(chat_id):
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
+
+        users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
+
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days > 0:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
+                users_details.append(user_details)
+
+        users_message = "\n".join(users_details)
+        with open('clients', 'w') as file:
+            file.write(users_message)
+        with open('clients', 'rb') as userz:
+            bot.sendDocument(chat_id, userz)
+    except FileNotFoundError:
+        bot.sendMessage(chat_id, "The users file does not exist.")
 
 pending_add_user_command = None
 
@@ -330,9 +371,9 @@ def handle(msg):
         elif command == '/backup':
             # Send the /etc/plogs file as a document
             try:
-                os.system("cat /etc/passwd | grep 'home' | grep 'false' > clients")
-                with open('clients', 'rb') as userz:
-                    bot.sendDocument(chat_id, userz)
+                lets_backup = backups(chat_id)
+                bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
+                os.remove(clients)
             except FileNotFoundError:
                 bot.sendMessage(chat_id, "The users file does not exist.")
 
