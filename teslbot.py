@@ -340,7 +340,7 @@ def handle(msg):
 
         if text.lower() == 'restore users' or text == '/bulk_add':
             # Send a message asking the user to send bulk data in the next message
-            bot.sendMessage(chat_id, "Please send the bulk data (username password days) in the next message.")
+            bot.sendMessage(chat_id, "Please send the bulk user data (open the clients file you got in this chat and copy everything, then send here) in the next message.")
 
             # Update user state to expect bulk data in the next message
             user_states[chat_id] = 'waiting_bulk_data'
@@ -425,7 +425,7 @@ def handle(msg):
             bot.sendMessage(chat_id,
                             f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯\nTo add a domain, press /domain")
 
-        elif command.lower() == 'add ram':
+        elif command.lower() == 'add swap':
             os.system("sudo fallocate -l 1024M /swapfile")
             os.system("sudo chmod 600 /swapfile")
             os.system("sudo mkswap /swapfile")
@@ -482,9 +482,7 @@ def handle(msg):
 
         if command.lower() == 'domain':
             domain_message = ("Hello {username}, To add a domain to this server use /domain coomand.\nExample:\n\n/domain abc.exanple.com\nMake sure the domain points to this servers IP address.")
-            kasumba = bot.sendMessage(chat_id, domain_message, reply_markup=Keyboard)
-            time.sleep(4)
-            bot.deleteMessage((chat_id, kasumba['message_id']))
+            bot.sendMessage(chat_id, domain_message, reply_markup=keyboard)
         elif command.lower().startswith('/domain'):
 
             try:
