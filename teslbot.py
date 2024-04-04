@@ -223,7 +223,8 @@ def list_expired(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                users_details = f"You have no expired Users yet. \nYou have good clients!"
+                users_details = "No one is expired"
+                users_details.append(user_details)
 
         users_message = "\n".join(users_details)
         organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
@@ -385,7 +386,7 @@ def handle(msg):
 
         elif user_states.get(chat_id) == 'waiting_bulk_data':
             # Process the received bulk data
-            process_bulk_users(text, chat_id, reply_markup=keyboard)
+            process_bulk_users(text, chat_id)
 
             # Reset user state
             user_states[chat_id] = None
