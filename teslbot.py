@@ -317,9 +317,9 @@ def process_bulk_users(bulk_data, chat_id):
         try:
             username, password, days = line.split()
             response = add_user(username, password, days, user_info="R", chat_id=chat_id)
-            bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            bot.sendMessage(chat_id, response)
         except ValueError:
-            bot.sendMessage(chat_id, f"Error processing line: {line}", reply_markup=keyboard)
+            bot.sendMessage(chat_id, f"Error processing line: {line}")
 
 
 pending_add_user_command = None
@@ -385,7 +385,7 @@ def handle(msg):
 
         elif user_states.get(chat_id) == 'waiting_bulk_data':
             # Process the received bulk data
-            process_bulk_users(text, chat_id)
+            process_bulk_users(text, chat_id, reply_markup=keyboard)
 
             # Reset user state
             user_states[chat_id] = None
