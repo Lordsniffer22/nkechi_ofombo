@@ -298,7 +298,7 @@ def backups(chat_id):
 
             # Exclude users with expiry set to "never"
             if remaining_days > 0:
-                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
+                user_details = f"{username} {password} {remaining_days}"
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
