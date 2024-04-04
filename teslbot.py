@@ -373,7 +373,7 @@ def handle(msg):
             try:
                 lets_backup = backups(chat_id)
                 bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
-                os.remove(clients)
+                os.system('rm clients')
             except FileNotFoundError:
                 bot.sendMessage(chat_id, "The users file does not exist.")
 
