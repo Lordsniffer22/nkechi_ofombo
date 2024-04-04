@@ -309,7 +309,22 @@ def backups(chat_id):
     except FileNotFoundError:
         bot.sendMessage(chat_id, "The users file does not exist.")
 
+def process_bulk_users(bulk_data, chat_id):
+    # Split the bulk data into individual lines
+    lines = bulk_data.split('\n')
+
+    for line in lines:
+        try:
+            username, password, days = line.split()
+            response = add_user(username, password, days, user_info="R", chat_id=chat_id)
+            bot.sendMessage(chat_id, response, reply_markup=keyboard)
+        except ValueError:
+            bot.sendMessage(chat_id, f"Error processing line: {line}", reply_markup=keyboard)
+
+
 pending_add_user_command = None
+# Initialize a dictionary to keep track of user states
+user_states = {}
 
 
 def handle(msg):
@@ -336,8 +351,12 @@ def handle(msg):
 
 
     ], resize_keyboard=True)
-
     if content_type == 'text':
+        text = msg['text'].strip()
+        # Ensure user_states is initialized
+        if chat_id not in user_states:
+            user_states[chat_id] = None
+
         command = msg['text']
         query = msg['text']
         if is_youtube_link(query):
@@ -348,7 +367,7 @@ def handle(msg):
             bot.deleteMessage((chat_id, processing_message['message_id']))
 
         if command.lower() == 'start' or command == '/start':
-            start_message = ("♻️ Welcome to Tesla SSH VPS Manager👌. \n"
+            start_message = ("♻️ Welcome to Tesla SSH VPS Manager👌. \n\n"
                              "You can use this bot to Manage users on your server and as well perform other server management tasks without leaving Telegram.\n\n"
                              "🔰 Made with spirit. \n"
                              "========================= \n"
@@ -356,6 +375,20 @@ def handle(msg):
                              "Mastered by: @hackwell101 \n"
                              "Join @udpcustom")
             bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
+
+        if text == '/bulk_add':
+            # Send a message asking the user to send bulk data in the next message
+            bot.sendMessage(chat_id, "Please send the bulk data (username password days) in the next message.")
+
+            # Update user state to expect bulk data in the next message
+            user_states[chat_id] = 'waiting_bulk_data'
+
+        elif user_states.get(chat_id) == 'waiting_bulk_data':
+            # Process the received bulk data
+            process_bulk_users(text, chat_id)
+
+            # Reset user state
+            user_states[chat_id] = None
 
         elif command == '/backup':
             # Send the /etc/plogs file as a document
@@ -485,22 +518,6 @@ def handle(msg):
                             )
             bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
 
-        elif command.lower() == 'verify':
-            # Prompt user to enter the secret key for verification
-            bot.sendMessage(chat_id,
-                            "Please enter the secret key🔑 for verification. \n Get it from the Bot manager on your server. \n\n SSH into your server and type: 👉 bot , \n and then press enter")
-        #   verified_users[chat_id] = False
-
-        elif command.lower().startswith('/verify'):
-            try:
-                _, secret_key = command.split()
-            #     response = verify_user(chat_id, secret_key)
-            #      bot.sendMessage(chat_id, response, reply_markup=keyboard)
-            except ValueError:
-                bot.sendMessage(chat_id,
-                                "😳 Oh Oooh...! You entered it wrongly. \n\n ✳️ To verify, Use this format: \n \n👉   /verify XXXXXXXXXXX \n \n Where XXXXXXXXXX is your SECRET KEY you got from your VPS server 💻",
-                                reply_markup=keyboard)
-
         if command.lower().startswith('/domain'):
 
             try:
@@ -525,7 +542,7 @@ def handle(msg):
             # Process the pending "Add User" command
             try:
                 _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
-                response = add_user(username, password, days, user_info="1", chat_id=chat_id)
+                response = add_user(username, password, days, user_info="A", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
