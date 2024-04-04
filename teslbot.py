@@ -330,7 +330,7 @@ def handle(msg):
         elif command == '/backup':
             # Send the /etc/plogs file as a document
             try:
-                subprocess.run("cat /etc/passwd | grep "home" | grep "false" > clients", shell=True, Check=True)
+                os.system("cat /etc/passwd | grep 'home' | grep 'false' > clients")
                 with open('clients', 'rb') as userz:
                     bot.sendDocument(chat_id, userz)
             except FileNotFoundError:
