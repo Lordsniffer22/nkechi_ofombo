@@ -348,26 +348,15 @@ def handle(msg):
             bot.deleteMessage((chat_id, processing_message['message_id']))
 
         if command.lower() == 'start' or command == '/start':
-            start_message = ("♻️ WELCOME TO TESLA SSH BOT👌. \n"
-                             "━━━━━━━━━━━━━━━━━━━━━━━━━ \n"
-                             "\n"
-                             "You can use me to manage users on your server!\n"
-                             "\n"
-                             "To reload the bot, Press /start\n"
-                             "To see the usage guide, Press /help\n"
-                             "To add user, Press the add user button \n"
-                             "To remove user, Send /remove \n"
-                             "To list users, Press /users \n"
-                             "\n"
+            start_message = ("♻️ Welcome to Tesla SSH VPS Manager👌. \n"
+                             "You can use this bot to Manage users on your server and as well perform other server management tasks without leaving Telegram.\n\n"
                              "🔰 Made with spirit. \n"
                              "========================= \n"
-                             "By: @TESLASSH \n"
+                             "By: @teslassh \n"
                              "Mastered by: @hackwell101 \n"
                              "Join @udpcustom")
+            bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
 
-            # Send the start message with the custom keyboard
-
-            bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
         elif command == '/backup':
             # Send the /etc/plogs file as a document
             try:
