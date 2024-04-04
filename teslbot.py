@@ -223,7 +223,7 @@ def list_expired(chat_id):
                 user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
                 users_details.append(user_details)
             else:
-                users_details = "No one is expired!"
+                return "No one is expired!"
 
         users_message = "\n".join(users_details)
         organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
