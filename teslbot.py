@@ -189,49 +189,6 @@ def list_users(chat_id):
         return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
     except subprocess.CalledProcessError as e:
         return f"Failed to list users. Error: {e}"
-def list_expired(chat_id):
-    try:
-        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
-        users_list = [line.split(':') for line in users_info.split('\n') if line]
-
-        users_details = []
-
-        for user_info in users_list:
-            username = user_info[0]
-            gecos_field = user_info[4]
-
-            # Extract password part after the comma
-            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
-
-            # Get the expiration date
-            expiration_date_str = \
-                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
-                    1].strip()
-
-            # Skip users with expiration set to "never"
-            if expiration_date_str.lower() == 'never':
-                continue
-
-            # Convert expiration date to a datetime object
-            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
-
-            # Calculate remaining days
-            remaining_days = (expiration_date - datetime.now()).days
-
-            # Exclude users with expiry set to "never"
-            if remaining_days <= 0:
-                user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
-                users_details.append(user_details)
-            else:
-                users_details = f"No one is expired"
-                users_details.append(user_details)
-
-        users_message = "\n".join(users_details)
-        organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
-        return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
-    except subprocess.CalledProcessError as e:
-        return f"Failed to list users. Error: {e}"
-
 
 def cleaner(chat_id):
     try:
@@ -339,12 +296,16 @@ def handle(msg):
          KeyboardButton(text='List Users', resize_keyboard=True)],
 
         [KeyboardButton(text='Enable BBR', resize_keyboard=True),
-         KeyboardButton(text='Add RAM', resize_keyboard=True),
-         KeyboardButton(text='Exp. Users', resize_keyboard=True)],
+         KeyboardButton(text='Add SWAP', resize_keyboard=True),
+         KeyboardButton(text='Clean Expired', resize_keyboard=True)],
 
         [KeyboardButton(text='Update Bot', resize_keyboard=True),
          KeyboardButton(text='VPS INFO', resize_keyboard=True),
          KeyboardButton(text='Power I/O', resize_keyboard=True)],
+
+        [KeyboardButton(text='Backup Users', resize_keyboard=True),
+         KeyboardButton(text='Restore Users', resize_keyboard=True),
+         KeyboardButton(text='Domain', resize_keyboard=True)],
 
         [KeyboardButton(text='Whats New', resize_keyboard=True),
          KeyboardButton(text='Help', resize_keyboard=True),
@@ -377,7 +338,7 @@ def handle(msg):
                              "Join @udpcustom")
             bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
 
-        if text == '/bulk_add':
+        if text.lower() == 'restore users' or text == '/bulk_add':
             # Send a message asking the user to send bulk data in the next message
             bot.sendMessage(chat_id, "Please send the bulk data (username password days) in the next message.")
 
@@ -391,7 +352,7 @@ def handle(msg):
             # Reset user state
             user_states[chat_id] = None
 
-        elif command == '/backup':
+        elif command.lower() == 'backup users' or command == '/backup':
             # Send the /etc/plogs file as a document
             try:
                 lets_backup = backups(chat_id)
@@ -462,7 +423,7 @@ def handle(msg):
 
             # Send the message with the cleaned output
             bot.sendMessage(chat_id,
-                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
+                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯\nTo add a domain, press /domain")
 
         elif command.lower() == 'add ram':
             os.system("sudo fallocate -l 1024M /swapfile")
@@ -519,7 +480,12 @@ def handle(msg):
                             )
             bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
 
-        if command.lower().startswith('/domain'):
+        if command.lower() == 'domain':
+            domain_message = ("Hello {username}, To add a domain to this server use /domain coomand.\nExample:\n\n/domain abc.exanple.com\nMake sure the domain points to this servers IP address.")
+            kasumba = bot.sendMessage(chat_id, domain_message, reply_markup=Keyboard)
+            sleep 4 
+            bot.deleteMessage((chat_id, kasumba['message_id']))
+        elif command.lower().startswith('/domain'):
 
             try:
 
@@ -587,7 +553,7 @@ def handle(msg):
             time.sleep(1)
             bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
 
-        elif command == '/clean':
+        elif command.lower() == 'clean expired' or command == '/clean':
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
