@@ -481,7 +481,7 @@ def handle(msg):
             bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
 
         if command.lower() == 'domain':
-            domain_message = ("Hello {username}, To add a domain to this server use /domain coomand.\nExample:\n\n/domain abc.exanple.com\nMake sure the domain points to this servers IP address.")
+            domain_message = ("Hello, To add a domain to this server use /domain coomand.\n\nExample:\n/domain abc.exanple.com\nMake sure the domain points to this servers IP address.")
             bot.sendMessage(chat_id, domain_message, reply_markup=keyboard)
         elif command.lower().startswith('/domain'):
 
@@ -544,12 +544,6 @@ def handle(msg):
         elif command.lower() == 'list users' or command == '/users':
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
-        elif command.lower() == 'exp. users':
-            expires = list_expired(chat_id)
-            actionas = ("To Remove all expired users at once, \n╰┈➤Press /clean")
-            bot.sendMessage(chat_id, expires, reply_markup=keyboard)
-            time.sleep(1)
-            bot.sendMessage(chat_id, actionas, reply_markup=keyboard)
 
         elif command.lower() == 'clean expired' or command == '/clean':
             cleans = cleaner(chat_id)
