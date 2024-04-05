@@ -528,7 +528,7 @@ def handle(msg):
             # Process the pending "Remove User" command
             try:
                 # Split the pending command and current message to extract username
-                _, username = (pending_remove_user + ' ' + command).split(maxsplit=1)
+                _, username = (pending_remove_user + ' ' + command).split(maxsplit=2)
 
                 # Assume the remove_user function is already defined.
                 response = remove_user(username.strip(), chat_id)
