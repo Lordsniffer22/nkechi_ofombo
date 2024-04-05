@@ -295,7 +295,7 @@ def handle(msg):
     # Define custom keyboard buttons with smaller size in a single row
     keyboard = ReplyKeyboardMarkup(keyboard=[
         [KeyboardButton(text='Add User', resize_keyboard=True),
-         KeyboardButton(text='Remove User', resize_keyboard=True),
+         KeyboardButton(text='Remove', resize_keyboard=True),
          KeyboardButton(text='List Users', resize_keyboard=True)],
 
         [KeyboardButton(text='Enable BBR', resize_keyboard=True),
@@ -519,7 +519,7 @@ def handle(msg):
                 # Reset the pending command after processing
                 pending_add_user_command = None
 
-        elif command.lower() == 'remove user':
+        elif command.lower() == 'remove':
             # Set the pending remove user command
             pending_remove_user = command
             bot.sendMessage(chat_id, "It's time to remove a user. Which user?.")
@@ -528,13 +528,13 @@ def handle(msg):
             # Process the pending "Remove User" command
             try:
                 # Split the pending command and current message to extract username
-                _, username = (pending_remove_user + ' ' + command).split(maxsplit=2)
+                _, username = (pending_remove_user + ' ' + command).split(maxsplit=1)
 
                 # Assume the remove_user function is already defined.
                 response = remove_user(username.strip(), chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Looks like that name does not exist or  you made a wrong spelling.")
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Looks like i got some errors in removing. contact @teslassh for assistance")
             finally:
                 # Reset the pending command after processing
                 pending_remove_user = None
