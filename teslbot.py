@@ -462,6 +462,8 @@ def handle(msg):
             user_states[chat_id] = None
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
+            result0 = subprocess.run(['wget', '-qO-', 'ipinfo.io/country'], stdout=subprocess.PIPE)
+            country = result0.stdout.decode('utf-8').strip()
             # Define the path to the bash script
             bash_script_path = "/etc/hsm/toxic/ham.sh"
 
@@ -477,7 +479,7 @@ def handle(msg):
 
             # Send the message with the cleaned output
             bot.sendMessage(chat_id,
-                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   Host IP: {serv_ip}\n  ─────────────\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
+                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   Host IP: {serv_ip}\n  ─────────────\n   LOCATION: {region},{country}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
 
         elif command.lower() == 'add swap':
             pending_add_user_command = None
