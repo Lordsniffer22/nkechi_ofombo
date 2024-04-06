@@ -1,88 +1,118 @@
-
-import asyncio
-import logging
-import sys
+import json
+import requests
 import os
-from os import getenv
-from pytube import YouTube
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import InputFile
-from aiogram.utils.markdown import hbold
+from urllib.parse import urlencode
 
-# Initialize the bot
+# Channel : @decrypt_file
+# Developer : @BOOS_TOOLS 🇪🇬
 
-# Bot token can be obtained via https://t.me/BotFather
-TOKEN = '7021922965:AAFgpeUCisXYM-s6rDbzhwBtTNZ62jL0x0o'
-bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+# Need Edit Line 9
+API_KEY = "6710319141:AAE9XrEmt9-Vj6yBXDocq2Tmw9JMfch0i5A"  # Put Token
 
-# Function to check if a message is a YouTube link
-def is_youtube_link(text):
-    return text.startswith('https://www.youtube.com/') or text.startswith('https://youtu.be/')
-
-# Function to download a YouTube video
-async def download_video(video_url):
-    yt = YouTube(video_url)
-    video_title = yt.title
-    streams = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-    if streams:
-        file_path = streams.download()
-        return file_path, video_title
+def bot(method, datas=None):
+    url = f"https://api.telegram.org/bot{API_KEY}/{method}"
+    response = requests.post(url, data=datas)
+    if response.status_code != 200:
+        print(f"Error: {response.text}")
     else:
-        return None, None
+        return response.json()
 
-# Function to download a YouTube video and convert it to MP3
-async def download_and_convert_to_mp3(video_url):
-    yt = YouTube(video_url)
-    video_title = yt.title
-    stream = yt.streams.filter(only_audio=True).first()
-    if stream:
-        file_path = stream.download()
-        mp3_file = f"{video_title}.mp3"
-        os.rename(file_path, mp3_file)
-        return mp3_file, video_title
-    else:
-        return None, None
+# Channel : @decrypt_file
+# Developer : @BOOS_TOOLS
 
-# Function to handle incoming messages
-@dp.message_handler(content_types=types.ContentType.TEXT)
-async def handle_message(message: types.Message):
-    query = message.text
-    if is_youtube_link(query):
-        processing = "Processing... \n Hang on tight🤙"
-        processing_message = await message.reply(processing)
-        if query.startswith('/v'):
-            await send_video(message.chat.id, query)
-        else:
-            await send_audio(message.chat.id, query)
-        await asyncio.sleep(3)  # Sleep for 3 seconds
-        await message.delete()
-        await processing_message.delete()
+def aes_ecb_decrypt(data, key):
+    cipher = "aes-128-ecb"
+    decrypted = ""
+    try:
+        decrypted = requests.post(f"https://api.telegram.org/bot{API_KEY}/decrypt", data={"data": data, "key": key}).text
+    except Exception as e:
+        print(f"Error in AES decryption: {e}")
+    return decrypted
 
-# Function to send a video file to the user with a caption
-async def send_video(chat_id, video_url):
-    video_file, video_title = await download_video(video_url)
-    if video_file:
-        # Add a caption to the video file
-        caption = "Hey, your video is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
-        with open(video_file, 'rb') as f:
-            await bot.send_video(chat_id, f, caption=caption)
-        os.remove(video_file)  # Remove the video file after sending
+def aes_ecb_en(data, key):
+    cipher = "aes-128-ecb"
+    encrypted = ""
+    try:
+        encrypted = requests.post(f"https://api.telegram.org/bot{API_KEY}/encrypt", data={"data": data, "key": key}).text
+    except Exception as e:
+        print(f"Error in AES encryption: {e}")
+    return encrypted
 
-# Function to send an MP3 file to the user with a caption
-async def send_audio(chat_id, video_url):
-    mp3_file, video_title = await download_and_convert_to_mp3(video_url)
-    if mp3_file:
-        # Add a caption to the audio file
-        caption = "Hey, your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
-        with open(mp3_file, 'rb') as f:
-            await bot.send_audio(chat_id, f, caption=caption)
-        os.remove(mp3_file)  # Remove the MP3 file after sending
+def get_file(file_id):
+    response = requests.get(f"https://api.telegram.org/bot{API_KEY}/getFile?file_id={file_id}")
+    return response.json()
 
-# Start polling
-async def main():
-    await bot.start_polling()
+# Channel : @decrypt_file
+# Developer : @BOOS_TOOLS
 
-if __name__ == '__main__':
-    asyncio.run(main())
+def handle_message(update):
+    message = update["message"]
+    chat_id = message["chat"]["id"]
+    text = message.get("text", "")
+    caption = message.get("caption", "")
+    if "document" in message:
+        file_name = message["document"]["file_name"]
+        if '.hat' in file_name:
+            file_id = message["document"]["file_id"]
+            file_info = get_file(file_id)["result"]
+            file_path = file_info["file_path"]
+            r = str(random.randint(1111, 9999))
+            with open(f"{r}.hat", "wb") as file:
+                file.write(requests.get(f"https://api.telegram.org/file/bot{API_KEY}/{file_path}").content)
+            with open(f"{r}.hat", "rb") as file:
+                file_data = file.read()
+            key = base64.b64decode("zbNkuNCGSLivpEuep3BcNA==")
+            decrypted_data = aes_ecb_decrypt(file_data, key)
+            data = json.loads(decrypted_data)
+            if caption == "":
+                cap = "NuLL"
+            else:
+                cap = caption
+            data["descriptionv5"] = cap
+            data["protextras"]["password"] = False
+            data["protextras"]["expiry"] = False
+            data["protextras"]["id_lock"] = False
+            data["protextras"]["block_root"] = False
+            data["protextras"]["anti_sniff"] = False
+            encrypted_data = aes_ecb_en(json.dumps(data), key)
+            with open(f"{r}.hat", "wb") as file:
+                file.write(encrypted_data.encode())
+            cp = f"""
+├ • Developer :@BOOS_TOOLS
+├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+├ • 💠 Expiry Time : Disabled
+├ • 💠 ID_Lock : Disabled
+├ • 💠 Password : Disabled
+├ • 💠 Block_Root : Disabled
+├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+├ • 💠 Description : {cap}
+├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+├ • BoT ID : @derypterbot
+"""
+            bot("sendDocument", {"chat_id": chat_id, "document": open(f"{r}.hat", "rb"), "caption": cp})
+            os.unlink(f"{r}.hat")
+    elif text == "/start":
+        bot("sendMessage", {"chat_id": chat_id, "text": """
+🇪🇬This project was made by an Iranian 🇪🇬
 
+💠 Send Me Ha Tunnel Plus Config and write Caption For Description
+
+♻️ The tasks performed by this robot:
+
+🔹Only Ha Tunnel Plus - .HAT 🔹
+🔻Time makes the use of config unlimited
+🔻The number of users is unlimited
+🔻The password disables the file
+🔻Allows root users to use
+
+🔹Change the description as desired 🔹
+
+💠 Channel: @decrypt_file
+💠 Developer: @BOOS_TOOLS
+""", "parse_mode": "HTML"})
+
+# Channel : @decrypt_file
+# Developer : @BOOS_TOOLS
+
+if __name__ == "__main__":
+    handle_message(json.loads(input()))
