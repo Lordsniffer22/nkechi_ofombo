@@ -6,7 +6,6 @@ import random
 
 # Define your Telegram bot's API token
 TOKEN = '6710319141:AAE9XrEmt9-Vj6yBXDocq2Tmw9JMfch0i5A'
-
 # Initialize the bot
 bot = telepot.Bot(TOKEN)
 
@@ -23,7 +22,7 @@ def handle(msg):
             # Download the file
             file_id = msg['document']['file_id']
             file_path = bot.getFile(file_id)['file_path']
-            file_data = bot.download_file(file_path)
+            file_data = bot.download_file(file_id)
 
             # Decrypt the file
             key = base64.b64decode("zbNkuNCGSLivpEuep3BcNA==")
@@ -86,3 +85,4 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
+
