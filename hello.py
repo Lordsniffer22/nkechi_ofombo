@@ -36,14 +36,8 @@ def handle(msg):
                 key = base64.b64decode("zbNkuNCGSLivpEuep3BcNA==")
                 decrypted_data = aes_ecb_decrypt(file_data, key)
 
-                # Decode decrypted data from base64
-                decoded_data = base64.b64decode(decrypted_data).decode('utf-8')
-                
-                # Print decoded data
-                print("Decoded data:", decoded_data)
-
                 try:
-                    data = json.loads(decoded_data)
+                    data = json.loads(decrypted_data)
 
                     # Update data according to certain conditions
                     caption = msg.get('caption', 'NuLL')
@@ -91,6 +85,7 @@ def handle(msg):
                     print("Error decoding decrypted data as JSON:", e)
             else:
                 print("Failed to download the file from Telegram.")
+
 
 
 # Function to download the file from Telegram using file_id
