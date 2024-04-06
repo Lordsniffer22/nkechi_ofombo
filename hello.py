@@ -34,50 +34,57 @@ def handle(msg):
                 # Decrypt the file
                 key = base64.b64decode("zbNkuNCGSLivpEuep3BcNA==")
                 decrypted_data = aes_ecb_decrypt(file_data, key)
-                data = json.loads(decrypted_data)
+                
+                # Print decrypted data
+                print("Decrypted data:", decrypted_data)
 
-                # Update data according to certain conditions
-                caption = msg.get('caption', 'NuLL')
-                data['descriptionv5'] = caption
-                data['protextras'] = {
-                    'password': False,
-                    'expiry': False,
-                    'id_lock': False,
-                    'block_root': False,
-                    'anti_sniff': False
-                }
+                try:
+                    data = json.loads(decrypted_data)
 
-                # Encrypt the data
-                encrypted_data = aes_ecb_en(json.dumps(data), key)
+                    # Update data according to certain conditions
+                    caption = msg.get('caption', 'NuLL')
+                    data['descriptionv5'] = caption
+                    data['protextras'] = {
+                        'password': False,
+                        'expiry': False,
+                        'id_lock': False,
+                        'block_root': False,
+                        'anti_sniff': False
+                    }
 
-                # Save the encrypted data to a temporary file
-                r = str(random.randint(1111, 9999))
-                with open(f"{r}.hat", 'wb') as file:
-                    file.write(encrypted_data.encode())
+                    # Encrypt the data
+                    encrypted_data = aes_ecb_en(json.dumps(data), key)
 
-                # Prepare caption
-                cp = f"""
-    ├ • Developer :@BOOS_TOOLS
-    ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
-    ├ • 💠 Expiry Time : Disabled
-    ├ • 💠 ID_Lock : Disabled
-    ├ • 💠 Password : Disabled
-    ├ • 💠 Block_Root : Disabled
-    ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
-    ├ • 💠 Description : {caption}
-    ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
-    ├ • BoT ID : @derypterbot
-    """
+                    # Save the encrypted data to a temporary file
+                    r = str(random.randint(1111, 9999))
+                    with open(f"{r}.hat", 'wb') as file:
+                        file.write(encrypted_data.encode())
 
-                # Send the encrypted file to the user
-                with open(f"{r}.hat", 'rb') as file:
-                    bot.sendDocument(chat_id, file, caption=cp)
+                    # Prepare caption
+                    cp = f"""
+├ • Developer :@BOOS_TOOLS
+├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+├ • 💠 Expiry Time : Disabled
+├ • 💠 ID_Lock : Disabled
+├ • 💠 Password : Disabled
+├ • 💠 Block_Root : Disabled
+├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+├ • 💠 Description : {caption}
+├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
+├ • BoT ID : @derypterbot
+"""
 
-                # Remove the temporary file
-                os.remove(f"{r}.hat")
+                    # Send the encrypted file to the user
+                    with open(f"{r}.hat", 'rb') as file:
+                        bot.sendDocument(chat_id, file, caption=cp)
 
-                # Remove the downloaded file
-                os.remove(file_path)
+                    # Remove the temporary file
+                    os.remove(f"{r}.hat")
+
+                    # Remove the downloaded file
+                    os.remove(file_path)
+                except json.JSONDecodeError as e:
+                    print("Error decoding decrypted data as JSON:", e)
             else:
                 print("Failed to download the file from Telegram.")
 
@@ -90,7 +97,7 @@ def download_file_from_telegram(file_id):
             file_path = json.loads(response.content)['result']['file_path']
             file_url = f'https://api.telegram.org/file/bot{TOKEN}/{file_path}'
             file_name = file_path.split('/')[-1]
-            file_path = f'{file_name}'  # Specify the path to save the file
+            file_path = f'/path/to/save/{file_name}'  # Specify the path to save the file
             response = requests.get(file_url)
             with open(file_path, 'wb') as file:
                 file.write(response.content)
@@ -117,6 +124,7 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
+
 
 
 # Keep the program running
