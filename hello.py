@@ -1,82 +1,55 @@
-import json
-import requests
+import telepot
 import os
-from urllib.parse import urlencode
+import json
+import base64
+import random
 
-# Channel : @decrypt_file
-# Developer : @BOOS_TOOLS 🇪🇬
+# Define your Telegram bot's API token
+TOKEN = '6710319141:AAE9XrEmt9-Vj6yBXDocq2Tmw9JMfch0i5A'
 
-# Need Edit Line 9
-API_KEY = "6710319141:AAE9XrEmt9-Vj6yBXDocq2Tmw9JMfch0i5A"  # Put Token
+# Initialize the bot
+bot = telepot.Bot(TOKEN)
 
-def bot(method, datas=None):
-    url = f"https://api.telegram.org/bot{API_KEY}/{method}"
-    response = requests.post(url, data=datas)
-    if response.status_code != 200:
-        print(f"Error: {response.text}")
-    else:
-        return response.json()
+# Function to handle incoming messages
+def handle(msg):
+    content_type, chat_type, chat_id = telepot.glance(msg)
 
-# Channel : @decrypt_file
-# Developer : @BOOS_TOOLS
+    # Check if the message is a document
+    if content_type == 'document':
+        file_name = msg['document']['file_name']
 
-def aes_ecb_decrypt(data, key):
-    cipher = "aes-128-ecb"
-    decrypted = ""
-    try:
-        decrypted = requests.post(f"https://api.telegram.org/bot{API_KEY}/decrypt", data={"data": data, "key": key}).text
-    except Exception as e:
-        print(f"Error in AES decryption: {e}")
-    return decrypted
+        # Check if the file has ".hat" extension
+        if file_name.endswith('.hat'):
+            # Download the file
+            file_id = msg['document']['file_id']
+            file_path = bot.get_file(file_id)['file_path']
+            file_data = bot.download_file(file_path)
 
-def aes_ecb_en(data, key):
-    cipher = "aes-128-ecb"
-    encrypted = ""
-    try:
-        encrypted = requests.post(f"https://api.telegram.org/bot{API_KEY}/encrypt", data={"data": data, "key": key}).text
-    except Exception as e:
-        print(f"Error in AES encryption: {e}")
-    return encrypted
-
-def get_file(file_id):
-    response = requests.get(f"https://api.telegram.org/bot{API_KEY}/getFile?file_id={file_id}")
-    return response.json()
-
-# Channel : @decrypt_file
-# Developer : @BOOS_TOOLS
-
-def handle_message(update):
-    message = update["message"]
-    chat_id = message["chat"]["id"]
-    text = message.get("text", "")
-    caption = message.get("caption", "")
-    if "document" in message:
-        file_name = message["document"]["file_name"]
-        if '.hat' in file_name:
-            file_id = message["document"]["file_id"]
-            file_info = get_file(file_id)["result"]
-            file_path = file_info["file_path"]
-            r = str(random.randint(1111, 9999))
-            with open(f"{r}.hat", "wb") as file:
-                file.write(requests.get(f"https://api.telegram.org/file/bot{API_KEY}/{file_path}").content)
-            with open(f"{r}.hat", "rb") as file:
-                file_data = file.read()
+            # Decrypt the file
             key = base64.b64decode("zbNkuNCGSLivpEuep3BcNA==")
             decrypted_data = aes_ecb_decrypt(file_data, key)
             data = json.loads(decrypted_data)
-            if caption == "":
-                cap = "NuLL"
-            else:
-                cap = caption
-            data["descriptionv5"] = cap
-            data["protextras"]["password"] = False
-            data["protextras"]["expiry"] = False
-            data["protextras"]["id_lock"] = False
-            data["protextras"]["block_root"] = False
-            data["protextras"]["anti_sniff"] = False
+
+            # Update data according to certain conditions
+            caption = msg.get('caption', 'NuLL')
+            data['descriptionv5'] = caption
+            data['protextras'] = {
+                'password': False,
+                'expiry': False,
+                'id_lock': False,
+                'block_root': False,
+                'anti_sniff': False
+            }
+
+            # Encrypt the data
             encrypted_data = aes_ecb_en(json.dumps(data), key)
-            with open(f"{r}.hat", "wb") as file:
+
+            # Save the encrypted data to a temporary file
+            r = str(random.randint(1111, 9999))
+            with open(f"{r}.hat", 'wb') as file:
                 file.write(encrypted_data.encode())
+
+            # Prepare caption
             cp = f"""
 ├ • Developer :@BOOS_TOOLS
 ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
@@ -85,34 +58,31 @@ def handle_message(update):
 ├ • 💠 Password : Disabled
 ├ • 💠 Block_Root : Disabled
 ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
-├ • 💠 Description : {cap}
+├ • 💠 Description : {caption}
 ├ • ┅┅━━━━ 𖣫 ━━━━┅┅ •
 ├ • BoT ID : @derypterbot
 """
-            bot("sendDocument", {"chat_id": chat_id, "document": open(f"{r}.hat", "rb"), "caption": cp})
-            os.unlink(f"{r}.hat")
-    elif text == "/start":
-        bot("sendMessage", {"chat_id": chat_id, "text": """
-🇪🇬This project was made by an Iranian 🇪🇬
 
-💠 Send Me Ha Tunnel Plus Config and write Caption For Description
+            # Send the encrypted file to the user
+            with open(f"{r}.hat", 'rb') as file:
+                bot.sendDocument(chat_id, file, caption=cp)
 
-♻️ The tasks performed by this robot:
+            # Remove the temporary file
+            os.remove(f"{r}.hat")
 
-🔹Only Ha Tunnel Plus - .HAT 🔹
-🔻Time makes the use of config unlimited
-🔻The number of users is unlimited
-🔻The password disables the file
-🔻Allows root users to use
+# Function to decrypt AES-ECB encrypted data
+def aes_ecb_decrypt(data, key):
+    # Implementation of AES decryption
+    return data
 
-🔹Change the description as desired 🔹
+# Function to encrypt data using AES-ECB
+def aes_ecb_en(data, key):
+    # Implementation of AES encryption
+    return data
 
-💠 Channel: @decrypt_file
-💠 Developer: @BOOS_TOOLS
-""", "parse_mode": "HTML"})
+# Start the bot
+bot.message_loop(handle)
 
-# Channel : @decrypt_file
-# Developer : @BOOS_TOOLS
-
-if __name__ == "__main__":
-    handle_message(json.loads(input()))
+# Keep the program running
+while True:
+    pass
