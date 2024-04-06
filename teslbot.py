@@ -208,9 +208,7 @@ def list_users(chat_id):
         return f"Failed to list users."
 
 def cleaner(chat_id):
-    pending_add_user_command = None
-    pending_remove_user = None
-    pending_add_domain = None
+
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
         users_list = [line.split(':') for line in users_info.split('\n') if line]
@@ -385,6 +383,7 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             # Send the file as a document
             try:
                 lets_backup = backups(chat_id)
@@ -397,6 +396,8 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
+
             gamba = (
                 f"The server is updating...\nPlease leave everything to us."
             )
@@ -411,23 +412,46 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
                                    stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
             bot.sendMessage(chat_id, news, reply_markup=keyboard)
 
 
+        elif command.lower() == 'list users':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            try:
+                response = list_users(chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "I failed")
+
+
+        elif command.lower() == 'clean expired':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            cleans = cleaner(chat_id)
+            bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
+
 
         elif command.lower() == '/nodomain':
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             cleanz = nodomain(chat_id)
             bot.sendMessage(chat_id, cleanz, reply_markup=keyboard)
         elif command.lower() == 'power i/o':
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             reboot_msg = (
                 f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
             )
@@ -450,6 +474,7 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             try:
                 enable_bbr(chat_id)
             except ValueError:
@@ -460,6 +485,7 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             # Define the path to the bash script
@@ -482,6 +508,7 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             os.system("sudo fallocate -l 1024M /swapfile")
             os.system("sudo chmod 600 /swapfile")
             os.system("sudo mkswap /swapfile")
@@ -496,6 +523,7 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             start_message = ("♻️ ZERO ONE LLC 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
                              "\n"
@@ -518,6 +546,7 @@ def handle(msg):
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             help_message = ("⚙️ HOW TO USE BOT:\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━"
                             "\n"
@@ -545,6 +574,7 @@ def handle(msg):
         if command.lower() == 'add domain':
             pending_add_user_command = None
             pending_remove_user = None
+            user_states[chat_id] = None
             # Set the pending add domain command
             pending_add_domain = command
             check_current = currentdomain(chat_id)
@@ -571,6 +601,7 @@ def handle(msg):
         if command.lower() == 'add user':
             pending_remove_user = None
             pending_add_domain = None
+            user_states[chat_id] = None
             pending_add_user_command = command
             bot.sendMessage(chat_id,
                             "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
@@ -592,6 +623,7 @@ def handle(msg):
         elif command.lower() == 'remove':
             pending_add_user_command = None
             pending_add_domain = None
+            user_states[chat_id] = None
             # Set the pending remove user command
             pending_remove_user = command
             bot.sendMessage(chat_id, "It's time to remove a user. Which user?.")
@@ -612,23 +644,7 @@ def handle(msg):
                 pending_remove_user = None
 
 
-        elif command.lower() == 'list users':
-            pending_add_user_command = None
-            pending_remove_user = None
-            pending_add_domain = None
-            try:
-                response = list_users(chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard)
-            except ValueError:
-                bot.sendMessage(chat_id, "I failed")
 
-
-        elif command.lower() == 'clean expired':
-            pending_add_user_command = None
-            pending_remove_user = None
-            pending_add_domain = None
-            cleans = cleaner(chat_id)
-            bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
 # Set the command
 
@@ -637,3 +653,4 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
+    
