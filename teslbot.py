@@ -361,36 +361,6 @@ def handle(msg):
                              "Join @udpcustom")
             bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
 
-        elif command.lower() == 'backup users' or command == '/backup':
-            pending_add_user_command = None
-            pending_remove_user = None
-            pending_add_domain = None
-            user_states[chat_id] = None
-            # Send the file as a document
-            try:
-                lets_backup = backups(chat_id)
-                bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
-                os.system('rm clients')
-            except FileNotFoundError:
-                bot.sendMessage(chat_id, "The users file does not exist.")
-        elif text.lower() == 'restore users' or text == '/bulk_add':
-            pending_add_user_command = None
-            pending_remove_user = None
-            pending_add_domain = None
-            # Send a message asking the user to send bulk data in the next message
-            bot.sendMessage(chat_id, "Please send the bulk user data (open the clients file you got in this chat and copy everything, then send here) in the next message.")
-
-            # Update user state to expect bulk data in the next message
-            user_states[chat_id] = 'waiting_bulk_data'
-
-        elif user_states.get(chat_id) == 'waiting_bulk_data':
-
-            # Process the received bulk data
-            process_bulk_users(text, chat_id)
-
-            # Reset user state
-            user_states[chat_id] = None
-
         elif command.lower() == 'update bot' or command == '/update':
             pending_add_user_command = None
             pending_remove_user = None
@@ -438,27 +408,6 @@ def handle(msg):
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
-        if command.lower() == 'add user':
-            pending_remove_user = None
-            pending_add_domain = None
-            user_states[chat_id] = None
-            pending_add_user_command = command
-            bot.sendMessage(chat_id,
-                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
-                            reply_markup=keyboard)
-
-        elif pending_add_user_command:
-            # Process the pending "Add User" command
-            try:
-                _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
-                response = add_user(username, password, days, user_info="A", chat_id=chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard)
-            except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
-                                reply_markup=keyboard)
-            finally:
-                # Reset the pending command after processing
-                pending_add_user_command = None
 
         elif command.lower() == 'remove':
             pending_add_user_command = None
@@ -615,6 +564,57 @@ def handle(msg):
                             )
             bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
 
+        elif command.lower() == 'backup users' or command == '/backup':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            # Send the file as a document
+            try:
+                lets_backup = backups(chat_id)
+                bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
+                os.system('rm clients')
+            except FileNotFoundError:
+                bot.sendMessage(chat_id, "The users file does not exist.")
+        elif text.lower() == 'restore users' or text == '/bulk_add':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            # Send a message asking the user to send bulk data in the next message
+            bot.sendMessage(chat_id, "Please send the bulk user data (open the clients file you got in this chat and copy everything, then send here) in the next message.")
+
+            # Update user state to expect bulk data in the next message
+            user_states[chat_id] = 'waiting_bulk_data'
+
+        elif user_states.get(chat_id) == 'waiting_bulk_data':
+
+            # Process the received bulk data
+            process_bulk_users(text, chat_id)
+
+            # Reset user state
+            user_states[chat_id] = None
+            
+        if command.lower() == 'add user':
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            pending_add_user_command = command
+            bot.sendMessage(chat_id,
+                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
+                            reply_markup=keyboard)
+
+        elif pending_add_user_command:
+            # Process the pending "Add User" command
+            try:
+                _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
+                response = add_user(username, password, days, user_info="A", chat_id=chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
+                                reply_markup=keyboard)
+            finally:
+                # Reset the pending command after processing
+                pending_add_user_command = None
         if command.lower() == 'add domain':
             pending_add_user_command = None
             pending_remove_user = None
