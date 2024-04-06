@@ -22,7 +22,7 @@ def handle(msg):
         if file_name.endswith('.hat'):
             # Download the file
             file_id = msg['document']['file_id']
-            file_path = bot.get_file(file_id)['file_path']
+            file_path = bot.getFile(file_id)['file_path']
             file_data = bot.download_file(file_path)
 
             # Decrypt the file
