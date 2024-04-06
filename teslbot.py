@@ -477,7 +477,7 @@ def handle(msg):
 
             # Send the message with the cleaned output
             bot.sendMessage(chat_id,
-                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\nHost IP: {serv_ip}\n  ─────────────\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
+                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   Host IP: {serv_ip}\n  ─────────────\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
 
         elif command.lower() == 'add swap':
             pending_add_user_command = None
