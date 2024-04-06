@@ -208,7 +208,9 @@ def list_users(chat_id):
         return f"Failed to list users."
 
 def cleaner(chat_id):
-
+    pending_add_user_command = None
+    pending_remove_user = None
+    pending_add_domain = None
     try:
         users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
         users_list = [line.split(':') for line in users_info.split('\n') if line]
