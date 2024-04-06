@@ -4,6 +4,7 @@ import json
 import base64
 import random
 import requests
+import Crypto.Cipher
 from Crypto.Cipher import AES
 # Define your Telegram bot's API token
 TOKEN = '6710319141:AAE9XrEmt9-Vj6yBXDocq2Tmw9JMfch0i5A'
