@@ -550,7 +550,7 @@ def handle(msg):
             try:
                 lets_backup = backups(chat_id)
                 bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
-                os.system('rm clients')
+                os.system('rm clients.txt')
             except FileNotFoundError:
                 bot.sendMessage(chat_id, "The users file does not exist.")
         elif text.lower() == 'restore users' or text == '/bulk_add':
@@ -600,8 +600,7 @@ def handle(msg):
             user_states[chat_id] = None
             pending_add_user_command = command
             bot.sendMessage(chat_id,
-                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
-                            reply_markup=keyboard)
+                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30")
 
         elif pending_add_user_command:
             # Process the pending "Add User" command
@@ -610,8 +609,7 @@ def handle(msg):
                 response = add_user(username, password, days, user_info="A", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, f"🤡 {username} seems to be a command.\n✌️Try Checking /help",
-                                reply_markup=keyboard)
+                bot.sendMessage(chat_id, "You instead sent a command. Try again!", reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
                 pending_add_user_command = None
