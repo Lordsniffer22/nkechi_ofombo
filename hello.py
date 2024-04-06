@@ -91,7 +91,7 @@ def download_file_from_telegram(file_id):
             file_path = json.loads(response.content)['result']['file_path']
             file_url = f'https://api.telegram.org/file/bot{TOKEN}/{file_path}'
             file_name = file_path.split('/')[-1]
-            file_path = f'/path/to/save/{file_name}'  # Specify the path to save the file
+            file_path = f'{file_name}'  # Specify the path to save the file
             response = requests.get(file_url)
             with open(file_path, 'wb') as file:
                 file.write(response.content)
