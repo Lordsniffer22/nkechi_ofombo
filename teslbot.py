@@ -439,6 +439,51 @@ def handle(msg):
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
+        if command.lower() == 'add user':
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            pending_add_user_command = command
+            bot.sendMessage(chat_id,
+                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
+                            reply_markup=keyboard)
+
+        elif pending_add_user_command:
+            # Process the pending "Add User" command
+            try:
+                _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
+                response = add_user(username, password, days, user_info="A", chat_id=chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
+                                reply_markup=keyboard)
+            finally:
+                # Reset the pending command after processing
+                pending_add_user_command = None
+
+        elif command.lower() == 'remove':
+            pending_add_user_command = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            # Set the pending remove user command
+            pending_remove_user = command
+            bot.sendMessage(chat_id, "It's time to remove a user. Which user?.")
+
+        elif pending_remove_user:
+            # Process the pending "Remove User" command
+            try:
+                # Split the pending command and current message to extract username
+                _, username = (pending_remove_user + ' ' + command).split(maxsplit=1)
+
+                # Assume the remove_user function is already defined.
+                response = remove_user(username.strip(), chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Looks like i got some errors in removing. contact @teslassh for assistance")
+            finally:
+                # Reset the pending command after processing
+                pending_remove_user = None
+
 
         elif command.lower() == '/nodomain':
             pending_add_user_command = None
@@ -598,54 +643,6 @@ def handle(msg):
                 pending_add_domain = None
 
 
-        if command.lower() == 'add user':
-            pending_remove_user = None
-            pending_add_domain = None
-            user_states[chat_id] = None
-            pending_add_user_command = command
-            bot.sendMessage(chat_id,
-                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30",
-                            reply_markup=keyboard)
-
-        elif pending_add_user_command:
-            # Process the pending "Add User" command
-            try:
-                _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
-                response = add_user(username, password, days, user_info="A", chat_id=chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard)
-            except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
-                                reply_markup=keyboard)
-            finally:
-                # Reset the pending command after processing
-                pending_add_user_command = None
-
-        elif command.lower() == 'remove':
-            pending_add_user_command = None
-            pending_add_domain = None
-            user_states[chat_id] = None
-            # Set the pending remove user command
-            pending_remove_user = command
-            bot.sendMessage(chat_id, "It's time to remove a user. Which user?.")
-
-        elif pending_remove_user:
-            # Process the pending "Remove User" command
-            try:
-                # Split the pending command and current message to extract username
-                _, username = (pending_remove_user + ' ' + command).split(maxsplit=1)
-
-                # Assume the remove_user function is already defined.
-                response = remove_user(username.strip(), chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard)
-            except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Looks like i got some errors in removing. contact @teslassh for assistance")
-            finally:
-                # Reset the pending command after processing
-                pending_remove_user = None
-
-
-
-
 # Set the command
 
 bot.message_loop(handle)
@@ -653,4 +650,3 @@ bot.message_loop(handle)
 # Keep the program running
 while True:
     pass
-    
