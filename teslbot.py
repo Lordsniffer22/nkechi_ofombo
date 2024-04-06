@@ -278,9 +278,9 @@ def backups(chat_id):
                 users_details.append(user_details)
 
         users_message = "\n".join(users_details)
-        with open('clients', 'w') as file:
+        with open('clients.txt', 'w') as file:
             file.write(users_message)
-        with open('clients', 'rb') as userz:
+        with open('clients.txt', 'rb') as userz:
             bot.sendDocument(chat_id, userz)
     except FileNotFoundError:
         bot.sendMessage(chat_id, "The users file does not exist.")
@@ -361,7 +361,19 @@ def handle(msg):
                              "Join @udpcustom")
             bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
 
-        if text.lower() == 'restore users' or text == '/bulk_add':
+        elif command.lower() == 'backup users' or command == '/backup':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            # Send the file as a document
+            try:
+                lets_backup = backups(chat_id)
+                bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
+                os.system('rm clients')
+            except FileNotFoundError:
+                bot.sendMessage(chat_id, "The users file does not exist.")
+        elif text.lower() == 'restore users' or text == '/bulk_add':
             pending_add_user_command = None
             pending_remove_user = None
             pending_add_domain = None
@@ -378,19 +390,6 @@ def handle(msg):
 
             # Reset user state
             user_states[chat_id] = None
-
-        elif command.lower() == 'backup users' or command == '/backup':
-            pending_add_user_command = None
-            pending_remove_user = None
-            pending_add_domain = None
-            user_states[chat_id] = None
-            # Send the file as a document
-            try:
-                lets_backup = backups(chat_id)
-                bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
-                os.system('rm clients')
-            except FileNotFoundError:
-                bot.sendMessage(chat_id, "The users file does not exist.")
 
         elif command.lower() == 'update bot' or command == '/update':
             pending_add_user_command = None
