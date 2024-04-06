@@ -115,7 +115,7 @@ def remove_user(username, chat_id):
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
         return f"{username} Has been removed successfully!"
     except subprocess.CalledProcessError as e:
-        return f"Failed to remove user {username} because he is not existing in the database or you made a wrong spelling."
+        return f"🤡 {username} seems to be a command or that user does not exist.\n✌️Try a different spelling"
 
 
 def restart_udp_daemon(chat_id):
@@ -593,7 +593,7 @@ def handle(msg):
             finally:
                 # Reset the pending command after processing
                 pending_remove_user = None
-                
+
         if command.lower() == 'add user':
             pending_remove_user = None
             pending_add_domain = None
@@ -610,7 +610,7 @@ def handle(msg):
                 response = add_user(username, password, days, user_info="A", chat_id=chat_id)
                 bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
-                bot.sendMessage(chat_id, "😳 Oh Oooh...! Something went wrong Try checking the /help section.",
+                bot.sendMessage(chat_id, f"🤡 {username} seems to be a command.\n✌️Try Checking /help",
                                 reply_markup=keyboard)
             finally:
                 # Reset the pending command after processing
