@@ -66,11 +66,6 @@ def enable_bbr(chat_id):
     except subprocess.CalledProcessError as e:
         print(f"Error enabling BBR: {e}")
         bot.sendMessage(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
-
-def reset_states():
-    pending_add_user_command = None
-    pending_remove_user = None
-    pending_add_domain = None
 def get_domain():
     try:
         with open(domain_file_path, 'r') as domain_file:
@@ -366,7 +361,9 @@ def handle(msg):
             bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
 
         if text.lower() == 'restore users' or text == '/bulk_add':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             # Send a message asking the user to send bulk data in the next message
             bot.sendMessage(chat_id, "Please send the bulk user data (open the clients file you got in this chat and copy everything, then send here) in the next message.")
 
@@ -374,7 +371,7 @@ def handle(msg):
             user_states[chat_id] = 'waiting_bulk_data'
 
         elif user_states.get(chat_id) == 'waiting_bulk_data':
-            
+
             # Process the received bulk data
             process_bulk_users(text, chat_id)
 
@@ -382,7 +379,9 @@ def handle(msg):
             user_states[chat_id] = None
 
         elif command.lower() == 'backup users' or command == '/backup':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             # Send the file as a document
             try:
                 lets_backup = backups(chat_id)
@@ -392,7 +391,9 @@ def handle(msg):
                 bot.sendMessage(chat_id, "The users file does not exist.")
 
         elif command.lower() == 'update bot' or command == '/update':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             gamba = (
                 f"The server is updating...\nPlease leave everything to us."
             )
@@ -404,7 +405,9 @@ def handle(msg):
             bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news", reply_markup=keyboard)
 
         elif command.lower() == 'whats new' or command == '/news':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
                                    stdout=subprocess.PIPE)
             news = repos.stdout.decode('utf-8').strip()
@@ -413,11 +416,15 @@ def handle(msg):
 
 
         elif command.lower() == '/nodomain':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             cleanz = nodomain(chat_id)
             bot.sendMessage(chat_id, cleanz, reply_markup=keyboard)
         elif command.lower() == 'power i/o':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             reboot_msg = (
                 f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
             )
@@ -437,7 +444,9 @@ def handle(msg):
             uptime_check = (" Hey, Am back online! \nHow do i serve you, master???")
             bot.sendMessage(chat_id, uptime_check, reply_markup=keyboard)
         elif command.lower() == 'enable bbr':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             try:
                 enable_bbr(chat_id)
             except ValueError:
@@ -445,7 +454,9 @@ def handle(msg):
                                 f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
                                 reply_markup=keyboard)
         elif command.lower() == 'vps info':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
             region = result.stdout.decode('utf-8').strip()
             # Define the path to the bash script
@@ -465,7 +476,9 @@ def handle(msg):
                             f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯\nTo add a domain, press /domain")
 
         elif command.lower() == 'add swap':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             os.system("sudo fallocate -l 1024M /swapfile")
             os.system("sudo chmod 600 /swapfile")
             os.system("sudo mkswap /swapfile")
@@ -477,7 +490,9 @@ def handle(msg):
             bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
 
         elif command.lower() == 'dev team':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             start_message = ("♻️ ZERO ONE LLC 💻. \n"
                              "━━━━━━━━━━━━━━━━ \n"
                              "\n"
@@ -497,7 +512,9 @@ def handle(msg):
             bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
 
         elif command.lower() == 'help' or command == '/help':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             help_message = ("⚙️ HOW TO USE BOT:\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━"
                             "\n"
@@ -593,12 +610,16 @@ def handle(msg):
 
 
         elif command.lower() == 'list users' or command == '/users':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             response = list_users(chat_id)
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
         elif command.lower() == 'clean expired' or command == '/clean':
-            reset_states()
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
             cleans = cleaner(chat_id)
             bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
 
