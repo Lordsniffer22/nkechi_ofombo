@@ -101,7 +101,7 @@ def add_user(username, password, days, user_info, chat_id):
              '-p', passs, '-c', f'{user_info},{password}', username], check=True)
 
         # Get server IP address or saved domain
-        server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
+        server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip().split()[0]
 
         # Send success message with details
         success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
@@ -473,10 +473,11 @@ def handle(msg):
 
             # Remove the '[0m' substrings from the output
             clean_output = output.replace('[0m', '')
+            serv_ip = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip().split()[0]
 
             # Send the message with the cleaned output
             bot.sendMessage(chat_id,
-                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯\nTo add a domain, press /domain")
+                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\nHost IP: {serv_ip}\n  ─────────────\n   LOCATION: {region}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
 
         elif command.lower() == 'add swap':
             pending_add_user_command = None
