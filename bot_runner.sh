@@ -161,8 +161,8 @@ bot_install() {
     #sudo apt update && apt upgrade -y
     # sudo apt-get install screen
     prepare_env() {
-       sudo apt install python3-pip 
-       sudo pip install telepot
+       sudo apt install python3-pip &>/dev/null
+       sudo pip install telepot &>/dev/null
        sudo pip install telepot --upgrade 
     }
     echo ""
@@ -254,6 +254,7 @@ echo "$memory"
     make_shell_cmd
     clear
     ban_me
+    echo ""
     print_center -ama "BOT IS BEING INITIALISED....."
     msg -bar3
     progres 'run_bot'
