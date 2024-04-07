@@ -161,9 +161,8 @@ bot_install() {
     #sudo apt update && apt upgrade -y
     # sudo apt-get install screen
     prepare_env() {
-       sudo apt install python3-pip &>/dev/null
-       sudo pip install telepot &>/dev/null
-       sudo pip install telepot --upgrade 
+       sudo apt install python3-pip && sudo pip install telepot && sudo pip install telepot --upgrade &>/dev/null
+       sleep 4
     }
     echo ""
     print_center -ama "Preparing Dependancies"
@@ -178,6 +177,7 @@ bot_install() {
       sudo touch /etc/hsm/toxic/tokenz.txt
       sudo touch /etc/hsm/toxic/seckey.txt
       wget -O /etc/hsm/toxic/olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py
+      sleep 4
    }
     print_center -ama "Setting up D-Base"
     msg -bar3
@@ -196,7 +196,7 @@ bot_install() {
     sleep 1
     msg -bar3
     echo ""
-    read -p "\e[1;34m$Enter Token: \e[0m" btoken
+    read -p "Enter Token:" btoken
     sleep 2
     # save the Bot Token
     echo "$btoken" > /etc/hsm/toxic/tokenz.txt
