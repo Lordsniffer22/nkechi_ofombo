@@ -15,6 +15,34 @@ print_pink() {
 print_viola() {
     echo -e "\e[1;35m$1\e[0m"
 }
+progres() {
+comando[0]="$1"
+comando[1]="$2"
+ (
+[[ -e $HOME/fim ]] && rm $HOME/fim
+${comando[0]} -y > /dev/null 2>&1
+${comando[1]} -y > /dev/null 2>&1
+touch $HOME/fim
+ ) > /dev/null 2>&1 &
+ tput civis
+echo -ne "  \033[1;33mWAIT \033[1;37m- \033[1;33m["
+while true; do
+   for((i=0; i<18; i++)); do
+   echo -ne "\033[1;31m#"
+   sleep 0.1s
+   done
+   [[ -e $HOME/fim ]] && rm $HOME/fim && break
+   echo -e "\033[1;33m]"
+   sleep 1s
+   tput cuu1
+   tput dl1
+   echo -ne "  \033[1;33mWAIT \033[1;37m- \033[1;33m["
+done
+echo -e "\033[1;33m]\033[1;37m -\033[1;32m OK !\033[1;37m"
+tput cnorm
+}
+
+#NEGLECTED FUNCTION.
 see_key() {
     ban_me
     msg -bar
@@ -47,32 +75,31 @@ press_back() {
  esac
 }
 
-restart_bot() {
-    #Run the bot
-    ban_me
-    print_center -ama "RESTARTING THE BOT".....
-    sleep 2
+restart_bot1() {
     systemctl daemon-reload 
     systemctl restart sshbt 
+}
+restart_bot() {
+      #Run the bot
+    ban_me
+    sleep 1
+    print_center -ama "Restarting the Bot."
+    progres 'restart_bot1'
     echo ""
     print_pink "Bot has been restarted successfully"
     sleep 2
     bot_menu
 
 }
+
 run_bot() {
     #Run the bot
-    ban_me
-    print_center -ama "BOT IS BEING INITIALISED....."
-    sleep 3
     chmod 640 /etc/systemd/system/sshbt.service
     systemctl daemon-reload 
     systemctl enable sshbt 
     systemctl start sshbt
-    print_pink "Cheers! Your bot is now running."
     echo ""
     sleep 2
-    sudo bot
 
 }
 
@@ -132,26 +159,27 @@ bot_install() {
     sudo apt install python3-pip &>/dev/null
     sudo pip install telepot &>/dev/null
     sudo pip install telepot --upgrade &>/dev/null
-    sudo touch tokenz.txt
-    sudo touch seckey.txt
+    
    # Download teslbot from git
     teslbot_fetch() {
-      wget -O olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py &&
-      sudo mkdir -p /etc/hsm/toxic/ &&
+      sudo mkdir -p /etc/hsm/toxic/
       sudo rm -f /etc/hsm/toxic/olwa.py
-      sudo mv olwa.py /etc/hsm/toxic/
+      sudo touch /etc/hsm/toxic/tokenz.txt
+      sudo touch /etc/hsm/toxic/seckey.txt
+      wget -O /etc/hsm/toxic/olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py
    }
+    print_center -ama "Setting up Bot structure"
+    progres 'teslbot_fetch'
 
-    teslbot_fetch &>/dev/null
-    sudo mv tokenz.txt /etc/hsm/toxic/
     #creste file command
     sudo rm -f /usr/bin/bot
     wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
     chmod +x /usr/bin/bot
 
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     clear
     ban_me
-    echo ""q
+    echo ""
     print_center -ama "BOT TOKEN REQUIRED"
     sleep 2
     msg -bar3
@@ -165,43 +193,39 @@ bot_install() {
     # save the Bot Token
     echo "$btoken" > /etc/hsm/toxic/tokenz.txt
 
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     # Function to generate a random 12-character key
-    generate_key() {
-      tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 12
-    }
+   # generate_key() {
+   #   tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 12
+  #  }
 
    # generate the key
-    secretk=$(generate_key)
+   # secretk=$(generate_key)
 
    # Store the new key in seckey.txt
-    echo "$secretk" > seckey.txt
-    sudo mv -f seckey.txt /etc/hsm/toxic/
+   # echo "$secretk" > seckey.txt
+   # sudo mv -f seckey.txt /etc/hsm/toxic/
 
    # Display a message
-    ban_me
-    msg -bar
-    print_center -ama "SERVER KEY Manager"
-    msg -bar0
-    echo ""
+  #  ban_me
+ #   msg -bar
+  #  print_center -ama "SERVER KEY Manager"
+  #  msg -bar0
+  #  echo ""
     
   # print options menu
-    print_center -ama "${a12:-BOT SECRET KEY}"
-    msg -bar3
-    gamba="Bot secret:"
-    echo ""
-    while read -r line; do
-      echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
-      echo ""
-      print_blu "You can use it to verify your bot ownership on Telegram."
-      print_center -ama " Made By TeslaSSH, t.me/teslassh"
-      sleep 5
-    done < /etc/hsm/toxic/seckey.txt
-    # Search and remove raw files
-    find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
-      do
-        rm -f "$file"
-      done
+  #  print_center -ama "${a12:-BOT SECRET KEY}"
+   # msg -bar3
+   # gamba="Bot secret:"
+   # echo ""
+   # while read -r line; do
+    #  echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
+    #  echo ""
+     # print_blu "You can use it to verify your bot ownership on Telegram."
+   #   print_center -ama " Made By TeslaSSH, t.me/teslassh"
+   #   sleep 5
+    #done < /etc/hsm/toxic/seckey.txt
     # make Ram checker
 
     make_Ram_cmd() {
@@ -252,22 +276,16 @@ echo "$memory"
     # Activate the service
     make_Ram_cmd
     make_shell_cmd
-    run_bot
+    print_center -ama "BOT IS BEING INITIALISED....."
+    progres 'run_bot'
+    print_pink "Cheers! Your bot is now running."
+    # Search and remove raw files
+    find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
+      do
+        rm -f "$file"
+      done
+    sudo bot
 }
-#bot_installer() {
-      # Check if mana.sh exists
-    #if [ -f ~/udp/mana.sh ]; then
-    #  bot_install
-   # else
-   #   print_viola "You did not install teslassh udp script on your server."
-     # echo ""
-    #  print_yellow "Go visit github to install The Script"
-     # sleep 4
-     # exit
-    #fi
-
-#}
-
 
 ban_me() {
   clear
@@ -287,18 +305,19 @@ os_check() {
       elif [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "23.10" ]]; then
           bot_install
       else
-          print_pink "THE BOT IS MEANT TO RUN ON UBUNTU 22.04 AND 23.10"
+          print_pink "THE BOT IS MEANT TO RUN ON UBUNTU 22.04 AND 23.10 or latest"
           exit 1
       fi
   fi 
-}
+} 
 install_udp_first() {
-    print_center 'After the server reboots, Login amd type "bot"'
+    print_center 'Bot installation will begin after this installation process'
     sleep 4
     rm -f install.sh
     wget --no-cache  "https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/install.sh" -O install.sh
     chmod +x install.sh 
     ./install.sh
+    bot_install
 }
 
 menu_real() {
