@@ -1,385 +1,656 @@
-#!/bin/bash
-#Prepare the environment
-print_blue() {
-    echo -e "\e[1;34m$1\e[0m"
-}
-print_blu() {
-    echo -e "\e[34m$1\e[0m"
-}
-print_yellow() {
-    echo -e "\e[1;33m$1\e[0m"
-}
-print_pink() {
-    echo -e "\e[1;95m$1\e[0m"
-}
-print_viola() {
-    echo -e "\e[1;35m$1\e[0m"
-}
-progres() {
-comando[0]="$1"
-comando[1]="$2"
- (
-[[ -e $HOME/fim ]] && rm $HOME/fim
-${comando[0]} -y > /dev/null 2>&1
-${comando[1]} -y > /dev/null 2>&1
-touch $HOME/fim
- ) > /dev/null 2>&1 &
- tput civis
-echo -ne "  \033[1;33mWAIT \033[1;37m- \033[1;33m["
-while true; do
-   for((i=0; i<18; i++)); do
-   echo -ne "\033[1;31m#"
-   sleep 0.1s
-   done
-   [[ -e $HOME/fim ]] && rm $HOME/fim && break
-   echo -e "\033[1;33m]"
-   sleep 1s
-   tput cuu1
-   tput dl1
-   echo -ne "  \033[1;33mWAIT \033[1;37m- \033[1;33m["
-done
-echo -e "\033[1;33m]\033[1;37m -\033[1;32m OK !\033[1;37m"
-tput cnorm
-}
+# Made with love by Teslassh
+# Stealing this source code is illegal as always.
+# #You are allowed to use the tool in any way you wish
+import telepot
+import subprocess
+import os
+from pytube import YouTube
+# import json
+from datetime import datetime, timedelta
+import time
+from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
-#NEGLECTED FUNCTION.
-see_key() {
-    ban_me
-    msg -bar
-    print_center -ama "SERVER KEY Manager"
-    msg -bar0
-    echo ""
-  # print options menu
-    print_center -ama "${a12:-BOT SECRET KEY}"
-    msg -bar3
-    gamba="Bot secret:"
-    echo ""
-    while read -r line; do
-      echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
-      echo ""
-      print_blu "You can use it to verify your bot ownership on Telegram."
-      print_center -ama " Made By TeslaSSH, t.me/teslassh"
-      sleep 4
+with open('tokenz.txt', 'r') as file:
+    bot_token = file.read().strip()
+bot = telepot.Bot(bot_token)
+# File path to store the secret key
+# seckey_file_path = 'seckey.txt'
+domain_file_path = 'pydomain.txt'
 
-   done < /etc/hsm/toxic/seckey.txt
-   press_back
-}
-press_back() {
- echo ""
- read -p "Press Enter to go back" confm
- sleep 1
- case $confm in
-   [Yy]* ) bot_menu ;;
-   [Nn]* ) bot_menu ;;
-   * ) bot_menu ;;
- esac
-}
 
-restart_bot1() {
-    systemctl daemon-reload 
-    systemctl restart sshbt
-    sleep 3 
-}
-restart_bot() {
-      #Run the bot
-    ban_me
-    sleep 1
-    print_center -ama "Restarting the Bot."
-    progres 'restart_bot1'
-    echo ""
-    print_pink "Bot has been restarted successfully"
-    sleep 4
-    bot_menu
+def save_domain(domain):
+    with open(domain_file_path, 'w') as domain_file:
+        domain_file.write(domain)
 
-}
-
-run_bot() {
-    #Run the bot
-    chmod 640 /etc/systemd/system/sshbt.service
-    systemctl daemon-reload 
-    systemctl enable sshbt 
-    systemctl start sshbt
-    echo ""
-    sleep 4
-
-}
-
-cease_bot() {
-    systemctl stop sshbt
-    sleep 4
-}
-stop_bot() {
-  print_center -ama "STOPPING THE BOT..."
-  echo ""
-  progres 'cease_bot'
-  echo ""
-  print_pink "Your Bot has been stopped"
-  bot_menu
-}
-
-ch_token() {
-    # Run the bot
-    ban_me
-    print_center -ama "CHANGE YOUR BOT TOKEN"
-    msg -bar3
-    sleep 1
-    echo ""
-    print_blue "Enter new token"
-    echo ""
-    read -p "NEW TOKEN: " new_token
-    sleep 3
-
-    while IFS= read -r line; do
-        if [ "$line" == "$new_token" ]; then
-            print_yellow "The Bot Token entered already exists"
-            bot_menu
-        fi
-    done < /etc/hsm/toxic/tokenz.txt
-
-    echo "$new_token" > /etc/hsm/toxic/tokenz.txt
-    print_pink "A new Bot token has been Saved!"
-    systemctl restart sshbt
-    bot_menu
-}
-
-bot_removo() {
-  sudo rm -f /etc/hsm/toxic/olwa.py 
-  sudo rm -f /usr/bin/bot
-  sleep 3
-}
-bot_remove() {
-    clear
-    ban_me
-    echo ""
-    print_center -ama "Removing. Please wait...."
-    progres 'bot_removo'
-    msg -bar3
-    echo ""
-    print_pink "Your bot has been Uninstalled Successfully"
-    sudo udp
-}
-bot_install() {
-    cd
-    clear
-    ban_me
-    #sudo apt update && apt upgrade -y
-    # sudo apt-get install screen
-    prepare_env() {
-       sudo apt install python3-pip && sudo pip install telepot && sudo pip install telepot --upgrade &>/dev/null
-       sleep 4
-    }
-    echo ""
-    print_center -ama "Preparing Dependancies"
-    msg -bar3
-    progres 'prepare_env'
-    echo ""
-
-   # Download teslbot from git
-    teslbot_fetch() {
-      sudo mkdir -p /etc/hsm/toxic/
-      sudo rm -f /etc/hsm/toxic/olwa.py
-      sudo touch /etc/hsm/toxic/tokenz.txt
-      sudo touch /etc/hsm/toxic/seckey.txt
-      wget -O /etc/hsm/toxic/welcome.jpg https://raw.githubusercontent.com/TeslaSSH/Redq/main/Dupes/welcome.jpg
-      wget -O /etc/hsm/toxic/olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py
-      sleep 4
-   }
-    print_center -ama "Setting up D-Base"
-    msg -bar3
-    progres 'teslbot_fetch'
-    echo ""
-
-    #creste file command
-    sudo rm -f /usr/bin/bot
-    wget -O /usr/bin/bot 'https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/bot_runner.sh' &>/dev/null
-    chmod +x /usr/bin/bot
-
-#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    clear 
-    ban_me
-    print_center -ama "BOT TOKEN REQUIRED"
-    sleep 1
-    msg -bar3
-    echo ""
-    read -p "Enter Token: " btoken
-    sleep 2
-    # save the Bot Token
-    echo "$btoken" > /etc/hsm/toxic/tokenz.txt
-
-#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    # make Ram checker
-
-    make_Ram_cmd() {
-      echo '#!/bin/bash
-memory=$(neofetch | grep "Memory" | cut -d: -f2 | sed "s/ //g")
-echo "$memory"
-' > /etc/hsm/toxic/ham.sh
-
-      chmod 777 /etc/hsm/toxic/ham.sh
-    }
-    make_shell_cmd() {
-      echo '#!/bin/bash
-      github_file_url="https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py"
-      local_file_path="/etc/hsm/toxic/olwa.py"
-
-       # Download latest file from github without saving it.
-      latest_content=$(wget -O - "$github_file_url" 2>/dev/null)
-      #current loko content
-      current_content=$(cat "$local_file_path")
-       # Compare the two
-      if [ "$current_content" != "$latest_content" ]; then
-         echo "has been Updated successfully!"\
-         rm -f "$local_file_path"
-         wget -O "$local_file_path" "$github_file_url" 2>/dev/null
-         systemctl restart sshbt
-      else
-         echo "is already up-to-date."
-      fi
-      exit' > /etc/hsm/toxic/shell.sh
-      chmod 777 /etc/hsm/toxic/shell.sh
-    }
-
-    # [make service file]
-    echo '[Unit]
-    Description=Made by Teslassh (( ZERO ONE LLC ))
-    After=network.target
-
-    [Service]
-    User=root
-    Type=simple
-    ExecStart=/usr/bin/python3 /etc/hsm/toxic/olwa.py 
-    WorkingDirectory=/etc/hsm/toxic/
-    Restart=always
-
-    [Install]
-    WantedBy=multi-user.target' > /etc/systemd/system/sshbt.service
-
-    # Activate the service
-    make_Ram_cmd
-    make_shell_cmd
-    clear
-    ban_me
-    echo ""
-    print_center -ama "BOT IS BEING INITIALISED....."
-    msg -bar3
-    progres 'run_bot'
-    echo ""
-    print_pink "Cheers! Your bot is now running."
-    # Search and remove raw files
-    find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
-      do
-        rm -f "$file"
-      done
-    sudo bot
-}
-
-ban_me() {
-  clear
-  print_pink " _____ _____ ____  _        _      ____ ____  _   _ "
-  print_pink "|_   _| ____/ ___|| |      / \    / ___/ ___|| | | |"
-  print_blue "  | | |  _| \___ \| |     / _ \   \___ \___ \| |_| |"
-  print_yellow "  | | | |___ ___) | |___ / ___ \   ___) |__) |  _  |"
-  print_pink "  |_| |_____|____/|_____/_/   \_\ |____/____/|_| |_|" 
-  echo ""
-}
-#check system
-os_check() {
-  if [ -f /etc/os-release ]; then
-      . /etc/os-release
-      if [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "22.04" ]]; then
-          bot_install
-      elif [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "23.10" ]]; then
-          bot_install
-      else
-          print_pink "THE BOT IS MEANT TO RUN ON UBUNTU 22.04 AND 23.10 or latest"
-          exit 1
-      fi
-  fi 
-} 
-install_udp_first() {
-    print_center 'Bot installation will begin after this installation process'
-    sleep 4
-    rm -f install.sh
-    wget --no-cache  "https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/install.sh" -O install.sh
-    chmod +x install.sh 
-    ./install.sh
-    bot_install
-}
-
-menu_real() {
-    ban_me
-    msg -bar
-    print_center -ama "BOT MANAGER By TeslaSSH"
-    msg -bar0
-    echo ""
-    # print options menu
-    print_center -ama "${a12:-CHOOSE AN OPTION}"
-    msg -bar3
-    echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a6:-RESTART BOT ☢️}")"
-    echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-Install UDP BOT }")"
-    echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-SECRET KEY 🔑}")"
-    echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -ama "${a6:-STOP BOT ⛔}")"
-    echo " $(msg -verd "[5]") $(msg -verm2 '>') $(msg -ama "${a6:-CHANGE BOT TOKEN 🔁}")"
-    echo " $(msg -verd "[6]") $(msg -verm2 '>') $(msg -ama "${a6:-Uninstall Bot}")"
-    exit2home
-
-    # prompt user for option selection
-    read -p " ⇢  Enter your selection: " option
-
-    # handle option selection
-    case $option in
-    1)
-      restart_bot
-      ;;
-    2)
-      os_check #checks os and installs bot
-      ;;
-    3)
-      see_key
-      ;;
-    4)
-      stop_bot
-      ;;
-    5)
-      ch_token
-      ;;
-    6)
-      bot_remove
-      ;;
-    0)
-      exit
-      ;;
-    esac
-}
-
-bot_menu() {
-  source <(curl -sSL 'https://raw.githubusercontent.com/TeslaSSH/Tesla_UDP_custom-/main/module/module')
-  report=$(systemctl is-active udp-custom)
-  if [ "$report" == "active" ] || [ -f /etc/hsm/toxic/olwa.py ]; then
-      menu_real
-  else
-      print_pink "IT APPEARS THAT UDP CUSTOM IS NOT INSTALLED YET ON THIS VPS"
-      echo ""
-      echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -ama "${a8:-Install UDP CUSTOM First✳️}")"
-      echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-Continue Anyway}")"
-      echo " $(msg -verd "[0]") $(msg -verm2 '>') $(msg -ama "${a8:-Exit installer}")"
-      echo ""
-      read -p " ⇢  Enter your selection: " ansa
-      case $ansa in
-      1)
-        install_udp_first
-        ;;
-      2)
-        bot_install
-        ;;
-      0)
-        exit
-        ;;
-      esac
-   fi   
-}
-
-bot_menu
+def nodomain(chat_id):
+    try:
+        with open('pydomain.txt', 'w') as file:
+            file.write("")
+            return "Domain has been removed."
+    except Exception as e:
+        return f"Failed to remove the domain"
+def currentdomain(chat_id):
+    try:
+        with open('pydomain.txt', 'r') as info:
+            domain = info.read().strip()
+            if domain:
+                return "Current domain is: " + domain
+            else:
+                return "This server has no domain yet"
+    except Exception as e:
+        return f"Failed to retrieve the current domain"
 
 
 
+def check_bbr_status(chat_id):
+    try:
+        status = subprocess.check_output(['sysctl', 'net.ipv4.tcp_congestion_control']).decode('utf-8')
+        return 'bbr' in status
+    except subprocess.CalledProcessError as e:
+        print(f"Error checking BBR status: {e}")
+        return False
+
+
+def enable_bbr(chat_id):
+    try:
+        if not check_bbr_status(chat_id):
+            subprocess.run(['modprobe', 'tcp_bbr'])
+            with open('/etc/sysctl.conf', 'r') as f:
+                if 'net.ipv4.tcp_congestion_control=bbr' not in f.read():
+                    with open('/etc/sysctl.conf', 'a') as f:
+                        f.write('net.core.default_qdisc=fq \nnet.ipv4.tcp_congestion_control=bbr\n')
+            subprocess.run(['sysctl', '-p'])
+            bot.sendMessage(chat_id, 'BBR has been enabled successfully! Enjoy the better connections')
+        else:
+            bot.sendMessage(chat_id, 'BBR is already running. No need to activate it again.')
+    except subprocess.CalledProcessError as e:
+        print(f"Error enabling BBR: {e}")
+        bot.sendMessage(chat_id, 'Failed to enable BBR. Contact the bot administrator.')
+def get_domain():
+    try:
+        with open(domain_file_path, 'r') as domain_file:
+            return domain_file.read().strip()
+    except FileNotFoundError:
+        return None
+
+
+def add_user(username, password, days, user_info, chat_id):
+    # Check if the user is verified
+    # if not is_verified(chat_id):
+    #    return "🔐 You need to verify yourself first by providing the secret key using /verify command."
+
+    current_date = datetime.now()
+    expiration_date = current_date + timedelta(days=int(days))
+    expiration_date_str = expiration_date.strftime('%Y-%m-%d')
+
+    # Check if the user already exists
+    existing_users = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+    if f'{username}:' in existing_users and user_info.lower() not in existing_users.lower():
+        return f"{username} already exists with a different info."
+
+    # Generate hashed password
+    osl_version = subprocess.check_output(['openssl', 'version']).decode('utf-8')
+    osl_version = osl_version.split()[1][:5]
+    password_option = '-6' if osl_version == '1.1.1' else '-1'
+    passs = subprocess.check_output(['openssl', 'passwd', password_option, password]).decode('utf-8').strip()
+
+    # Create user
+    try:
+        subprocess.run(
+            ['sudo', 'useradd', '-M', '-s', '/bin/false', '-e', expiration_date_str, '-K', f'PASS_MAX_DAYS={days}',
+             '-p', passs, '-c', f'{user_info},{password}', username], check=True)
+
+        # Get server IP address or saved domain
+        server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip().split()[0]
+
+        # Send success message with details
+        success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
+        return success_message
+    except subprocess.CalledProcessError as e:
+        return f"Failed to add user {username} because He already exists."
+
+
+def remove_user(username, chat_id):
+    try:
+        subprocess.run(['sudo', 'userdel', '--force', username], check=True)
+        return f"{username} Has been removed successfully!"
+    except subprocess.CalledProcessError as e:
+        return f"🤡 {username} seems to be a command or that user does not exist.\n✌️Try a different spelling"
+
+
+def restart_udp_daemon(chat_id):
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
+        return f"\n Who else? 😳"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to restart daemons."
+
+
+def reboot_server(chat_id):
+    try:
+        time.sleep(4)
+        subprocess.run(['reboot'], check=True)
+    except subprocess.CalledProcessError as e:
+        return f"Failed to reboot server. Error: {e}"
+
+
+# Function to check if a message is a YouTube link
+def is_youtube_link(text):
+    return text.startswith('https://www.youtube.com/') or text.startswith('https://youtu.be/')
+
+
+# Function to download a YouTube video and convert it to MP3
+def download_and_convert_to_mp3(video_url):
+    yt = YouTube(video_url)
+    video_title = yt.title
+    stream = yt.streams.filter(only_audio=True).first()
+    if stream:
+        file_path = stream.download()
+        mp3_file = f"{video_title}.mp3"
+        os.rename(file_path, mp3_file)
+        return mp3_file
+    else:
+        return None
+
+
+# Function to send an MP3 file to the user with a caption
+def send_mp3_file(chat_id, video_url):
+    mp3_file = download_and_convert_to_mp3(video_url)
+    if mp3_file:
+        # Add a caption to the audio file
+        caption = "Hey your music is here.\n\n➤Bot: @tubyDoo_Bot \n│\n╰┈➤Join @udpcustom"
+        with open(mp3_file, 'rb') as f:
+            bot.sendAudio(chat_id, f, caption=caption)
+        os.remove(mp3_file)  # Remove the MP3 file after sending
+
+
+def list_users(chat_id):
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
+
+        users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
+
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days > 0:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  {remaining_days} Days\n│──────────────────────────│"
+                users_details.append(user_details)
+            else:
+                user_details = f"│ {username}  ⇿     {password}  ⇿  🛑Expired\n│──────────────────────────│"
+                users_details.append(user_details)
+
+        users_message = "\n".join(users_details)
+        organzn = '│      SCRIPTX UDP MANAGER   @scriptx13  │ '
+        return f"╭──────────────────────────╮\n{organzn} \n╰──────────────────────────╯\n╭──👩🏻‍🦰USERS───PASS──🕗EXPIRY───╮\n{users_message}\n╰──────────────────────────╯"
+    except subprocess.CalledProcessError as e:
+        return f"Failed to list users."
+
+def cleaner(chat_id):
+
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
+
+        #users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
+
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days <= 0:
+               subprocess.run(['sudo', 'userdel', username])
+        return f"I just Wiped the expired Sh*t. Sorry for them😂 "
+    except subprocess.CalledProcessError as e:
+        return f"Hey, i got an arror while wiping."
+def backups(chat_id):
+    try:
+        users_info = subprocess.check_output(['cat', '/etc/passwd']).decode('utf-8')
+        users_list = [line.split(':') for line in users_info.split('\n') if line]
+
+        users_details = []
+
+        for user_info in users_list:
+            username = user_info[0]
+            gecos_field = user_info[4]
+
+            # Extract password part after the comma
+            password = gecos_field.split(',')[1] if ',' in gecos_field else ''
+
+            # Get the expiration date
+            expiration_date_str = \
+                subprocess.check_output(['sudo', 'chage', '-l', username]).decode('utf-8').split('\n')[1].split(':')[
+                    1].strip()
+
+            # Skip users with expiration set to "never"
+            if expiration_date_str.lower() == 'never':
+                continue
+
+            # Convert expiration date to a datetime object
+            expiration_date = datetime.strptime(expiration_date_str, '%b %d, %Y')
+
+            # Calculate remaining days
+            remaining_days = (expiration_date - datetime.now()).days
+
+            # Exclude users with expiry set to "never"
+            if remaining_days > 0:
+                user_details = f"{username} {password} {remaining_days}"
+                users_details.append(user_details)
+
+        users_message = "\n".join(users_details)
+        with open('clients.txt', 'w') as file:
+            file.write(users_message)
+        with open('clients.txt', 'rb') as userz:
+            bot.sendDocument(chat_id, userz)
+    except FileNotFoundError:
+        bot.sendMessage(chat_id, "The users file does not exist.")
+
+def process_bulk_users(bulk_data, chat_id):
+    # Split the bulk data into individual lines
+    lines = bulk_data.split('\n')
+
+    for line in lines:
+        try:
+            username, password, days = line.split()
+            response = add_user(username, password, days, user_info="R", chat_id=chat_id)
+            bot.sendMessage(chat_id, response)
+        except ValueError:
+            bot.sendMessage(chat_id, f"I was not able to add:  {line}\ndue to errors it contain")
+
+
+pending_add_user_command = None
+pending_remove_user = None
+pending_add_domain = None
+# Initialize a dictionary to keep track of user states
+user_states = {}
+
+
+
+def handle(msg):
+    global pending_add_user_command
+    global pending_remove_user
+    global pending_add_domain
+    content_type, chat_type, chat_id = telepot.glance(msg)
+
+    # Define custom keyboard buttons with smaller size in a single row
+    keyboard = ReplyKeyboardMarkup(keyboard=[
+        [KeyboardButton(text='Add User', resize_keyboard=True),
+         KeyboardButton(text='Remove', resize_keyboard=True),
+         KeyboardButton(text='List Users', resize_keyboard=True)],
+
+        [KeyboardButton(text='Enable BBR', resize_keyboard=True),
+         KeyboardButton(text='Add SWAP', resize_keyboard=True),
+         KeyboardButton(text='Clean Expired', resize_keyboard=True)],
+
+        [KeyboardButton(text='Update Bot', resize_keyboard=True),
+         KeyboardButton(text='VPS INFO', resize_keyboard=True),
+         KeyboardButton(text='Power I/O', resize_keyboard=True)],
+
+        [KeyboardButton(text='Backup Users', resize_keyboard=True),
+         KeyboardButton(text='Restore Users', resize_keyboard=True),
+         KeyboardButton(text='Add Domain', resize_keyboard=True)],
+
+        [KeyboardButton(text='Whats New', resize_keyboard=True),
+         KeyboardButton(text='Help', resize_keyboard=True),
+         KeyboardButton(text='Dev Team', resize_keyboard=True)],
+
+
+    ], resize_keyboard=True)
+    if content_type == 'text':
+        text = msg['text'].strip()
+        # Ensure user_states is initialized
+        if chat_id not in user_states:
+            user_states[chat_id] = None
+
+        command = msg['text']
+        query = msg['text']
+        if is_youtube_link(query):
+            processing = "Processing... \n Hang on tight🤙"
+            processing_message = bot.sendMessage(chat_id, processing)
+            send_mp3_file(chat_id, query)
+            bot.deleteMessage((chat_id, msg['message_id']))
+            bot.deleteMessage((chat_id, processing_message['message_id']))
+
+        if command.lower() == 'start' or command == '/start':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            start_message = ("♻️ Welcome to Tesla SSH VPS Manager👌. \n\n"
+                             "You can use this bot to Manage users on your server and as well perform other server management tasks without leaving Telegram.\n\n"
+                             "🔰 Made with spirit. \n"
+                             "========================= \n"
+                             "By: @teslassh \n"
+                             "Mastered by: @hackwell101 \n"
+                             "Join @udpcustom")
+            bot.sendPhoto(chat_id, photo=open('welcome.jpg', 'rb'), caption=start_message, reply_markup=keyboard)
+
+        elif command.lower() == 'update bot' or command == '/update':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+
+            gamba = (
+                f"The server is updating...\nPlease leave everything to us."
+            )
+            kati_gamba = bot.sendMessage(chat_id, gamba, reply_markup=keyboard)
+            updet = subprocess.run(['./shell.sh'], stdout=subprocess.PIPE)
+            updater = updet.stdout.decode('utf-8').strip()
+            time.sleep(3)
+            bot.deleteMessage((chat_id, kati_gamba['message_id']))
+            bot.sendMessage(chat_id, f"Your bot {updater}. \n\nTo see What's New, \nClick on 👉: /news", reply_markup=keyboard)
+
+        elif command.lower() == 'whats new' or command == '/news':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            repos = subprocess.run(['wget', '-qO-', 'https://raw.githubusercontent.com/TeslaSSH/Redq/main/news.txt'],
+                                   stdout=subprocess.PIPE)
+            news = repos.stdout.decode('utf-8').strip()
+            bot.sendMessage(chat_id, news, reply_markup=keyboard)
+
+
+        elif command.lower() == 'list users':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            try:
+                response = list_users(chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "I failed")
+
+
+        elif command.lower() == 'clean expired':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            cleans = cleaner(chat_id)
+            bot.sendMessage(chat_id, cleans, reply_markup=keyboard)
+
+
+
+        elif command.lower() == '/nodomain':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            cleanz = nodomain(chat_id)
+            bot.sendMessage(chat_id, cleanz, reply_markup=keyboard)
+        elif command.lower() == 'power i/o':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            reboot_msg = (
+                f"😳You pressed the Power ON/OFF switch. \nCurrently running services will stop running if you reboot. \nThis will disturb your udp clients for about 60 seconds but it will be good for them afterwards. \nTo continue rebooting the server, send me this command: /reboot "
+            )
+            bot.sendMessage(chat_id, reboot_msg, reply_markup=keyboard)
+        elif command.lower() == '/reboot':
+            try:
+                first_inform = (
+                    "The server is rebooting in a few seconds. In about 20s, Press /upcheck to know if its back again")
+                bot.sendMessage(chat_id, first_inform, reply_markup=keyboard)
+                response_reboot = reboot_server(chat_id)
+                bot.sendMessage(chat_id, response_reboot, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id,
+                                f"😳 Oh Oooh...! VPS Reboot command didn't work. You must install bot as a sudoer",
+                                reply_markup=keyboard)
+        elif command.lower() == '/upcheck':
+            uptime_check = (" Hey, Am back online! \nHow do i serve you, master???")
+            bot.sendMessage(chat_id, uptime_check, reply_markup=keyboard)
+        elif command.lower() == 'enable bbr':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            try:
+                enable_bbr(chat_id)
+            except ValueError:
+                bot.sendMessage(chat_id,
+                                f"😳 Oh Oooh...! BBR was not enabled. Contact my Master @teslassh",
+                                reply_markup=keyboard)
+        elif command.lower() == 'vps info':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            result = subprocess.run(['wget', '-qO-', 'ipinfo.io/region'], stdout=subprocess.PIPE)
+            region = result.stdout.decode('utf-8').strip()
+            result0 = subprocess.run(['wget', '-qO-', 'ipinfo.io/country'], stdout=subprocess.PIPE)
+            country = result0.stdout.decode('utf-8').strip()
+            # Define the path to the bash script
+            bash_script_path = "/etc/hsm/toxic/ham.sh"
+
+            # Execute the bash script and capture stdout
+            result1 = subprocess.run([bash_script_path], stdout=subprocess.PIPE)
+
+            # Decode the stdout bytes to a string
+            output = result1.stdout.decode('utf-8').strip()
+
+            # Remove the '[0m' substrings from the output
+            clean_output = output.replace('[0m', '')
+            serv_ip = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip().split()[0]
+
+            # Send the message with the cleaned output
+            bot.sendMessage(chat_id,
+                            f"╭──── ⋅ ⋅ ── ── ⋅ ⋅── ──╮\n   Host IP: {serv_ip}\n  ─────────────\n   LOCATION: {region},{country}\n  ─────────────\n   RAM: {clean_output}\n╰──── ⋅ ⋅ ── ── ⋅ ⋅ ────╯")
+
+        elif command.lower() == 'add swap':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            os.system("sudo fallocate -l 1024M /swapfile")
+            os.system("sudo chmod 600 /swapfile")
+            os.system("sudo mkswap /swapfile")
+            os.system("sudo swapon /swapfile")
+            with open('/etc/fstab', 'a') as f:
+                f.write('/swapfile none swap sw 0 0\n')
+
+            os.system('sysctl vm.swappiness=10')
+            bot.sendMessage(chat_id, f"You have added 1GB Virtual RAM. Its a swap memory my Boss!")
+
+        elif command.lower() == 'dev team':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            start_message = ("♻️ ZERO ONE LLC 💻. \n"
+                             "━━━━━━━━━━━━━━━━ \n"
+                             "\n"
+                             "Hello, thanks for choosing our cloud projects!\n"
+                             "\n"
+                             "This Tool was an imagination from @hackwell101, our Team member and founder of @udpcustom\n\n"
+                             "Super thanks to the developers:\n"
+                             "=============================== \n"
+                             "Bot Logic: Ted ( @hackwell101 ) \n"
+                             "Program Lang: Tesla SSH ( @teslassh ) \n"
+                             "To list users, Press /users \n"
+                             "\n"
+                             "💖Made with spirit. \n"
+                             "Join @udpcustom")
+
+            # Send the start message with the custom keyboard
+            bot.sendMessage(chat_id, start_message, reply_markup=keyboard)
+
+        elif command.lower() == 'help' or command == '/help':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            help_message = ("⚙️ HOW TO USE BOT:\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━━━━"
+                            "\n"
+                            "- 📌 To Add a new user, \n"
+                            'Cick on "Add User" Button, and then send me the user details to be added. in the format below: \n [username] [password] [days]\n'
+                            "\n"
+                            "Example: \n Nicholas passwad 30\n"
+                            "...........................................................\n"
+
+                            "- 📵 To Remove a user, \n"
+                            "Send /remove [username]\n"
+                            "\n"
+                            "Example: \n /remove Nicholas\n"
+                            "...........................................................\n"
+                            "- 💰 To List all users, \n"
+                            'Click on "List Users" button\n'
+                            "\n"
+                            "-🌐 To add a domain or sub-domain, \n"
+                            "send /domain [ your domain ] \n\n Example: /domain sub.domain.com. \n\n"
+                            "🆘 if you are facing issues with the bot,\n"
+                            "Contact: @teslassh"
+                            )
+            bot.sendMessage(chat_id, help_message, reply_markup=keyboard)
+
+        elif command.lower() == 'backup users' or command == '/backup':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            # Send the file as a document
+            try:
+                lets_backup = backups(chat_id)
+                bot.sendMessage(chat_id, lets_backup, reply_markup=keyboard)
+                os.system('rm clients.txt')
+            except FileNotFoundError:
+                bot.sendMessage(chat_id, "The users file does not exist.")
+        elif text.lower() == 'restore users' or text == '/bulk_add':
+            pending_add_user_command = None
+            pending_remove_user = None
+            pending_add_domain = None
+            # Send a message asking the user to send bulk data in the next message
+            bot.sendMessage(chat_id, "Please send the bulk user data (open the clients file you got in this chat and copy everything, then send here) in the next message.")
+
+            # Update user state to expect bulk data in the next message
+            user_states[chat_id] = 'waiting_bulk_data'
+
+        elif user_states.get(chat_id) == 'waiting_bulk_data':
+
+            # Process the received bulk data
+            process_bulk_users(text, chat_id)
+
+            # Reset user state
+            user_states[chat_id] = None
+
+        elif command.lower() == 'remove':
+            pending_add_user_command = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            # Set the pending remove user command
+            pending_remove_user = command
+            bot.sendMessage(chat_id, "It's time to remove a user. Which user?.")
+
+        elif pending_remove_user:
+            # Process the pending "Remove User" command
+            try:
+                # Split the pending command and current message to extract username
+                _, username = (pending_remove_user + ' ' + command).split(maxsplit=1)
+
+                # Assume the remove_user function is already defined.
+                response = remove_user(username.strip(), chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "😳 Oh Oooh...! Looks like i got some errors in removing. contact @teslassh for assistance")
+            finally:
+                # Reset the pending command after processing
+                pending_remove_user = None
+
+        if command.lower() == 'add user':
+            pending_remove_user = None
+            pending_add_domain = None
+            user_states[chat_id] = None
+            pending_add_user_command = command
+            bot.sendMessage(chat_id,
+                            "Gat it!👌 Now Send me the user details to add in the format [username] [password] [days]. \n\n Example: Nicholas passwad 30")
+
+        elif pending_add_user_command:
+            # Process the pending "Add User" command
+            try:
+                _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
+                response = add_user(username, password, days, user_info="A", chat_id=chat_id)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+            except ValueError:
+                bot.sendMessage(chat_id, "You instead sent a command. Try again!", reply_markup=keyboard)
+            finally:
+                # Reset the pending command after processing
+                pending_add_user_command = None
+        if command.lower() == 'add domain':
+            pending_add_user_command = None
+            pending_remove_user = None
+            user_states[chat_id] = None
+            # Set the pending add domain command
+            pending_add_domain = command
+            check_current = currentdomain(chat_id)
+            bot.sendMessage(chat_id, check_current, reply_markup=keyboard)
+            time.sleep(2)
+            bot.sendMessage(chat_id, "Send me the new domain. \nExample: example.com or dns.example.com\n\nYou're about to add a domain to your server. Make sure its pointing to your server ip address.")
+
+        elif pending_add_domain:
+            # Process the pending "Add Domain" command
+            try:
+                # Extract the domain from the current message
+                domain = command.strip()
+
+                # Assume the save_domain function is already defined.
+                save_domain(domain)
+                bot.sendMessage(chat_id, f"Domain {domain} has been successfully added.")
+            except Exception as e:
+                bot.sendMessage(chat_id, f"Error: {e}. Please try again or check the /help section.")
+            finally:
+                # Reset the pending command after processing
+                pending_add_domain = None
+
+
+# Set the command
+
+bot.message_loop(handle)
+
+# Keep the program running
+while True:
+    pass
