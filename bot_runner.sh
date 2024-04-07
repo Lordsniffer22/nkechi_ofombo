@@ -87,7 +87,7 @@ restart_bot() {
     progres 'restart_bot1'
     echo ""
     print_pink "Bot has been restarted successfully"
-    sleep 2
+    sleep 4
     bot_menu
 
 }
@@ -99,21 +99,23 @@ run_bot() {
     systemctl enable sshbt 
     systemctl start sshbt
     echo ""
-    sleep 2
+    sleep 4
 
 }
 
-stop_bot() {
-    #Run the bot
-    ban_me
-    print_center -ama "STOPPING THE BOT".....
+cease_bot() {
     systemctl stop sshbt
-    sleep 2
-    print_pink "Your Bot has been stopped"
-    sleep 2
-    bot_menu
-
+    sleep 4
 }
+stop_bot() {
+  print_center -ama "STOPPING THE BOT..."
+  echo ""
+  progres 'cease_bot'
+  echo ""
+  print_pink "Your Bot has been stopped"
+  bot_menu
+}
+
 ch_token() {
     # Run the bot
     ban_me
@@ -139,27 +141,36 @@ ch_token() {
     bot_menu
 }
 
+bot_removo() {
+  sudo rm -f /etc/hsm/toxic/olwa.py 
+  sudo rm -f /usr/bin/bot
+  sleep 3
+}
 bot_remove() {
-  ban_me
-  print_center -ama "Removing. Please wait...."
-  sleep 3
-  sudo rm -f /etc/hsm/toxic/olwa.py &>/dev/null
-  sudo rm -f /usr/bin/bot &>/dev/null
-  print_pink "Your bot has been Uninstalled Successfully"
-  sleep 3
-  clear
-  sudo udp
+    print_center -ama "Removing. Please wait...."
+    progres 'bot_removo'
+    msg -bar3
+    echo ""
+    print_pink "Your bot has been Uninstalled Successfully"
+    sudo udp
 }
 bot_install() {
     cd
     clear
+    ban_me
     #sudo apt update && apt upgrade -y
     # sudo apt-get install screen
-    sudo apt-get install jq
-    sudo apt install python3-pip &>/dev/null
-    sudo pip install telepot &>/dev/null
-    sudo pip install telepot --upgrade &>/dev/null
-    
+    prepare_env() {
+       sudo apt install python3-pip 
+       sudo pip install telepot
+       sudo pip install telepot --upgrade 
+    }
+    echo ""
+    print_center -ama "Preparing Dependancies"
+    msg -bar3
+    progres 'prepare_env'
+    echo ""
+
    # Download teslbot from git
     teslbot_fetch() {
       sudo mkdir -p /etc/hsm/toxic/
@@ -168,8 +179,10 @@ bot_install() {
       sudo touch /etc/hsm/toxic/seckey.txt
       wget -O /etc/hsm/toxic/olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py
    }
-    print_center -ama "Setting up Bot structure"
+    print_center -ama "Setting up D-Base"
+    msg -bar3
     progres 'teslbot_fetch'
+    echo ""
 
     #creste file command
     sudo rm -f /usr/bin/bot
@@ -177,55 +190,18 @@ bot_install() {
     chmod +x /usr/bin/bot
 
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    clear
+    clear 
     ban_me
-    echo ""
     print_center -ama "BOT TOKEN REQUIRED"
-    sleep 2
+    sleep 1
     msg -bar3
     echo ""
-    read -p "Enter Token: " btoken
+    read -p "\e[1;34m$Enter Token: \e[0m" btoken
     sleep 2
-    print_center -ama "You entered: \e[1;95m$btoken\e[0m"
-    sleep 2
-    clear
-
     # save the Bot Token
     echo "$btoken" > /etc/hsm/toxic/tokenz.txt
 
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-    # Function to generate a random 12-character key
-   # generate_key() {
-   #   tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 12
-  #  }
-
-   # generate the key
-   # secretk=$(generate_key)
-
-   # Store the new key in seckey.txt
-   # echo "$secretk" > seckey.txt
-   # sudo mv -f seckey.txt /etc/hsm/toxic/
-
-   # Display a message
-  #  ban_me
- #   msg -bar
-  #  print_center -ama "SERVER KEY Manager"
-  #  msg -bar0
-  #  echo ""
-    
-  # print options menu
-  #  print_center -ama "${a12:-BOT SECRET KEY}"
-   # msg -bar3
-   # gamba="Bot secret:"
-   # echo ""
-   # while read -r line; do
-    #  echo -e "\e[1;33m$gamba\e[0m \e[1;95m$line\e[0m"
-    #  echo ""
-     # print_blu "You can use it to verify your bot ownership on Telegram."
-   #   print_center -ama " Made By TeslaSSH, t.me/teslassh"
-   #   sleep 5
-    #done < /etc/hsm/toxic/seckey.txt
     # make Ram checker
 
     make_Ram_cmd() {
@@ -276,8 +252,12 @@ echo "$memory"
     # Activate the service
     make_Ram_cmd
     make_shell_cmd
+    clear
+    ban_me
     print_center -ama "BOT IS BEING INITIALISED....."
+    msg -bar3
     progres 'run_bot'
+    echo ""
     print_pink "Cheers! Your bot is now running."
     # Search and remove raw files
     find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
