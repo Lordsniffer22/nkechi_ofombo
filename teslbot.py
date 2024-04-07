@@ -113,17 +113,10 @@ def add_user(username, password, days, user_info, chat_id):
 def remove_user(username, chat_id):
     try:
         subprocess.run(['sudo', 'userdel', '--force', username], check=True)
+        subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
         return f"{username} Has been removed successfully!"
     except subprocess.CalledProcessError as e:
         return f"🤡 {username} seems to be a command or that user does not exist.\n✌️Try a different spelling"
-
-
-def restart_udp_daemon(chat_id):
-    try:
-        subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
-        return f"\n Who else? 😳"
-    except subprocess.CalledProcessError as e:
-        return f"Failed to restart daemons."
 
 
 def reboot_server(chat_id):
@@ -240,6 +233,7 @@ def cleaner(chat_id):
             # Exclude users with expiry set to "never"
             if remaining_days <= 0:
                subprocess.run(['sudo', 'userdel', username])
+               subprocess.run(['sudo', 'systemctl', 'restart', 'udp-custom'], check=True)
         return f"I just Wiped the expired Sh*t. Sorry for them😂 "
     except subprocess.CalledProcessError as e:
         return f"Hey, i got an arror while wiping."
