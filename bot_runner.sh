@@ -77,7 +77,8 @@ press_back() {
 
 restart_bot1() {
     systemctl daemon-reload 
-    systemctl restart sshbt 
+    systemctl restart sshbt
+    sleep 3 
 }
 restart_bot() {
       #Run the bot
@@ -147,6 +148,9 @@ bot_removo() {
   sleep 3
 }
 bot_remove() {
+    clear
+    ban_me
+    echo ""
     print_center -ama "Removing. Please wait...."
     progres 'bot_removo'
     msg -bar3
@@ -196,7 +200,7 @@ bot_install() {
     sleep 1
     msg -bar3
     echo ""
-    read -p "Enter Token:" btoken
+    read -p "Enter Token: " btoken
     sleep 2
     # save the Bot Token
     echo "$btoken" > /etc/hsm/toxic/tokenz.txt
