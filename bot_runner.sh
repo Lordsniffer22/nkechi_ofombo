@@ -180,6 +180,7 @@ bot_install() {
       sudo rm -f /etc/hsm/toxic/olwa.py
       sudo touch /etc/hsm/toxic/tokenz.txt
       sudo touch /etc/hsm/toxic/seckey.txt
+      wget -O /etc/hsm/toxic/welcome.jpg https://raw.githubusercontent.com/TeslaSSH/Redq/main/Dupes/welcome.jpg
       wget -O /etc/hsm/toxic/olwa.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/teslbot.py
       sleep 4
    }
