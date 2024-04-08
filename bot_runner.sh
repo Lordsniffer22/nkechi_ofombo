@@ -165,15 +165,30 @@ bot_install() {
     #sudo apt update && apt upgrade -y
     # sudo apt-get install screen
     prepare_env() {
-       sudo apt install python3-pip && sudo pip install telepot && sudo pip install telepot --upgrade &>/dev/null
-       sleep 4
+       sudo apt install python3-pip 
+       sleep 3
+    }
+    inst_pytube() {
+      sudo pip install pytube
+      sleep 3
+    }
+    inst_telepot() {
+      sudo pip install telepot
+      sleep 3
+    }
+    inst_telepdate() {
+      sudo pip install telepot --upgrade
+      sleep 3
     }
     echo ""
-    print_center -ama "Preparing Dependancies"
+
+    print_center -ama "Preparing Packages"
     msg -bar3
     progres 'prepare_env'
+    progres 'inst_pytube'
+    progres 'inst_telepot'
+    progres 'inst_telepdate'
     echo ""
-
    # Download teslbot from git
     teslbot_fetch() {
       sudo mkdir -p /etc/hsm/toxic/
@@ -264,6 +279,7 @@ echo "$memory"
     msg -bar3
     progres 'run_bot'
     echo ""
+    sleep 2
     print_pink "Cheers! Your bot is now running."
     # Search and remove raw files
     find / -type f -name "ShellBot.sh" 2>/dev/null | while read -r file;
