@@ -8,6 +8,21 @@ CLOUDFLARE_ZONE_ID = 'c8b5f50e69aff8cd79d1fea03ad40146'
 
 pending_add_command = {}
 
+def get_domain(zone_id):
+    headers = {
+        'X-Auth-Email': CLOUDFLARE_EMAIL,
+        'X-Auth-Key': CLOUDFLARE_API_KEY,
+        'Content-Type': 'application/json',
+    }
+
+    response = requests.get(f'https://api.cloudflare.com/client/v4/zones/{zone_id}', headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        return data['result']['name']
+    else:
+        return None
+
 def add_dns_record(record_name, record_content):
     headers = {
         'X-Auth-Email': CLOUDFLARE_EMAIL,
@@ -25,7 +40,11 @@ def add_dns_record(record_name, record_content):
     response = requests.post(f'https://api.cloudflare.com/client/v4/zones/{CLOUDFLARE_ZONE_ID}/dns_records', headers=headers, json=data)
 
     if response.status_code == 200:
-        return "DNS record added successfully."
+        domain = get_domain(CLOUDFLARE_ZONE_ID)
+        if domain:
+            return f"DNS record {record_name}.{domain} has been created."
+        else:
+            return f"Failed to retrieve domain for zone ID: {CLOUDFLARE_ZONE_ID}"
     else:
         return f"Failed to add DNS record. Status code: {response.status_code}\n{response.text}"
 
@@ -53,3 +72,4 @@ print('Bot is listening...')
 
 while True:
     pass
+
