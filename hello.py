@@ -103,22 +103,22 @@ def handle(msg):
         command = msg['text']
         
         if command.lower() == 'add record':
-            bot.sendMessage(chat_id, "Please enter the DNS record name and IP address in the format [name] [IP address] (e.g., example.com 192.0.2.1):")
+            bot.sendMessage(chat_id, "Please enter the DNS record name and IP address in the format [name] [IP address] (e.g., example.com 192.0.2.1):", reply_markup=keyboard)
             pending_add_command[chat_id] = 'add record'
 
-        elif command == '/list':
+        elif command.lower == 'list records':
             response = list_dns_records()
-            bot.sendMessage(chat_id, response)
+            bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
         elif command.startswith('/remove'):
             _, record_name = command.split(' ', 1)
             response = remove_dns_record(record_name)
-            bot.sendMessage(chat_id, response)
+            bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
         elif chat_id in pending_add_command:
             record_name, record_content = command.split(' ', 1)
             response = add_dns_record(record_name, record_content)
-            bot.sendMessage(chat_id, response)
+            bot.sendMessage(chat_id, response, reply_markup=keyboard)
             del pending_add_command[chat_id]
 
 # Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your Telegram Bot token
