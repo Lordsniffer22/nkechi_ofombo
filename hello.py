@@ -59,7 +59,7 @@ def list_dns_records():
 
     if response.status_code == 200:
         data = response.json()
-        records = [f"{record['name']} - {record['content']}" for record in data['result']]
+        records = [f"{record['name']}    -    {record['content']}" for record in data['result']]
         if records:
             return "A Records:\n" + "\n".join(records)
         else:
@@ -92,13 +92,19 @@ def remove_dns_record(record_name):
 
 def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
+        # Define custom keyboard buttons with smaller size in a single row
+    keyboard = ReplyKeyboardMarkup(keyboard=[
+        [KeyboardButton(text='Add Record', resize_keyboard=True),
+         KeyboardButton(text='Remove Record', resize_keyboard=True),
+         KeyboardButton(text='List Records', resize_keyboard=True)],
+    ], resize_keyboard=True)
     
     if content_type == 'text':
         command = msg['text']
         
-        if command.startswith('/addrecord'):
+        if command.lower() == 'add record':
             bot.sendMessage(chat_id, "Please enter the DNS record name and IP address in the format [name] [IP address] (e.g., example.com 192.0.2.1):")
-            pending_add_command[chat_id] = '/addrecord'
+            pending_add_command[chat_id] = 'add record'
 
         elif command == '/list':
             response = list_dns_records()
