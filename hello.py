@@ -111,7 +111,7 @@ def handle(msg):
             response = list_dns_records()
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
-        elif command.lower() == 'remove records':
+        elif command.lower() == 'remove record':
             
             bot.sendMessage(chat_id, "Hey, to remove a record Please send me the command in the example format below:\n\n/remove john.teslassh.xyz", reply_markup=keyboard)
 
@@ -135,3 +135,4 @@ print('Bot is listening...')
 while True:
     pass
 
+s
