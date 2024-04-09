@@ -59,6 +59,7 @@ teslbot_fetch() {
 }
 
 print_yellow 'INSTALLING THE PACKAGES'
+clear
 progres 'teslbot_fetch'
 initialise() {
     chmod 640 /etc/systemd/system/flames.service
