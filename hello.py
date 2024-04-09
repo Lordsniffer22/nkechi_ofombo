@@ -1,5 +1,6 @@
 import telepot
 import requests
+from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 
 # Cloudflare API configuration
 CLOUDFLARE_API_KEY = 'a4028ce12fc7e7467b950b69ca480df447ba2'
