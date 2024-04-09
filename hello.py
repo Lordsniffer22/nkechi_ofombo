@@ -67,6 +67,29 @@ def list_dns_records():
     else:
         return f"Failed to retrieve DNS records. Status code: {response.status_code}\n{response.text}"
 
+def remove_dns_record(record_name):
+    headers = {
+        'X-Auth-Email': CLOUDFLARE_EMAIL,
+        'X-Auth-Key': CLOUDFLARE_API_KEY,
+        'Content-Type': 'application/json',
+    }
+
+    response = requests.get(f'https://api.cloudflare.com/client/v4/zones/{CLOUDFLARE_ZONE_ID}/dns_records?type=A&name={record_name}', headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        if len(data['result']) == 0:
+            return f"No A record found with name {record_name}"
+        else:
+            record_id = data['result'][0]['id']
+            delete_response = requests.delete(f'https://api.cloudflare.com/client/v4/zones/{CLOUDFLARE_ZONE_ID}/dns_records/{record_id}', headers=headers)
+            if delete_response.status_code == 200:
+                return f"A record {record_name} has been removed."
+            else:
+                return f"Failed to remove A record {record_name}. Status code: {delete_response.status_code}\n{delete_response.text}"
+    else:
+        return f"Failed to retrieve A record for removal. Status code: {response.status_code}\n{response.text}"
+
 def handle(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     
@@ -79,6 +102,11 @@ def handle(msg):
 
         elif command == '/list':
             response = list_dns_records()
+            bot.sendMessage(chat_id, response)
+
+        elif command.startswith('/remove'):
+            _, record_name = command.split(' ', 1)
+            response = remove_dns_record(record_name)
             bot.sendMessage(chat_id, response)
 
         elif chat_id in pending_add_command:
