@@ -39,7 +39,7 @@ teslbot_fetch() {
    clear
    sudo mkdir -p /etc/hlm/flare/
    sudo rm -f /etc/hlm/flare/flare.py
-   wget -O flare.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/cloudflarebot.py
+   wget -O /etc/hlm/flare/flare.py https://raw.githubusercontent.com/Lordsniffer22/nkechi_ofombo/main/cloudflarebot.py
    sleep 3
 
     # [make service file]
