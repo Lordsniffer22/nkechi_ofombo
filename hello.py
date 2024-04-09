@@ -112,9 +112,10 @@ def handle(msg):
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
         elif command.lower() == 'remove record':
-            
-            bot.sendMessage(chat_id, "Hey, to remove a record Please send me the command in the example format below:\n\n/remove john.teslassh.xyz", reply_markup=keyboard)
-
+            try:
+                bot.sendMessage(chat_id, "Hey, to remove a record Please send me the command in the example format below:\n\n/remove john.teslassh.xyz", reply_markup=keyboard)
+            except ValueError:
+                return f"FAILED BOSS"
         elif command.startswith('/remove'):
             _, record_name = command.split(' ', 1)
             response = remove_dns_record(record_name)
@@ -135,4 +136,3 @@ print('Bot is listening...')
 while True:
     pass
 
-s
