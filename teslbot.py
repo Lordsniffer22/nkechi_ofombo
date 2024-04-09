@@ -611,7 +611,7 @@ def handle(msg):
             try:
                 _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
                 response = add_user(username, password, days, user_info="A", chat_id=chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard, parse_mode="Markdown)
             except ValueError:
                 bot.sendMessage(chat_id, "You instead sent a command. Try again!", reply_markup=keyboard)
             finally:
