@@ -112,8 +112,8 @@ def handle(msg):
             bot.sendMessage(chat_id, response, reply_markup=keyboard)
 
         elif command.lower() == 'remove records':
-            responds = (f"Hey, to remove a record Please send me the command in the example format below:\n\n/remove john.teslassh.xyz")
-            bot.sendMessage(chat_id, responds, reply_markup=keyboard)
+            
+            bot.sendMessage(chat_id, "Hey, to remove a record Please send me the command in the example format below:\n\n/remove john.teslassh.xyz", reply_markup=keyboard)
 
         elif command.startswith('/remove'):
             _, record_name = command.split(' ', 1)
