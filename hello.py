@@ -6,7 +6,9 @@ CLOUDFLARE_API_KEY = 'a4028ce12fc7e7467b950b69ca480df447ba2'
 CLOUDFLARE_EMAIL = 'tariusblake@gmail.com'
 CLOUDFLARE_ZONE_ID = 'c8b5f50e69aff8cd79d1fea03ad40146'
 
-def add_dns_record(record_name, record_type, record_content, proxied=False):
+pending_add_command = {}
+
+def add_dns_record(record_name, record_content):
     headers = {
         'X-Auth-Email': CLOUDFLARE_EMAIL,
         'X-Auth-Key': CLOUDFLARE_API_KEY,
@@ -14,10 +16,10 @@ def add_dns_record(record_name, record_type, record_content, proxied=False):
     }
 
     data = {
-        'type': record_type,
+        'type': 'A',
         'name': record_name,
         'content': record_content,
-        'proxied': proxied
+        'proxied': False
     }
 
     response = requests.post(f'https://api.cloudflare.com/client/v4/zones/{CLOUDFLARE_ZONE_ID}/dns_records', headers=headers, json=data)
@@ -34,11 +36,14 @@ def handle(msg):
         command = msg['text']
         
         if command.startswith('/addrecord'):
-            _, record_name, record_type, record_content, proxied_str = command.split()
-            proxied = True if proxied_str.lower() == 'true' else False
-            
-            response = add_dns_record(record_name, record_type, record_content, proxied)
+            bot.sendMessage(chat_id, "Please enter the DNS record name and IP address in the format [name] [IP address] (e.g., example.com 192.0.2.1):")
+            pending_add_command[chat_id] = '/addrecord'
+
+        elif chat_id in pending_add_command:
+            record_name, record_content = command.split(' ', 1)
+            response = add_dns_record(record_name, record_content)
             bot.sendMessage(chat_id, response)
+            del pending_add_command[chat_id]
 
 # Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your Telegram Bot token
 bot = telepot.Bot('6486401647:AAGaY2kaQyPKkjVttkjUUeENFk5OxpaJXjE')
