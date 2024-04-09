@@ -104,7 +104,7 @@ def handle(msg):
         command = msg['text']
         
         if command.lower() == 'add record':
-            bot.sendMessage(chat_id, "Please enter the DNS record name and IP address in the format [name] [IP address] (e.g., example.com 192.0.2.1):", reply_markup=keyboard)
+            bot.sendMessage(chat_id, "Please enter the DNS record name and IP address in the format [name] [IP address] (e.g., john 192.0.2.1):", reply_markup=keyboard)
             pending_add_command[chat_id] = 'add record'
 
         elif command.lower() == 'list records':
