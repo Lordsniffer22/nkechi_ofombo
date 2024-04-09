@@ -104,7 +104,7 @@ def add_user(username, password, days, user_info, chat_id):
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip().split()[0]
 
         # Send success message with details
-        success_message = f" {username} has been added successfully!\n\nServer Details:\n──────────────────────────\nUDP Link: {server_info}:1-65535@{username}:{password}\n\nSSH WS: {server_info}:80@{username}:{password}\nproxy Ports(ws): 80\n\nWS Payload:\nGET / HTTP/1.1[crlf]Host: {server_info}[crlf]Upgrade: websocket[crlf][crlf]"
+        success_message = f" {username} has been added successfully!\n\n**Server Details:**\n──────────────────────────\nUDP Custom: \n{server_info}:1-65535@{username}:{password}\n\nSSH WS: \n{server_info}:80@{username}:{password}\n\nproxy Ports(ws): 80\n\nWS Payload:\nGET / HTTP/1.1[crlf]Host: {server_info}[crlf]Upgrade: websocket[crlf][crlf]"
         return success_message
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username} because He already exists."
