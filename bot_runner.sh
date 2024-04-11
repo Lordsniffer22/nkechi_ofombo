@@ -158,16 +158,16 @@ bot_remove() {
     print_pink "Your bot has been Uninstalled Successfully"
     sudo udp
 }
+prepare_env() {
+  sudo apt install python3-pip 
+}
 bot_install() {
     cd
+    prepare_env
     clear
     ban_me
     #sudo apt update && apt upgrade -y
     # sudo apt-get install screen
-    prepare_env() {
-       sudo apt install python3-pip 
-       sleep 3
-    }
     inst_pytube() {
       sudo pip install pytube
       sleep 3
@@ -184,7 +184,6 @@ bot_install() {
 
     print_center -ama "Preparing Packages"
     msg -bar3
-    progres 'prepare_env'
     progres 'inst_pytube'
     progres 'inst_telepot'
     progres 'inst_telepdate'
@@ -298,20 +297,7 @@ ban_me() {
   print_pink "  |_| |_____|____/|_____/_/   \_\ |____/____/|_| |_|" 
   echo ""
 }
-#check system
-os_check() {
-  if [ -f /etc/os-release ]; then
-      . /etc/os-release
-      if [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "22.04" ]]; then
-          bot_install
-      elif [[ "$NAME" = "Ubuntu" && "$VERSION_ID" = "23.10" ]]; then
-          bot_install
-      else
-          print_pink "THE BOT IS MEANT TO RUN ON UBUNTU 22.04 AND 23.10 or latest"
-          exit 1
-      fi
-  fi 
-} 
+
 install_udp_first() {
     print_center 'Bot installation will begin after this installation process'
     sleep 4
@@ -348,7 +334,7 @@ menu_real() {
       restart_bot
       ;;
     2)
-      os_check #checks os and installs bot
+      bot_install #checks os and installs bot
       ;;
     3)
       see_key
