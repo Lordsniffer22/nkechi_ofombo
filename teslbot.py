@@ -104,11 +104,8 @@ def add_user(username, password, days, user_info, chat_id):
         server_info = get_domain() or subprocess.check_output(['hostname', '-I']).decode('utf-8').strip().split()[0]
 
         # Send success message with details
-        
-        # Send success message with details
-        success_message = f"*{username}* has been added successfully!\n\n**Server Details:**\n──────────────────────────\nUDP Custom:\n`{server_info}:1-65535@{username}:{password}`\n\nSSH WS:\n`{server_info}:80@{username}:{password}`\n\nproxy Ports(ws): 80\n\nWS Payload:\n```\nGET / HTTP/1.1[crlf]Host: {server_info}[crlf]Upgrade: websocket[crlf][crlf]\n```"
+        success_message = f" {username} has been added successfully!\n\nServer Details:\n{server_info}:1-65535@{username}:{password}"
         return success_message
-
     except subprocess.CalledProcessError as e:
         return f"Failed to add user {username} because He already exists."
 
@@ -611,7 +608,7 @@ def handle(msg):
             try:
                 _, username, password, days = (pending_add_user_command + ' ' + command).split()[1:]
                 response = add_user(username, password, days, user_info="A", chat_id=chat_id)
-                bot.sendMessage(chat_id, response, reply_markup=keyboard, parse_mode="Markdown)
+                bot.sendMessage(chat_id, response, reply_markup=keyboard)
             except ValueError:
                 bot.sendMessage(chat_id, "You instead sent a command. Try again!", reply_markup=keyboard)
             finally:
